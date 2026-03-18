@@ -10,15 +10,15 @@ interface VoicingDiagramProps {
   onClick?: () => void;
 }
 
-const STRING_SPACING = 38;
-const FRET_SPACING = 42;
+const STRING_SPACING = 76;
+const FRET_SPACING = 84;
 const STRINGS = 6;
 const FRETS = 4;
-const PADDING_TOP = 38;
-const PADDING_LEFT = 30;
-const PADDING_RIGHT = 20;
-const PADDING_BOTTOM = 12;
-const DOT_R = 16;
+const PADDING_TOP = 76;
+const PADDING_LEFT = 60;
+const PADDING_RIGHT = 40;
+const PADDING_BOTTOM = 24;
+const DOT_R = 32;
 
 const totalWidth = PADDING_LEFT + STRING_SPACING * (STRINGS - 1) + PADDING_RIGHT;
 const totalHeight = PADDING_TOP + FRET_SPACING * FRETS + PADDING_BOTTOM;
@@ -70,17 +70,17 @@ export function VoicingDiagram({
       <svg viewBox={`0 0 ${totalWidth} ${totalHeight}`} width={totalWidth} height={totalHeight}>
         {/* フレット番号 */}
         {startFret > 1 && (
-          <text x={PADDING_LEFT - 5} y={PADDING_TOP + FRET_SPACING * 0.5}
-            textAnchor="end" dominantBaseline="central" fontSize={10} fill="#6b7280">
+          <text x={PADDING_LEFT - 8} y={PADDING_TOP + FRET_SPACING * 0.5}
+            textAnchor="end" dominantBaseline="central" fontSize={20} fill="#6b7280">
             {startFret}fr
           </text>
         )}
 
         {/* ナット */}
         {startFret === 1 && (
-          <rect x={PADDING_LEFT} y={PADDING_TOP - 5}
-            width={STRING_SPACING * (STRINGS - 1)} height={5}
-            fill="#374151" rx={1} />
+          <rect x={PADDING_LEFT} y={PADDING_TOP - 10}
+            width={STRING_SPACING * (STRINGS - 1)} height={10}
+            fill="#374151" rx={2} />
         )}
 
         {/* フレット線 */}
@@ -96,21 +96,21 @@ export function VoicingDiagram({
           <line key={`string-${i}`}
             x1={PADDING_LEFT + STRING_SPACING * i} y1={PADDING_TOP}
             x2={PADDING_LEFT + STRING_SPACING * i} y2={PADDING_TOP + FRET_SPACING * FRETS}
-            stroke="#6b7280" strokeWidth={1 + (STRINGS - 1 - i) * 0.3} />
+            stroke="#6b7280" strokeWidth={2 + (STRINGS - 1 - i) * 0.6} />
         ))}
 
         {/* ミュート・開放弦 */}
         {actualFrets.map((fret, strIdx) => {
           const cx = PADDING_LEFT + STRING_SPACING * strIdx;
-          const cy = PADDING_TOP - 16;
+          const cy = PADDING_TOP - 32;
           if (fret === 'x') return (
             <text key={`top-${strIdx}`} x={cx} y={cy}
               textAnchor="middle" dominantBaseline="central"
-              fontSize={13} fill="#ef4444" fontWeight={700}>×</text>
+              fontSize={26} fill="#ef4444" fontWeight={700}>×</text>
           );
           if (fret === 0) return (
-            <circle key={`top-${strIdx}`} cx={cx} cy={cy} r={6}
-              fill="none" stroke="#374151" strokeWidth={1.5} />
+            <circle key={`top-${strIdx}`} cx={cx} cy={cy} r={12}
+              fill="none" stroke="#374151" strokeWidth={3} />
           );
           return null;
         })}
@@ -135,20 +135,20 @@ export function VoicingDiagram({
               <circle cx={cx} cy={cy} r={DOT_R} fill={isRoot ? '#2563eb' : '#374151'} />
               {displayMode === 'both' ? (
                 <>
-                  <text x={cx} y={cy - 5} textAnchor="middle" dominantBaseline="central"
-                    fontSize={8.5} fill="#fff" fontWeight={700}
+                  <text x={cx} y={cy - 10} textAnchor="middle" dominantBaseline="central"
+                    fontSize={17} fill="#fff" fontWeight={700}
                     style={{ pointerEvents: 'none', userSelect: 'none' }}>
                     {noteName}
                   </text>
-                  <text x={cx} y={cy + 5} textAnchor="middle" dominantBaseline="central"
-                    fontSize={8.5} fill={isRoot ? '#bfdbfe' : '#93c5fd'}
+                  <text x={cx} y={cy + 10} textAnchor="middle" dominantBaseline="central"
+                    fontSize={17} fill={isRoot ? '#bfdbfe' : '#93c5fd'}
                     style={{ pointerEvents: 'none', userSelect: 'none' }}>
                     {degreeName}
                   </text>
                 </>
               ) : (
                 <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
-                  fontSize={9} fill="#fff" fontWeight={700}
+                  fontSize={18} fill="#fff" fontWeight={700}
                   style={{ pointerEvents: 'none', userSelect: 'none' }}>
                   {displayMode === 'degree' ? degreeName : noteName}
                 </text>

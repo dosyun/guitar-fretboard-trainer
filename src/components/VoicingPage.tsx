@@ -3,6 +3,7 @@ import { RootSelector } from './RootSelector';
 import { VoicingDiagram } from './VoicingDiagram';
 import { VOICINGS_6TH, VOICINGS_5TH, VOICINGS_4TH, VOICING_TYPE_LIST } from '../data/voicings';
 import type { ChordVoicingType } from '../data/voicings';
+import type { NoteName } from '../types';
 import type { Accidental } from '../types';
 import { Segmented } from 'antd';
 
