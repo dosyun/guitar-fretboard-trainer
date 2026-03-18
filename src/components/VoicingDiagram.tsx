@@ -127,7 +127,7 @@ export function VoicingDiagram({
           const isRoot = noteAtPos === rootIdx;
           const interval = ((noteAtPos - rootIdx) + 12) % 12;
 
-          const noteName = isRoot ? 'R' : getNoteName(noteAtPos);
+          const noteName = getNoteName(noteAtPos);
           const degreeName = DEGREE_LABELS[interval];
 
           return (
