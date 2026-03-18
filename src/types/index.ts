@@ -44,6 +44,7 @@ export interface AppSettings {
 
 // CAGED
 export type CagedFormName = 'C' | 'A' | 'G' | 'E' | 'D';
-export type ChordTone = 'R' | '3' | '5';
+export type ChordTone = 'R' | '3' | 'm3' | '5' | 'b5' | '7' | 'm7';
+export type ChordType = 'major' | '7' | 'maj7' | 'm7' | 'm7b5';
 export type PentatonicDegree = 'R' | '2' | '3' | '5' | '6';
 export type CagedQuizMode = 'identify-form' | 'place-positions' | 'identify-chord-tone';

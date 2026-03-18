@@ -1,6 +1,6 @@
 import { getOpenStringName } from '../data/fretboard';
 import { getCagedPositions, CAGED_COLORS } from '../data/caged';
-import type { CagedFormName, NoteName } from '../types';
+import type { CagedFormName, NoteName, ChordType } from '../types';
 
 interface CagedMapProps {
   maxFret: number;
@@ -8,11 +8,12 @@ interface CagedMapProps {
   selectedForms: CagedFormName[];
   showPentatonic: boolean;
   showChordTones: boolean;
+  chordType?: ChordType; // メジャー固定（デフォルト）
 }
 
 const PADDING_LEFT = 40;
 const PADDING_RIGHT = 15;
-const PADDING_TOP = 25;
+const PADDING_TOP = 35;
 const PADDING_BOTTOM = 25;
 const STRING_SPACING = 30;
 const FRET_WIDTH = 55;
@@ -28,6 +29,7 @@ export function CagedMap({
   selectedForms,
   showPentatonic,
   showChordTones,
+  chordType = 'major',
 }: CagedMapProps) {
   const totalWidth = PADDING_LEFT + NUT_WIDTH + FRET_WIDTH * maxFret + PADDING_RIGHT;
   const totalHeight = PADDING_TOP + STRING_SPACING * 5 + PADDING_BOTTOM;
@@ -45,7 +47,7 @@ export function CagedMap({
 
   // 全フォームのポジションを収集
   const allPositions = selectedForms.flatMap((formName) => {
-    const positions = getCagedPositions(formName, rootNote, maxFret);
+    const positions = getCagedPositions(formName, rootNote, maxFret, chordType);
     return positions.map((p) => ({ ...p, formName }));
   });
 

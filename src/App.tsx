@@ -12,6 +12,7 @@ import { CagedMap } from './components/CagedMap';
 import { CagedFormSelector } from './components/CagedFormSelector';
 import { CagedLegend } from './components/CagedLegend';
 import { CagedQuiz } from './components/CagedQuiz';
+import { VoicingPage } from './components/VoicingPage';
 import { HelpPage } from './components/HelpPage';
 import { ScaleMap } from './components/ScaleMap';
 import { ScaleQuiz } from './components/ScaleQuiz';
@@ -27,10 +28,10 @@ import { Tabs as AntTabs, Segmented, Switch } from 'antd';
 import type { Accidental, FretPosition, NoteName, CagedFormName } from './types';
 import './index.css';
 
-type AppView = 'map' | 'quiz' | 'caged' | 'scale' | 'help';
+type AppView = 'map' | 'quiz' | 'scale' | 'caged' | 'voicing' | 'help';
 
 function App() {
-  const [accidental, setAccidental] = useState<Accidental>('both');
+  const [accidental, setAccidental] = useState<Accidental>('flat');
   const [view, setView] = useState<AppView>('map');
   const [mapDisplay, setMapDisplay] = useState<'notes' | 'intervals'>('notes');
   const [mapRoot, setMapRoot] = useState<NoteName>('C');
@@ -213,6 +214,7 @@ function App() {
             { key: 'quiz', label: 'クイズ' },
             { key: 'scale', label: 'スケール' },
             { key: 'caged', label: 'CAGED' },
+            { key: 'voicing', label: 'ボイシング' },
             { key: 'help', label: '使い方' },
           ]}
         />
@@ -510,6 +512,11 @@ function App() {
               />
             )}
           </>
+        )}
+
+        {/* ===== ボイシングビュー ===== */}
+        {view === 'voicing' && (
+          <VoicingPage accidental={accidental} />
         )}
 
         {/* ===== 説明書ビュー ===== */}

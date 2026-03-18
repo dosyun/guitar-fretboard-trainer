@@ -1,19 +1,19 @@
-import type { CagedFormName, ChordTone, PentatonicDegree, FretPosition, NoteName } from '../types';
+import type { CagedFormName, ChordTone, ChordType, PentatonicDegree, FretPosition, NoteName } from '../types';
 import { getNoteIndex } from './fretboard';
 
 // --- 型定義 ---
 
 export interface CagedPosition {
-  string: number;       // 0=6弦, 5=1弦
-  fretOffset: number;   // ルート基準フレットからのオフセット
+  string: number;
+  fretOffset: number;
   chordTone?: ChordTone;
   pentatonic?: PentatonicDegree;
 }
 
 export interface CagedForm {
   name: CagedFormName;
-  rootString: number;   // ルート音の弦
-  rootFretForC: number; // キーCでのルートフレット
+  rootString: number;
+  rootFretForC: number;
   positions: CagedPosition[];
 }
 
@@ -27,247 +27,303 @@ export const CAGED_COLORS: Record<CagedFormName, { bg: string; border: string; l
   D: { bg: '#7c3aed', border: '#6d28d9', light: '#ddd6fe' },
 };
 
-// --- 5フォーム定義 (キーC基準) ---
-// rootFretForC: キーCでのルート音フレット位置
-// fretOffset: rootFretForCからの相対オフセット
-// コードトーン: R=ルート, 3=長3度, 5=完全5度
-// ペンタトニック: R,2,3,5,6 (メジャーペンタ = R,M2,M3,P5,M6)
+// --- コードタイプ定義 ---
 
-// 各フォームをbuildFormで構築（キーC基準の絶対フレットから自動計算）
-
-// Standard tuning MIDI: 6弦=E2(40), 5弦=A2(45), 4弦=D3(50), 3弦=G3(55), 2弦=B3(59), 1弦=E4(64)
-// C major pentatonic: C(0), D(2), E(4), G(7), A(9) (mod 12)
-// C major chord: C(0), E(4), G(7)
-
-// Helper: given string index and fret, what note index (0-11)?
-function noteAt(s: number, f: number): number {
-  const tuning = [40, 45, 50, 55, 59, 64];
-  return (tuning[s] + f) % 12;
+export interface ChordTypeDefinition {
+  name: ChordType;
+  label: string;
 }
 
-// Build CAGED forms properly
-interface RawPosition {
-  string: number;
-  fret: number;
+export const CHORD_TYPES: Record<ChordType, ChordTypeDefinition> = {
+  major: { name: 'major', label: 'メジャー' },
+  '7':   { name: '7',     label: '7th' },
+  maj7:  { name: 'maj7',  label: 'M7' },
+  m7:    { name: 'm7',    label: 'm7' },
+  m7b5:  { name: 'm7b5',  label: 'm7(♭5)' },
+};
+
+export const CHORD_TYPE_LIST: ChordType[] = ['major', '7', 'maj7', 'm7', 'm7b5'];
+
+// --- 手動フォーム定義 ---
+// 全てキーC基準。fretOffsetはrootFretForCからの相対値。
+// 各フォーム×コードタイプのコードトーンを正確に定義。
+const TUNING = [40, 45, 50, 55, 59, 64];
+
+function noteAt(s: number, fret: number): number {
+  return (TUNING[s] + fret) % 12;
 }
 
+// Chord type intervals (semitones from root → tone label)
+const CHORD_INTERVALS: Record<ChordType, Map<number, ChordTone>> = {
+  major: new Map([[0, 'R'], [4, '3'], [7, '5']]),
+  '7':   new Map([[0, 'R'], [4, '3'], [7, '5'], [10, 'm7']]),
+  maj7:  new Map([[0, 'R'], [4, '3'], [7, '5'], [11, '7']]),
+  m7:    new Map([[0, 'R'], [3, 'm3'], [7, '5'], [10, 'm7']]),
+  m7b5:  new Map([[0, 'R'], [3, 'm3'], [6, 'b5'], [10, 'm7']]),
+};
+
+// Pentatonic (major): 0=R, 2=2, 4=3, 7=5, 9=6
+const PENTA_MAP = new Map<number, PentatonicDegree>([[0, 'R'], [2, '2'], [4, '3'], [7, '5'], [9, '6']]);
+
+// Each CAGED form defined as: rootString, rootFretForC, and the SHAPE
+// (which string+fretOffset positions to USE, based on the open chord shape)
+// These positions are the "playable" positions in the form.
+interface FormShape {
+  name: CagedFormName;
+  rootString: number;
+  rootFretForC: number;
+  // All positions in the form (string, fretOffset from rootFret)
+  // These are ALL the frets a player would use in this shape
+  shape: { string: number; fretOffset: number }[];
+}
+
+// Define shapes based on traditional CAGED open chord fingerings
+const FORM_SHAPES: FormShape[] = [
+  {
+    // C shape: open C chord = x 3 2 0 1 0
+    name: 'C', rootString: 1, rootFretForC: 3,
+    shape: [
+      { string: 1, fretOffset: 0 },    // 5弦3F
+      { string: 2, fretOffset: -2 },   // 4弦1F (for m3)
+      { string: 2, fretOffset: -1 },   // 4弦2F
+      { string: 3, fretOffset: -3 },   // 3弦0F
+      { string: 3, fretOffset: -2 },   // 3弦1F (for b5)
+      { string: 3, fretOffset: -1 },   // 3弦2F
+      { string: 3, fretOffset: 0 },    // 3弦3F (for m7)
+      { string: 4, fretOffset: -3 },   // 2弦0F (for maj7)
+      { string: 4, fretOffset: -2 },   // 2弦1F
+      { string: 5, fretOffset: -4 },   // 1弦-1F → skip if < 0 (for m3: Eb)
+      { string: 5, fretOffset: -3 },   // 1弦0F
+      { string: 5, fretOffset: -2 },   // 1弦1F
+    ],
+  },
+  {
+    // A shape: open A chord = x 0 2 2 2 0, barre version at fret 3 for C
+    name: 'A', rootString: 1, rootFretForC: 3,
+    shape: [
+      { string: 1, fretOffset: 0 },    // 5弦3F (R)
+      { string: 2, fretOffset: 2 },    // 4弦5F
+      { string: 2, fretOffset: 1 },    // 4弦4F (for m7 of some keys)
+      { string: 3, fretOffset: 2 },    // 3弦5F
+      { string: 3, fretOffset: 1 },    // 3弦4F (for maj7, m3)
+      { string: 3, fretOffset: 0 },    // 3弦3F (for m7)
+      { string: 4, fretOffset: 2 },    // 2弦5F
+      { string: 4, fretOffset: 1 },    // 2弦4F (for m3)
+      { string: 5, fretOffset: 0 },    // 1弦3F (barre)
+      { string: 5, fretOffset: -1 },   // 1弦2F (for 7th)
+    ],
+  },
+  {
+    // G shape: open G chord = 3 2 0 0 0 3 → for C at 8th fret area
+    name: 'G', rootString: 0, rootFretForC: 8,
+    shape: [
+      { string: 0, fretOffset: 0 },    // 6弦8F (R)
+      { string: 1, fretOffset: -1 },   // 5弦7F
+      { string: 1, fretOffset: -2 },   // 5弦6F (for m3 of some keys)
+      { string: 2, fretOffset: -3 },   // 4弦5F
+      { string: 2, fretOffset: -2 },   // 4弦6F (for m3)
+      { string: 2, fretOffset: 0 },    // 4弦8F (for m7)
+      { string: 3, fretOffset: -3 },   // 3弦5F
+      { string: 3, fretOffset: -2 },   // 3弦6F (for b5)
+      { string: 4, fretOffset: -3 },   // 2弦5F
+      { string: 5, fretOffset: 0 },    // 1弦8F
+      { string: 5, fretOffset: -1 },   // 1弦7F (for maj7)
+      { string: 5, fretOffset: -2 },   // 1弦6F (for m7)
+    ],
+  },
+  {
+    // E shape: open E chord = 0 2 2 1 0 0 → barre at 8 for C
+    name: 'E', rootString: 0, rootFretForC: 8,
+    shape: [
+      { string: 0, fretOffset: 0 },    // 6弦8F (R)
+      { string: 1, fretOffset: 2 },    // 5弦10F
+      { string: 1, fretOffset: 1 },    // 5弦9F (for m7 of some keys)
+      { string: 2, fretOffset: 2 },    // 4弦10F
+      { string: 2, fretOffset: 1 },    // 4弦9F (for m3, b5)
+      { string: 2, fretOffset: 0 },    // 4弦8F (for m7)
+      { string: 3, fretOffset: 1 },    // 3弦9F
+      { string: 3, fretOffset: 0 },    // 3弦8F (for m3)
+      { string: 4, fretOffset: 0 },    // 2弦8F
+      { string: 4, fretOffset: -1 },   // 2弦7F (for maj7)
+      { string: 5, fretOffset: 0 },    // 1弦8F
+      { string: 5, fretOffset: -2 },   // 1弦6F (for m7)
+    ],
+  },
+  {
+    // D shape: open D chord = x x 0 2 3 2 → for C at 10th fret area
+    name: 'D', rootString: 2, rootFretForC: 10,
+    shape: [
+      { string: 2, fretOffset: -2 },   // 4弦8F (for m7)
+      { string: 2, fretOffset: 0 },    // 4弦10F (R)
+      { string: 3, fretOffset: 2 },    // 3弦12F
+      { string: 3, fretOffset: 1 },    // 3弦11F (for maj7, m3)
+      { string: 4, fretOffset: 3 },    // 2弦13F
+      { string: 4, fretOffset: 2 },    // 2弦12F (for m3)
+      { string: 4, fretOffset: 1 },    // 2弦11F (for m7)
+      { string: 5, fretOffset: 2 },    // 1弦12F
+      { string: 5, fretOffset: 1 },    // 1弦11F (for m3)
+    ],
+  },
+];
+
+// Pentatonic shapes (major pentatonic, key of C)
+const PENTA_SHAPES: Record<CagedFormName, { string: number; fretOffset: number }[]> = {
+  C: [
+    { string: 0, fretOffset: -3 }, { string: 0, fretOffset: 0 },
+    { string: 1, fretOffset: -3 }, { string: 1, fretOffset: 0 },
+    { string: 2, fretOffset: -3 }, { string: 2, fretOffset: -1 },
+    { string: 3, fretOffset: -3 }, { string: 3, fretOffset: -1 },
+    { string: 4, fretOffset: -2 }, { string: 4, fretOffset: 0 },
+    { string: 5, fretOffset: -3 }, { string: 5, fretOffset: 0 },
+  ],
+  A: [
+    { string: 0, fretOffset: 0 }, { string: 0, fretOffset: 2 },
+    { string: 1, fretOffset: 0 }, { string: 1, fretOffset: 2 },
+    { string: 2, fretOffset: -1 }, { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: -1 }, { string: 3, fretOffset: 2 },
+    { string: 4, fretOffset: 0 }, { string: 4, fretOffset: 2 },
+    { string: 5, fretOffset: 0 }, { string: 5, fretOffset: 2 },
+  ],
+  G: [
+    { string: 0, fretOffset: -3 }, { string: 0, fretOffset: 0 },
+    { string: 1, fretOffset: -3 }, { string: 1, fretOffset: -1 },
+    { string: 2, fretOffset: -3 }, { string: 2, fretOffset: -1 },
+    { string: 3, fretOffset: -3 }, { string: 3, fretOffset: -1 },
+    { string: 4, fretOffset: -3 }, { string: 4, fretOffset: 0 },
+    { string: 5, fretOffset: -3 }, { string: 5, fretOffset: 0 },
+  ],
+  E: [
+    { string: 0, fretOffset: 0 }, { string: 0, fretOffset: 2 },
+    { string: 1, fretOffset: -1 }, { string: 1, fretOffset: 2 },
+    { string: 2, fretOffset: -1 }, { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: -1 }, { string: 3, fretOffset: 1 },
+    { string: 4, fretOffset: 0 }, { string: 4, fretOffset: 2 },
+    { string: 5, fretOffset: 0 }, { string: 5, fretOffset: 2 },
+  ],
+  D: [
+    { string: 1, fretOffset: 0 }, { string: 1, fretOffset: 2 },
+    { string: 2, fretOffset: 0 }, { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: 0 }, { string: 3, fretOffset: 2 },
+    { string: 4, fretOffset: 0 }, { string: 4, fretOffset: 3 },
+    { string: 5, fretOffset: 0 }, { string: 5, fretOffset: 2 },
+  ],
+};
+
+/** フォームをビルド: shapeの各ポジションが指定コードタイプの構成音かチェック */
 function buildForm(
-  name: CagedFormName,
-  rootString: number,
-  rootFretForC: number,
-  chordPositions: RawPosition[],
-  pentaPositions: RawPosition[],
+  formShape: FormShape,
+  chordType: ChordType,
 ): CagedForm {
+  const intervals = CHORD_INTERVALS[chordType];
+  const rootNoteC = 0; // C = 0
   const positions: CagedPosition[] = [];
   const seen = new Set<string>();
 
-  // Chord tone intervals: 0=R, 4=3, 7=5
-  const chordMap: Record<number, ChordTone> = { 0: 'R', 4: '3', 7: '5' };
-  // Penta intervals: 0=R, 2=2, 4=3, 7=5, 9=6
-  const pentaMap: Record<number, PentatonicDegree> = { 0: 'R', 2: '2', 4: '3', 7: '5', 9: '6' };
-
-  for (const p of chordPositions) {
-    const key = `${p.string}-${p.fret}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    const interval = noteAt(p.string, p.fret);
-    // interval relative to C (note index 0)
-    const ct = chordMap[interval];
-    const pt = pentaMap[interval];
-    positions.push({
-      string: p.string,
-      fretOffset: p.fret - rootFretForC,
-      chordTone: ct,
-      pentatonic: pt,
-    });
-  }
-
-  for (const p of pentaPositions) {
-    const key = `${p.string}-${p.fret}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    const interval = noteAt(p.string, p.fret);
-    const pt = pentaMap[interval];
-    if (pt) {
-      positions.push({
-        string: p.string,
-        fretOffset: p.fret - rootFretForC,
-        pentatonic: pt,
-      });
+  // コードトーン
+  for (const sp of formShape.shape) {
+    const fret = formShape.rootFretForC + sp.fretOffset;
+    if (fret < 0) continue;
+    const noteIdx = noteAt(sp.string, fret);
+    const interval = (noteIdx - rootNoteC + 12) % 12;
+    const tone = intervals.get(interval);
+    if (tone) {
+      const key = `${sp.string}-${sp.fretOffset}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        const pentaDeg = PENTA_MAP.get(interval);
+        positions.push({
+          string: sp.string,
+          fretOffset: sp.fretOffset,
+          chordTone: tone,
+          pentatonic: pentaDeg,
+        });
+      }
     }
   }
 
-  return { name, rootString, rootFretForC, positions };
+  // ペンタトニック
+  const pentaShape = PENTA_SHAPES[formShape.name];
+  for (const sp of pentaShape) {
+    const fret = formShape.rootFretForC + sp.fretOffset;
+    if (fret < 0) continue;
+    const noteIdx = noteAt(sp.string, fret);
+    const interval = (noteIdx - rootNoteC + 12) % 12;
+    const pentaDeg = PENTA_MAP.get(interval);
+    if (pentaDeg) {
+      const key = `${sp.string}-${sp.fretOffset}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        positions.push({
+          string: sp.string,
+          fretOffset: sp.fretOffset,
+          pentatonic: pentaDeg,
+        });
+      }
+    }
+  }
+
+  return {
+    name: formShape.name,
+    rootString: formShape.rootString,
+    rootFretForC: formShape.rootFretForC,
+    positions,
+  };
 }
 
-// C form (open C shape): frets 0-3, root on 5弦3F
-const C_FORM_DEF = buildForm('C', 1, 3,
-  // Chord: C major open shape
-  [
-    { string: 1, fret: 3 },  // C (R)
-    { string: 2, fret: 2 },  // E (3)
-    { string: 3, fret: 0 },  // G (5)  -- wait, 3弦0F = G
-    { string: 4, fret: 1 },  // C (R)
-    { string: 5, fret: 0 },  // E (3)
-  ],
-  // Pentatonic pattern around C form
-  [
-    { string: 0, fret: 0 },  // E (3)
-    { string: 0, fret: 3 },  // G (5)
-    { string: 1, fret: 0 },  // A (6)
-    { string: 1, fret: 2 },  // B → not penta, skip
-    { string: 1, fret: 3 },  // C (R)
-    { string: 2, fret: 0 },  // D (2)
-    { string: 2, fret: 2 },  // E (3)
-    { string: 3, fret: 0 },  // G (5)
-    { string: 3, fret: 2 },  // A (6)
-    { string: 4, fret: 0 },  // B → not penta
-    { string: 4, fret: 1 },  // C (R)
-    { string: 4, fret: 3 },  // D (2)
-    { string: 5, fret: 0 },  // E (3)
-    { string: 5, fret: 3 },  // G (5)
-  ],
-);
+// --- エクスポート ---
 
-// A form: frets 3-5 for key of C, root on 5弦3F (same string as C, connects)
-// A shape barre at 3rd fret
-const A_FORM_DEF = buildForm('A', 1, 3,
-  [
-    { string: 1, fret: 3 },  // C (R)
-    { string: 2, fret: 5 },  // G (5)
-    { string: 3, fret: 5 },  // C (R)
-    { string: 4, fret: 5 },  // E (3)
-    { string: 5, fret: 3 },  // G (5) -- barre
-  ],
-  [
-    { string: 0, fret: 3 },  // G (5)
-    { string: 0, fret: 5 },  // A (6)
-    { string: 1, fret: 3 },  // C (R)
-    { string: 1, fret: 5 },  // D (2)
-    { string: 2, fret: 2 },  // E (3)
-    { string: 2, fret: 5 },  // G (5)
-    { string: 3, fret: 2 },  // A (6)
-    { string: 3, fret: 5 },  // C (R)
-    { string: 4, fret: 3 },  // D (2)
-    { string: 4, fret: 5 },  // E (3)
-    { string: 5, fret: 3 },  // G (5)
-    { string: 5, fret: 5 },  // A (6)
-  ],
-);
-
-// G form: frets 5-8, root on 6弦8F
-const G_FORM_DEF = buildForm('G', 0, 8,
-  [
-    { string: 0, fret: 8 },  // C (R)
-    { string: 1, fret: 7 },  // E (3)
-    { string: 2, fret: 5 },  // G (5)
-    { string: 3, fret: 5 },  // C (R)
-    { string: 4, fret: 5 },  // E (3)
-    { string: 5, fret: 8 },  // C (R)
-  ],
-  [
-    { string: 0, fret: 5 },  // A (6)
-    { string: 0, fret: 7 },  // B → not penta... wait 6弦7F = B. skip
-    { string: 0, fret: 8 },  // C (R)
-    { string: 1, fret: 5 },  // D (2)
-    { string: 1, fret: 7 },  // E (3)
-    { string: 2, fret: 5 },  // G (5)
-    { string: 2, fret: 7 },  // A (6)
-    { string: 3, fret: 5 },  // C (R)
-    { string: 3, fret: 7 },  // D (2)
-    { string: 4, fret: 5 },  // E (3)
-    { string: 4, fret: 8 },  // G (5)
-    { string: 5, fret: 5 },  // A (6)
-    { string: 5, fret: 8 },  // C (R)
-  ],
-);
-
-// E form: frets 7-10, root on 6弦8F
-const E_FORM_DEF = buildForm('E', 0, 8,
-  [
-    { string: 0, fret: 8 },   // C (R)
-    { string: 1, fret: 10 },  // G (5)
-    { string: 2, fret: 10 },  // C (R)
-    { string: 3, fret: 9 },   // E (3)
-    { string: 4, fret: 8 },   // G (5)  -- wait 2弦8F = (59+8)%12 = 67%12 = 7 = G. yes
-    { string: 5, fret: 8 },   // C (R)
-  ],
-  [
-    { string: 0, fret: 7 },   // B → not penta. 6弦7F = (40+7)%12=47%12=11=B. skip
-    { string: 0, fret: 8 },   // C (R)
-    { string: 0, fret: 10 },  // D (2)
-    { string: 1, fret: 7 },   // E (3)
-    { string: 1, fret: 10 },  // G (5)
-    { string: 2, fret: 7 },   // A (6)
-    { string: 2, fret: 10 },  // C (R)
-    { string: 3, fret: 7 },   // D (2)
-    { string: 3, fret: 9 },   // E (3)
-    { string: 4, fret: 8 },   // G (5) -- (59+8)%12=7=G yes
-    { string: 4, fret: 10 },  // A (6)
-    { string: 5, fret: 8 },   // C (R)
-    { string: 5, fret: 10 },  // D (2)
-  ],
-);
-
-// D form: root on 4弦10F for key of C
-const D_FORM_FINAL = buildForm('D', 2, 10,
-  [
-    { string: 2, fret: 10 },  // C (R)
-    { string: 3, fret: 12 },  // G (5)
-    { string: 4, fret: 13 },  // C (R) -- may exceed 12F but that's ok
-    { string: 5, fret: 12 },  // E (3)
-  ],
-  [
-    { string: 1, fret: 10 },  // G (5) -- (45+10)%12=55%12=7=G ✓
-    { string: 1, fret: 12 },  // A (6)
-    { string: 2, fret: 10 },  // C (R)
-    { string: 2, fret: 12 },  // D (2)
-    { string: 3, fret: 10 },  // (55+10)%12=65%12=5=F → not penta, skip
-    { string: 3, fret: 12 },  // G (5)
-    { string: 4, fret: 10 },  // A (6)
-    { string: 4, fret: 13 },  // C (R)
-    { string: 5, fret: 10 },  // D (2)
-    { string: 5, fret: 12 },  // E (3)
-  ],
-);
-
-// Export all forms
-export const CAGED_FORMS: Record<CagedFormName, CagedForm> = {
-  C: C_FORM_DEF,
-  A: A_FORM_DEF,
-  G: G_FORM_DEF,
-  E: E_FORM_DEF,
-  D: D_FORM_FINAL,
-};
+export const CAGED_FORMS: Record<CagedFormName, CagedForm> = Object.fromEntries(
+  FORM_SHAPES.map((fs) => [fs.name, buildForm(fs, 'major')])
+) as Record<CagedFormName, CagedForm>;
 
 export const CAGED_ORDER: CagedFormName[] = ['C', 'A', 'G', 'E', 'D'];
 
 // --- ユーティリティ ---
 
-/** キーCからの半音差を計算 */
 function getTranspose(rootNote: NoteName): number {
-  return getNoteIndex(rootNote); // C=0, C#=1, D=2, ...
+  return getNoteIndex(rootNote);
 }
 
-/** CAGEDフォームを任意のキーに転調した絶対ポジションを取得 */
+/** CAGEDフォームを任意のキー・コードタイプで取得 */
 export function getCagedPositions(
   formName: CagedFormName,
   rootNote: NoteName,
   maxFret: number = 22,
+  chordType: ChordType = 'major',
 ): { pos: FretPosition; chordTone?: ChordTone; pentatonic?: PentatonicDegree }[] {
-  const form = CAGED_FORMS[formName];
+  const formShape = FORM_SHAPES.find((fs) => fs.name === formName)!;
+  const form = buildForm(formShape, chordType);
   const transpose = getTranspose(rootNote);
 
-  return form.positions
-    .map((p) => {
-      const fret = form.rootFretForC + p.fretOffset + transpose;
-      return {
-        pos: { string: p.string, fret },
-        chordTone: p.chordTone,
-        pentatonic: p.pentatonic,
-      };
-    })
-    .filter((p) => p.pos.fret >= 0 && p.pos.fret <= maxFret);
+  // フォームの自然なルートフレット位置を計算し、表示範囲内に収める
+  const naturalRootFret = form.rootFretForC + transpose;
+  let adjustedRootFret = naturalRootFret;
+  while (adjustedRootFret > maxFret) adjustedRootFret -= 12;
+  while (adjustedRootFret < 0) adjustedRootFret += 12;
+
+  const results: { pos: FretPosition; chordTone?: ChordTone; pentatonic?: PentatonicDegree }[] = [];
+  const seen = new Set<string>();
+
+  // 自然な位置と+12オクターブ上の位置を表示
+  for (const rootOffset of [0, 12]) {
+    const rootFret = adjustedRootFret + rootOffset;
+    for (const p of form.positions) {
+      const fret = rootFret + p.fretOffset;
+      if (fret >= 0 && fret <= maxFret) {
+        const key = `${p.string}-${fret}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          results.push({
+            pos: { string: p.string, fret },
+            chordTone: p.chordTone,
+            pentatonic: p.pentatonic,
+          });
+        }
+      }
+    }
+  }
+
+  return results;
 }
 
 /** コードトーンのみ取得 */
@@ -275,8 +331,9 @@ export function getCagedChordTones(
   formName: CagedFormName,
   rootNote: NoteName,
   maxFret: number = 22,
+  chordType: ChordType = 'major',
 ) {
-  return getCagedPositions(formName, rootNote, maxFret).filter((p) => p.chordTone);
+  return getCagedPositions(formName, rootNote, maxFret, chordType).filter((p) => p.chordTone);
 }
 
 /** ペンタトニック音のみ取得 */
@@ -284,14 +341,15 @@ export function getCagedPentatonic(
   formName: CagedFormName,
   rootNote: NoteName,
   maxFret: number = 22,
+  chordType: ChordType = 'major',
 ) {
-  return getCagedPositions(formName, rootNote, maxFret).filter((p) => p.pentatonic);
+  return getCagedPositions(formName, rootNote, maxFret, chordType).filter((p) => p.pentatonic);
 }
 
 /** 全5フォームを取得 */
-export function getAllCagedForms(rootNote: NoteName, maxFret: number = 22) {
+export function getAllCagedForms(rootNote: NoteName, maxFret: number = 22, chordType: ChordType = 'major') {
   return CAGED_ORDER.map((name) => ({
     name,
-    positions: getCagedPositions(name, rootNote, maxFret),
+    positions: getCagedPositions(name, rootNote, maxFret, chordType),
   }));
 }
