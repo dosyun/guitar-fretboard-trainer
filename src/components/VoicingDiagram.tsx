@@ -4,28 +4,26 @@ import type { NoteName } from '../types';
 interface VoicingDiagramProps {
   voicing: { label: string; frets: (number | 'x')[] };
   rootNote: NoteName;
-  displayMode?: 'note' | 'degree';
-  absolute?: boolean; // trueのときfretsをそのまま使う（オープンコード用）
+  displayMode?: 'note' | 'degree' | 'both';
+  absolute?: boolean;
   selected?: boolean;
   onClick?: () => void;
 }
 
-const STRING_SPACING = 26;
-const FRET_SPACING = 28;
+const STRING_SPACING = 30;
+const FRET_SPACING = 32;
 const STRINGS = 6;
 const FRETS = 4;
-const PADDING_TOP = 30;
-const PADDING_LEFT = 20;
-const PADDING_RIGHT = 16;
+const PADDING_TOP = 32;
+const PADDING_LEFT = 24;
+const PADDING_RIGHT = 18;
 const PADDING_BOTTOM = 10;
-const DOT_R = 9;
+const DOT_R = 13;
 
 const totalWidth = PADDING_LEFT + STRING_SPACING * (STRINGS - 1) + PADDING_RIGHT;
 const totalHeight = PADDING_TOP + FRET_SPACING * FRETS + PADDING_BOTTOM;
 
 const NOTE_NAMES_FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-
-// 弦の開放音（MIDIノート番号 mod 12）: 6弦→1弦の順
 const OPEN_STRINGS = [4, 9, 2, 7, 11, 4]; // 6弦→1弦: E,A,D,G,B,E
 
 const DEGREE_LABELS: Record<number, string> = {
@@ -37,26 +35,26 @@ function getNoteName(semitone: number): string {
   return NOTE_NAMES_FLAT[((semitone % 12) + 12) % 12];
 }
 
-export function VoicingDiagram({ voicing, rootNote, displayMode = 'note', absolute = false, selected, onClick }: VoicingDiagramProps) {
+export function VoicingDiagram({
+  voicing, rootNote, displayMode = 'note', absolute = false, selected, onClick,
+}: VoicingDiagramProps) {
   const rootIdx = getNoteIndex(rootNote);
 
   let actualFrets: (number | 'x')[];
   if (absolute) {
-    actualFrets = voicing.frets.map(f => f);
+    actualFrets = [...voicing.frets];
   } else {
     const rootStringIdx = voicing.frets.findIndex(f => f === 0);
     const rootOpenNote = OPEN_STRINGS[rootStringIdx];
     let baseFret = (rootIdx - rootOpenNote + 12) % 12;
     if (baseFret === 0) baseFret = 12;
-    actualFrets = voicing.frets.map((offset) => {
-      if (offset === 'x') return 'x';
-      return baseFret + (offset as number);
-    });
+    actualFrets = voicing.frets.map(offset =>
+      offset === 'x' ? 'x' : baseFret + (offset as number)
+    );
   }
 
   const nonZeroFrets = actualFrets.filter((f): f is number => f !== 'x' && f > 0);
   const minFret = nonZeroFrets.length > 0 ? Math.min(...nonZeroFrets) : 1;
-  // 開放弦がある場合はナットから表示
   const hasOpenString = actualFrets.some(f => f === 0);
   const startFret = hasOpenString ? 1 : minFret;
 
@@ -73,7 +71,7 @@ export function VoicingDiagram({ voicing, rootNote, displayMode = 'note', absolu
         {/* フレット番号 */}
         {startFret > 1 && (
           <text x={PADDING_LEFT - 5} y={PADDING_TOP + FRET_SPACING * 0.5}
-            textAnchor="end" dominantBaseline="central" fontSize={9} fill="#6b7280">
+            textAnchor="end" dominantBaseline="central" fontSize={10} fill="#6b7280">
             {startFret}fr
           </text>
         )}
@@ -104,11 +102,11 @@ export function VoicingDiagram({ voicing, rootNote, displayMode = 'note', absolu
         {/* ミュート・開放弦 */}
         {actualFrets.map((fret, strIdx) => {
           const cx = PADDING_LEFT + STRING_SPACING * strIdx;
-          const cy = PADDING_TOP - 15;
+          const cy = PADDING_TOP - 16;
           if (fret === 'x') return (
             <text key={`top-${strIdx}`} x={cx} y={cy}
               textAnchor="middle" dominantBaseline="central"
-              fontSize={12} fill="#ef4444" fontWeight={700}>×</text>
+              fontSize={13} fill="#ef4444" fontWeight={700}>×</text>
           );
           if (fret === 0) return (
             <circle key={`top-${strIdx}`} cx={cx} cy={cy} r={6}
@@ -128,27 +126,42 @@ export function VoicingDiagram({ voicing, rootNote, displayMode = 'note', absolu
           const noteAtPos = (OPEN_STRINGS[strIdx] + (fret as number)) % 12;
           const isRoot = noteAtPos === rootIdx;
           const interval = ((noteAtPos - rootIdx) + 12) % 12;
-          const label = displayMode === 'degree'
-            ? DEGREE_LABELS[interval]
-            : (isRoot ? 'R' : getNoteName(noteAtPos));
+
+          const noteName = isRoot ? 'R' : getNoteName(noteAtPos);
+          const degreeName = DEGREE_LABELS[interval];
 
           return (
             <g key={`dot-${strIdx}`}>
               <circle cx={cx} cy={cy} r={DOT_R} fill={isRoot ? '#2563eb' : '#374151'} />
-              <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
-                fontSize={7} fill="#fff" fontWeight={700}
-                style={{ pointerEvents: 'none', userSelect: 'none' }}>
-                {label}
-              </text>
+              {displayMode === 'both' ? (
+                <>
+                  <text x={cx} y={cy - 3.5} textAnchor="middle" dominantBaseline="central"
+                    fontSize={7.5} fill="#fff" fontWeight={700}
+                    style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                    {noteName}
+                  </text>
+                  <text x={cx} y={cy + 4.5} textAnchor="middle" dominantBaseline="central"
+                    fontSize={6} fill={isRoot ? '#bfdbfe' : '#9ca3af'}
+                    style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                    {degreeName}
+                  </text>
+                </>
+              ) : (
+                <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
+                  fontSize={8} fill="#fff" fontWeight={700}
+                  style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                  {displayMode === 'degree' ? degreeName : noteName}
+                </text>
+              )}
             </g>
           );
         })}
       </svg>
 
       {/* フレット番号列 */}
-      <div className="text-xs text-gray-400 mt-0.5">
+      <div className="text-xs text-gray-400 mt-0.5 flex">
         {actualFrets.map((f, i) => (
-          <span key={i} className="inline-block text-center" style={{ width: STRING_SPACING }}>
+          <span key={i} className="text-center" style={{ width: STRING_SPACING }}>
             {f === 'x' ? '×' : f}
           </span>
         ))}

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { RootSelector } from './RootSelector';
 import { VoicingDiagram } from './VoicingDiagram';
-import { VOICINGS_6TH, VOICINGS_5TH, VOICINGS_4TH, OPEN_CHORDS, VOICING_TYPE_LIST } from '../data/voicings';
+import { VOICINGS_6TH, VOICINGS_5TH, VOICINGS_4TH, VOICING_TYPE_LIST } from '../data/voicings';
 import type { ChordVoicingType } from '../data/voicings';
-import type { Accidental, NoteName } from '../types';
+import type { Accidental } from '../types';
 import { Segmented } from 'antd';
 
 interface VoicingPageProps {
@@ -22,7 +22,7 @@ const TYPE_LABELS: Record<ChordVoicingType, string> = {
 export function VoicingPage({ accidental }: VoicingPageProps) {
   const [rootNote, setRootNote] = useState<NoteName>('C');
   const [selectedType, setSelectedType] = useState<ChordVoicingType>('major');
-  const [displayMode, setDisplayMode] = useState<'note' | 'degree'>('note');
+  const [displayMode, setDisplayMode] = useState<'note' | 'degree' | 'both'>('both');
 
   const voicing6 = VOICINGS_6TH.find((v) => v.type === selectedType)!;
   const voicing5 = VOICINGS_5TH.find((v) => v.type === selectedType)!;
@@ -57,10 +57,11 @@ export function VoicingPage({ accidental }: VoicingPageProps) {
           <Segmented
             size="small"
             value={displayMode}
-            onChange={(v) => setDisplayMode(v as 'note' | 'degree')}
+            onChange={(v) => setDisplayMode(v as 'note' | 'degree' | 'both')}
             options={[
               { label: '音名', value: 'note' },
               { label: '度数', value: 'degree' },
+              { label: '両方', value: 'both' },
             ]}
           />
         </div>
@@ -85,33 +86,6 @@ export function VoicingPage({ accidental }: VoicingPageProps) {
         </div>
       </div>
 
-      {/* オープンコードセクション */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
-        <h2 className="text-sm font-bold text-gray-700 mb-3">オープンコード</h2>
-        <div className="flex justify-center mb-3">
-          <Segmented
-            size="small"
-            value={displayMode}
-            onChange={(v) => setDisplayMode(v as 'note' | 'degree')}
-            options={[
-              { label: '音名', value: 'note' },
-              { label: '度数', value: 'degree' },
-            ]}
-          />
-        </div>
-        <div className="flex flex-wrap justify-center gap-2">
-          {OPEN_CHORDS.map((chord) => (
-            <VoicingDiagram
-              key={chord.name}
-              voicing={chord}
-              rootNote={chord.root as NoteName}
-              displayMode={displayMode}
-              absolute
-            />
-          ))}
-        </div>
-      </div>
-
       {/* 凡例 */}
       <div className="bg-white rounded-xl shadow-sm p-4">
         <h3 className="text-sm font-bold text-gray-700 mb-2">構成音の見方</h3>
@@ -124,7 +98,7 @@ export function VoicingPage({ accidental }: VoicingPageProps) {
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-5 h-5 rounded-full bg-gray-800 flex items-center justify-center">
-              <span className="text-white text-[9px] font-bold">G</span>
+              <span className="text-white text-[9px] font-bold">3</span>
             </div>
             <span>その他の構成音</span>
           </div>
@@ -137,6 +111,7 @@ export function VoicingPage({ accidental }: VoicingPageProps) {
             <span>開放弦</span>
           </div>
         </div>
+        <p className="text-xs text-gray-400 mt-2">「両方」モード: 上段=音名、下段=度数</p>
       </div>
     </div>
   );

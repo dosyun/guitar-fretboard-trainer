@@ -13,6 +13,7 @@ import { CagedFormSelector } from './components/CagedFormSelector';
 import { CagedLegend } from './components/CagedLegend';
 import { CagedQuiz } from './components/CagedQuiz';
 import { VoicingPage } from './components/VoicingPage';
+import { OpenChordPage } from './components/OpenChordPage';
 import { HelpPage } from './components/HelpPage';
 import { ScaleMap } from './components/ScaleMap';
 import { ScaleQuiz } from './components/ScaleQuiz';
@@ -28,7 +29,7 @@ import { Tabs as AntTabs, Segmented, Switch } from 'antd';
 import type { Accidental, FretPosition, NoteName, CagedFormName } from './types';
 import './index.css';
 
-type AppView = 'map' | 'quiz' | 'scale' | 'caged' | 'voicing' | 'help';
+type AppView = 'map' | 'quiz' | 'scale' | 'caged' | 'voicing' | 'open' | 'help';
 
 function App() {
   const [accidental, setAccidental] = useState<Accidental>('flat');
@@ -215,6 +216,7 @@ function App() {
             { key: 'scale', label: 'スケール' },
             { key: 'caged', label: 'CAGED' },
             { key: 'voicing', label: 'ボイシング' },
+            { key: 'open', label: 'オープン' },
             { key: 'help', label: '使い方' },
           ]}
         />
@@ -518,6 +520,9 @@ function App() {
         {view === 'voicing' && (
           <VoicingPage accidental={accidental} />
         )}
+
+        {/* ===== オープンコードビュー ===== */}
+        {view === 'open' && <OpenChordPage />}
 
         {/* ===== 説明書ビュー ===== */}
         {view === 'help' && <HelpPage />}
