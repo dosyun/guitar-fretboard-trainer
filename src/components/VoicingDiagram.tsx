@@ -135,13 +135,13 @@ export function VoicingDiagram({
               <circle cx={cx} cy={cy} r={DOT_R} fill={isRoot ? '#2563eb' : '#374151'} />
               {displayMode === 'both' ? (
                 <>
-                  <text x={cx} y={cy - 4.5} textAnchor="middle" dominantBaseline="central"
-                    fontSize={9} fill="#fff" fontWeight={700}
+                  <text x={cx} y={cy - 5} textAnchor="middle" dominantBaseline="central"
+                    fontSize={8.5} fill="#fff" fontWeight={700}
                     style={{ pointerEvents: 'none', userSelect: 'none' }}>
                     {noteName}
                   </text>
-                  <text x={cx} y={cy + 5.5} textAnchor="middle" dominantBaseline="central"
-                    fontSize={7.5} fill={isRoot ? '#bfdbfe' : '#9ca3af'}
+                  <text x={cx} y={cy + 5} textAnchor="middle" dominantBaseline="central"
+                    fontSize={8.5} fill={isRoot ? '#bfdbfe' : '#93c5fd'}
                     style={{ pointerEvents: 'none', userSelect: 'none' }}>
                     {degreeName}
                   </text>
