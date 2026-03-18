@@ -23,6 +23,7 @@ import { getNoteAt, getIntervalAt, getAllPositionsForNote } from './data/fretboa
 import { CAGED_ORDER } from './data/caged';
 import { SCALES, SCALE_LIST, SCALE_COLORS } from './data/scales';
 import type { ScaleName } from './data/scales';
+import { Tabs, TabsList, TabsTrigger } from './components/ui/Tabs';
 import type { Accidental, FretPosition, NoteName, CagedFormName } from './types';
 import './index.css';
 
@@ -195,55 +196,34 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-200 py-3 px-4">
-        <h1 className="text-lg font-bold text-gray-800 text-center">
+      <header className="bg-white border-b border-gray-200 py-4 px-4 shadow-sm">
+        <h1 className="text-xl font-bold text-gray-900 text-center tracking-tight">
           Guitar Fretboard Trainer
         </h1>
       </header>
 
-      <main className="flex-1 flex flex-col gap-3 p-4 w-full">
-        {/* ビュー切替: マップ / クイズ / CAGED */}
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
-          {([
-            ['map', '指板マップ'],
-            ['quiz', 'クイズ'],
-            ['scale', 'スケール'],
-            ['caged', 'CAGED'],
-            ['help', '?'],
-          ] as const).map(([v, label]) => (
-            <button
-              key={v}
-              onClick={() => setView(v)}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                view === v ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+      <Tabs value={view} onValueChange={(v) => setView(v as AppView)} className="flex-1 flex flex-col">
+        <div className="sticky top-0 z-10 bg-gray-50 px-4 pt-3 pb-1">
+          <TabsList>
+            <TabsTrigger value="map">指板マップ</TabsTrigger>
+            <TabsTrigger value="quiz">クイズ</TabsTrigger>
+            <TabsTrigger value="scale">スケール</TabsTrigger>
+            <TabsTrigger value="caged">CAGED</TabsTrigger>
+            <TabsTrigger value="help">使い方</TabsTrigger>
+          </TabsList>
         </div>
+
+      <div className="flex-1 flex flex-col gap-3 px-4 pb-4 w-full">
 
         {/* ===== マップビュー ===== */}
         {view === 'map' && (
           <>
-            <div className="flex gap-1 bg-gray-100 p-1 rounded-lg max-w-xs mx-auto">
-              <button
-                onClick={() => setMapDisplay('notes')}
-                className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-colors ${
-                  mapDisplay === 'notes' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
-                }`}
-              >
-                音名
-              </button>
-              <button
-                onClick={() => setMapDisplay('intervals')}
-                className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-colors ${
-                  mapDisplay === 'intervals' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
-                }`}
-              >
-                度数
-              </button>
-            </div>
+            <Tabs value={mapDisplay} onValueChange={(v) => setMapDisplay(v as 'notes' | 'intervals')} className="max-w-xs mx-auto">
+              <TabsList>
+                <TabsTrigger value="notes">音名</TabsTrigger>
+                <TabsTrigger value="intervals">度数</TabsTrigger>
+              </TabsList>
+            </Tabs>
 
             {mapDisplay === 'intervals' && (
               <RootSelector current={mapRoot} accidental={accidental} onChange={setMapRoot} />
@@ -560,7 +540,8 @@ function App() {
           onMaxFretChange={(f) => { setMaxFret(f); setFretRange([0, f]); }}
           onReset={() => { resetScore(); cagedResetScore(); }}
         />
-      </main>
+      </div>
+      </Tabs>
     </div>
   );
 }
