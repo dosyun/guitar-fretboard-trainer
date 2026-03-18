@@ -10,15 +10,15 @@ interface VoicingDiagramProps {
   onClick?: () => void;
 }
 
-const STRING_SPACING = 30;
-const FRET_SPACING = 32;
+const STRING_SPACING = 38;
+const FRET_SPACING = 42;
 const STRINGS = 6;
 const FRETS = 4;
-const PADDING_TOP = 32;
-const PADDING_LEFT = 24;
-const PADDING_RIGHT = 18;
-const PADDING_BOTTOM = 10;
-const DOT_R = 13;
+const PADDING_TOP = 38;
+const PADDING_LEFT = 30;
+const PADDING_RIGHT = 20;
+const PADDING_BOTTOM = 12;
+const DOT_R = 16;
 
 const totalWidth = PADDING_LEFT + STRING_SPACING * (STRINGS - 1) + PADDING_RIGHT;
 const totalHeight = PADDING_TOP + FRET_SPACING * FRETS + PADDING_BOTTOM;
@@ -135,20 +135,20 @@ export function VoicingDiagram({
               <circle cx={cx} cy={cy} r={DOT_R} fill={isRoot ? '#2563eb' : '#374151'} />
               {displayMode === 'both' ? (
                 <>
-                  <text x={cx} y={cy - 3.5} textAnchor="middle" dominantBaseline="central"
-                    fontSize={7.5} fill="#fff" fontWeight={700}
+                  <text x={cx} y={cy - 4.5} textAnchor="middle" dominantBaseline="central"
+                    fontSize={9} fill="#fff" fontWeight={700}
                     style={{ pointerEvents: 'none', userSelect: 'none' }}>
                     {noteName}
                   </text>
-                  <text x={cx} y={cy + 4.5} textAnchor="middle" dominantBaseline="central"
-                    fontSize={6} fill={isRoot ? '#bfdbfe' : '#9ca3af'}
+                  <text x={cx} y={cy + 5.5} textAnchor="middle" dominantBaseline="central"
+                    fontSize={7.5} fill={isRoot ? '#bfdbfe' : '#9ca3af'}
                     style={{ pointerEvents: 'none', userSelect: 'none' }}>
                     {degreeName}
                   </text>
                 </>
               ) : (
                 <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
-                  fontSize={8} fill="#fff" fontWeight={700}
+                  fontSize={9} fill="#fff" fontWeight={700}
                   style={{ pointerEvents: 'none', userSelect: 'none' }}>
                   {displayMode === 'degree' ? degreeName : noteName}
                 </text>
