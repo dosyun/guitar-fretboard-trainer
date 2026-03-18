@@ -1,89 +1,121 @@
 import { useState } from 'react';
 import { RootSelector } from './RootSelector';
 import { VoicingDiagram } from './VoicingDiagram';
-import { VOICINGS_6TH, VOICINGS_5TH, VOICING_TYPE_LIST } from '../data/voicings';
+import { VOICINGS_6TH, VOICINGS_5TH, VOICINGS_4TH, OPEN_CHORDS, VOICING_TYPE_LIST } from '../data/voicings';
 import type { ChordVoicingType } from '../data/voicings';
 import type { Accidental, NoteName } from '../types';
+import { Segmented } from 'antd';
 
 interface VoicingPageProps {
   accidental: Accidental;
 }
 
+const TYPE_LABELS: Record<ChordVoicingType, string> = {
+  major: 'メジャー',
+  '7': '7th',
+  M7: 'M7',
+  m: 'マイナー',
+  m7: 'm7',
+  m7b5: 'm7(♭5)',
+};
+
 export function VoicingPage({ accidental }: VoicingPageProps) {
   const [rootNote, setRootNote] = useState<NoteName>('C');
   const [selectedType, setSelectedType] = useState<ChordVoicingType>('major');
-
-  const TYPE_LABELS: Record<ChordVoicingType, string> = {
-    major: 'メジャー',
-    '7': '7th',
-    M7: 'M7',
-    m: 'マイナー',
-    m7: 'm7',
-    m7b5: 'm7(♭5)',
-  };
+  const [displayMode, setDisplayMode] = useState<'note' | 'degree'>('note');
 
   const voicing6 = VOICINGS_6TH.find((v) => v.type === selectedType)!;
   const voicing5 = VOICINGS_5TH.find((v) => v.type === selectedType)!;
+  const voicing4 = VOICINGS_4TH.find((v) => v.type === selectedType)!;
 
   return (
     <div className="flex flex-col gap-4">
-      {/* ルート音選択 */}
-      <RootSelector current={rootNote} accidental={accidental} onChange={setRootNote} />
+      {/* バレーコードセクション */}
+      <div className="bg-white rounded-xl shadow-sm p-4">
+        <h2 className="text-sm font-bold text-gray-700 mb-3">バレーコード</h2>
 
-      {/* コードタイプ選択 */}
-      <div className="flex gap-2 justify-center flex-wrap">
-        {VOICING_TYPE_LIST.map((type) => (
-          <button
-            key={type}
-            onClick={() => setSelectedType(type)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium border-2 transition-all ${
-              selectedType === type
-                ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            {TYPE_LABELS[type]}
-          </button>
-        ))}
-      </div>
+        {/* ルート音・コードタイプ・表示切替 */}
+        <RootSelector current={rootNote} accidental={accidental} onChange={setRootNote} />
 
-      {/* ボイシングダイアグラム */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* 6弦ルート */}
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <h3 className="text-sm font-bold text-gray-500 mb-3 text-center">6弦ルート</h3>
-          <div className="flex justify-center">
-            <VoicingDiagram
-              voicing={voicing6}
-              rootNote={rootNote}
-            />
-          </div>
-          <div className="mt-3 text-xs text-gray-400 text-center">
-            <span className="font-medium text-gray-600">{rootNote}{selectedType === 'major' ? '' : selectedType === 'm' ? 'm' : selectedType}</span>
-            {' '}バレーコード（Eフォーム系）
-          </div>
+        <div className="flex gap-2 justify-center flex-wrap mt-3">
+          {VOICING_TYPE_LIST.map((type) => (
+            <button
+              key={type}
+              onClick={() => setSelectedType(type)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium border-2 transition-all ${
+                selectedType === type
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              {TYPE_LABELS[type]}
+            </button>
+          ))}
         </div>
 
-        {/* 5弦ルート */}
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <h3 className="text-sm font-bold text-gray-500 mb-3 text-center">5弦ルート</h3>
-          <div className="flex justify-center">
-            <VoicingDiagram
-              voicing={voicing5}
-              rootNote={rootNote}
-            />
+        <div className="flex justify-center mt-3">
+          <Segmented
+            size="small"
+            value={displayMode}
+            onChange={(v) => setDisplayMode(v as 'note' | 'degree')}
+            options={[
+              { label: '音名', value: 'note' },
+              { label: '度数', value: 'degree' },
+            ]}
+          />
+        </div>
+
+        {/* 3列グリッド */}
+        <div className="grid grid-cols-3 gap-3 mt-4">
+          <div className="flex flex-col items-center">
+            <div className="text-xs font-bold text-gray-500 mb-2">6弦ルート</div>
+            <VoicingDiagram voicing={voicing6} rootNote={rootNote} displayMode={displayMode} />
+            <div className="text-xs text-gray-400 mt-1 text-center">Eフォーム系</div>
           </div>
-          <div className="mt-3 text-xs text-gray-400 text-center">
-            <span className="font-medium text-gray-600">{rootNote}{selectedType === 'major' ? '' : selectedType === 'm' ? 'm' : selectedType}</span>
-            {' '}バレーコード（Aフォーム系）
+          <div className="flex flex-col items-center">
+            <div className="text-xs font-bold text-gray-500 mb-2">5弦ルート</div>
+            <VoicingDiagram voicing={voicing5} rootNote={rootNote} displayMode={displayMode} />
+            <div className="text-xs text-gray-400 mt-1 text-center">Aフォーム系</div>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="text-xs font-bold text-gray-500 mb-2">4弦ルート</div>
+            <VoicingDiagram voicing={voicing4} rootNote={rootNote} displayMode={displayMode} />
+            <div className="text-xs text-gray-400 mt-1 text-center">Dフォーム系</div>
           </div>
         </div>
       </div>
 
-      {/* コード構成音説明 */}
+      {/* オープンコードセクション */}
+      <div className="bg-white rounded-xl shadow-sm p-4">
+        <h2 className="text-sm font-bold text-gray-700 mb-3">オープンコード</h2>
+        <div className="flex justify-center mb-3">
+          <Segmented
+            size="small"
+            value={displayMode}
+            onChange={(v) => setDisplayMode(v as 'note' | 'degree')}
+            options={[
+              { label: '音名', value: 'note' },
+              { label: '度数', value: 'degree' },
+            ]}
+          />
+        </div>
+        <div className="flex flex-wrap justify-center gap-2">
+          {OPEN_CHORDS.map((chord) => (
+            <VoicingDiagram
+              key={chord.name}
+              voicing={chord}
+              rootNote={chord.root as NoteName}
+              displayMode={displayMode}
+              absolute
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* 凡例 */}
       <div className="bg-white rounded-xl shadow-sm p-4">
         <h3 className="text-sm font-bold text-gray-700 mb-2">構成音の見方</h3>
-        <div className="flex gap-4 text-xs text-gray-500">
+        <div className="flex gap-4 text-xs text-gray-500 flex-wrap">
           <div className="flex items-center gap-1.5">
             <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
               <span className="text-white text-[9px] font-bold">R</span>
