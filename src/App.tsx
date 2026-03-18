@@ -30,7 +30,7 @@ import './index.css';
 type AppView = 'map' | 'quiz' | 'caged' | 'scale' | 'help';
 
 function App() {
-  const [accidental, setAccidental] = useState<Accidental>('sharp');
+  const [accidental, setAccidental] = useState<Accidental>('both');
   const [view, setView] = useState<AppView>('map');
   const [mapDisplay, setMapDisplay] = useState<'notes' | 'intervals'>('notes');
   const [mapRoot, setMapRoot] = useState<NoteName>('C');
@@ -195,14 +195,14 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-200 py-4 px-4 shadow-sm">
-        <h1 className="text-xl font-bold text-gray-900 text-center tracking-tight">
+    <div className="min-h-screen flex flex-col" style={{ background: '#f0f4f8' }}>
+      <header className="bg-gradient-to-r from-blue-600 to-indigo-600 py-4 px-4 shadow-lg">
+        <h1 className="text-xl font-bold text-white text-center tracking-tight">
           Guitar Fretboard Trainer
         </h1>
       </header>
 
-      <div className="sticky top-0 z-10 bg-gray-50 px-4 pt-2">
+      <div className="sticky top-0 z-10 bg-white px-4 pt-2 shadow-sm">
         <AntTabs
           activeKey={view}
           onChange={(v) => setView(v as AppView)}
@@ -238,7 +238,7 @@ function App() {
               <RootSelector current={mapRoot} accidental={accidental} onChange={setMapRoot} />
             )}
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto bg-white rounded-xl shadow-sm p-2">
               <FretboardMap
                 maxFret={maxFret}
                 accidental={accidental}
@@ -283,17 +283,6 @@ function App() {
               />
             )}
 
-            <PracticeRangeSelector
-              selectedStrings={selectedStrings}
-              fretRange={fretRange}
-              maxFret={maxFret}
-              accidental={accidental}
-              selectedNotes={selectedNotes}
-              onStringsChange={(s) => { setSelectedStrings(s); if (started) start(quiz.mode, quiz.rootNote); resetScore(); }}
-              onFretRangeChange={(r) => { setFretRange(r); if (started) start(quiz.mode, quiz.rootNote); resetScore(); }}
-              onNotesChange={(n) => { setSelectedNotes(n); if (started) start(quiz.mode, quiz.rootNote); resetScore(); }}
-            />
-
             {started && <ScoreBoard score={score} />}
 
             {started && (
@@ -318,7 +307,7 @@ function App() {
               </div>
             )}
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto bg-white rounded-xl shadow-sm p-2">
               <Fretboard
                 maxFret={maxFret}
                 accidental={accidental}
@@ -345,6 +334,17 @@ function App() {
                 スタート
               </button>
             )}
+
+            <PracticeRangeSelector
+              selectedStrings={selectedStrings}
+              fretRange={fretRange}
+              maxFret={maxFret}
+              accidental={accidental}
+              selectedNotes={selectedNotes}
+              onStringsChange={(s) => { setSelectedStrings(s); if (started) start(quiz.mode, quiz.rootNote); resetScore(); }}
+              onFretRangeChange={(r) => { setFretRange(r); if (started) start(quiz.mode, quiz.rootNote); resetScore(); }}
+              onNotesChange={(n) => { setSelectedNotes(n); if (started) start(quiz.mode, quiz.rootNote); resetScore(); }}
+            />
           </>
         )}
 
@@ -413,7 +413,7 @@ function App() {
                 </div>
 
                 {/* スケールマップ */}
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto bg-white rounded-xl shadow-sm p-2">
                   <ScaleMap
                     maxFret={maxFret}
                     rootNote={scaleRoot}
@@ -479,7 +479,7 @@ function App() {
                 </div>
 
                 {/* CAGED指板マップ */}
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto bg-white rounded-xl shadow-sm p-2">
                   <CagedMap
                     maxFret={maxFret}
                     rootNote={cagedRoot}

@@ -7,8 +7,44 @@ body {
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #f0f4f8;
 }
 
 #root {
   min-height: 100svh;
+}
+
+/* Ant Design タブの強調 */
+.ant-tabs-tab {
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  padding: 12px 18px !important;
+  color: #6b7280 !important;
+}
+.ant-tabs-tab:hover {
+  color: #2563eb !important;
+}
+.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #2563eb !important;
+}
+.ant-tabs-ink-bar {
+  background: #2563eb !important;
+  height: 3px !important;
+  border-radius: 3px !important;
+}
+
+/* Segmented を見やすく */
+.ant-segmented {
+  background: #e2e8f0 !important;
+  border-radius: 10px !important;
+  padding: 3px !important;
+}
+.ant-segmented-item-selected {
+  background: #2563eb !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3) !important;
+}
+.ant-segmented-item-label {
+  font-weight: 600 !important;
 }
