@@ -23,7 +23,7 @@ import { getNoteAt, getIntervalAt, getAllPositionsForNote } from './data/fretboa
 import { CAGED_ORDER } from './data/caged';
 import { SCALES, SCALE_LIST, SCALE_COLORS } from './data/scales';
 import type { ScaleName } from './data/scales';
-import { Tabs, TabsList, TabsTrigger } from './components/ui/Tabs';
+import { Tabs as AntTabs, Segmented, Switch } from 'antd';
 import type { Accidental, FretPosition, NoteName, CagedFormName } from './types';
 import './index.css';
 
@@ -202,28 +202,37 @@ function App() {
         </h1>
       </header>
 
-      <Tabs value={view} onValueChange={(v) => setView(v as AppView)} className="flex-1 flex flex-col">
-        <div className="sticky top-0 z-10 bg-gray-50 px-4 pt-3 pb-1">
-          <TabsList>
-            <TabsTrigger value="map">指板マップ</TabsTrigger>
-            <TabsTrigger value="quiz">クイズ</TabsTrigger>
-            <TabsTrigger value="scale">スケール</TabsTrigger>
-            <TabsTrigger value="caged">CAGED</TabsTrigger>
-            <TabsTrigger value="help">使い方</TabsTrigger>
-          </TabsList>
-        </div>
+      <div className="sticky top-0 z-10 bg-gray-50 px-4 pt-2">
+        <AntTabs
+          activeKey={view}
+          onChange={(v) => setView(v as AppView)}
+          centered
+          size="large"
+          items={[
+            { key: 'map', label: '指板マップ' },
+            { key: 'quiz', label: 'クイズ' },
+            { key: 'scale', label: 'スケール' },
+            { key: 'caged', label: 'CAGED' },
+            { key: 'help', label: '使い方' },
+          ]}
+        />
+      </div>
 
       <div className="flex-1 flex flex-col gap-3 px-4 pb-4 w-full">
 
         {/* ===== マップビュー ===== */}
         {view === 'map' && (
           <>
-            <Tabs value={mapDisplay} onValueChange={(v) => setMapDisplay(v as 'notes' | 'intervals')} className="max-w-xs mx-auto">
-              <TabsList>
-                <TabsTrigger value="notes">音名</TabsTrigger>
-                <TabsTrigger value="intervals">度数</TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="flex justify-center">
+              <Segmented
+                value={mapDisplay}
+                onChange={(v) => setMapDisplay(v as 'notes' | 'intervals')}
+                options={[
+                  { label: '音名', value: 'notes' },
+                  { label: '度数', value: 'intervals' },
+                ]}
+              />
+            </div>
 
             {mapDisplay === 'intervals' && (
               <RootSelector current={mapRoot} accidental={accidental} onChange={setMapRoot} />
@@ -343,23 +352,15 @@ function App() {
         {view === 'scale' && (
           <>
             {/* サブタブ */}
-            <div className="flex gap-1 bg-gray-100 p-1 rounded-lg max-w-xs mx-auto">
-              <button
-                onClick={() => setScaleSubView('display')}
-                className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-colors ${
-                  scaleSubView === 'display' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
-                }`}
-              >
-                表示
-              </button>
-              <button
-                onClick={() => { setScaleSubView('quiz'); scaleResetScore(); }}
-                className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-colors ${
-                  scaleSubView === 'quiz' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
-                }`}
-              >
-                クイズ
-              </button>
+            <div className="flex justify-center">
+              <Segmented
+                value={scaleSubView}
+                onChange={(v) => { if (v === 'quiz') scaleResetScore(); setScaleSubView(v as 'display' | 'quiz'); }}
+                options={[
+                  { label: '表示', value: 'display' },
+                  { label: 'クイズ', value: 'quiz' },
+                ]}
+              />
             </div>
 
             {/* スケール選択 */}
@@ -446,23 +447,15 @@ function App() {
         {view === 'caged' && (
           <>
             {/* サブタブ: 表示 / クイズ */}
-            <div className="flex gap-1 bg-gray-100 p-1 rounded-lg max-w-xs mx-auto">
-              <button
-                onClick={() => setCagedSubView('display')}
-                className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-colors ${
-                  cagedSubView === 'display' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
-                }`}
-              >
-                表示
-              </button>
-              <button
-                onClick={() => { setCagedSubView('quiz'); cagedResetScore(); }}
-                className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-colors ${
-                  cagedSubView === 'quiz' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
-                }`}
-              >
-                クイズ
-              </button>
+            <div className="flex justify-center">
+              <Segmented
+                value={cagedSubView}
+                onChange={(v) => { if (v === 'quiz') cagedResetScore(); setCagedSubView(v as 'display' | 'quiz'); }}
+                options={[
+                  { label: '表示', value: 'display' },
+                  { label: 'クイズ', value: 'quiz' },
+                ]}
+              />
             </div>
 
             {/* ルート音選択 */}
@@ -474,23 +467,13 @@ function App() {
                 <CagedFormSelector selectedForms={selectedForms} onChange={setSelectedForms} />
 
                 {/* 表示トグル */}
-                <div className="flex gap-3 justify-center">
-                  <label className="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={showChordTones}
-                      onChange={(e) => setShowChordTones(e.target.checked)}
-                      className="rounded"
-                    />
+                <div className="flex gap-4 justify-center items-center">
+                  <label className="flex items-center gap-2 text-sm text-gray-600">
+                    <Switch size="small" checked={showChordTones} onChange={setShowChordTones} />
                     コードトーン
                   </label>
-                  <label className="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={showPentatonic}
-                      onChange={(e) => setShowPentatonic(e.target.checked)}
-                      className="rounded"
-                    />
+                  <label className="flex items-center gap-2 text-sm text-gray-600">
+                    <Switch size="small" checked={showPentatonic} onChange={setShowPentatonic} />
                     ペンタトニック
                   </label>
                 </div>
@@ -541,7 +524,6 @@ function App() {
           onReset={() => { resetScore(); cagedResetScore(); }}
         />
       </div>
-      </Tabs>
     </div>
   );
 }
