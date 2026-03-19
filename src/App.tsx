@@ -49,6 +49,7 @@ function App() {
   const [selectedForms, setSelectedForms] = useState<CagedFormName[]>([...CAGED_ORDER]);
   const [showPentatonic, setShowPentatonic] = useState(false);
   const [showChordTones, setShowChordTones] = useState(true);
+  const [cagedDisplayMode, setCagedDisplayMode] = useState<'degree' | 'note' | 'both'>('degree');
 
   // Scale state
   const [scaleSubView, setScaleSubView] = useState<'display' | 'quiz'>('display');
@@ -488,7 +489,7 @@ function App() {
                 <CagedFormSelector selectedForms={selectedForms} onChange={setSelectedForms} />
 
                 {/* 表示トグル */}
-                <div className="flex gap-4 justify-center items-center">
+                <div className="flex gap-4 justify-center items-center flex-wrap">
                   <label className="flex items-center gap-2 text-sm text-gray-600">
                     <Switch size="small" checked={showChordTones} onChange={setShowChordTones} />
                     コードトーン
@@ -497,6 +498,16 @@ function App() {
                     <Switch size="small" checked={showPentatonic} onChange={setShowPentatonic} />
                     ペンタトニック
                   </label>
+                  <Segmented
+                    size="small"
+                    value={cagedDisplayMode}
+                    onChange={v => setCagedDisplayMode(v as 'degree' | 'note' | 'both')}
+                    options={[
+                      { label: '度数', value: 'degree' },
+                      { label: '音名', value: 'note' },
+                      { label: '両方', value: 'both' },
+                    ]}
+                  />
                 </div>
 
                 {/* CAGED指板マップ */}
@@ -507,6 +518,8 @@ function App() {
                     selectedForms={selectedForms}
                     showPentatonic={showPentatonic}
                     showChordTones={showChordTones}
+                    displayMode={cagedDisplayMode}
+                    accidental={accidental}
                   />
                 </div>
 

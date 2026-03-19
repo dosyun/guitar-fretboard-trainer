@@ -1,6 +1,6 @@
-import { getOpenStringName } from '../data/fretboard';
+import { getOpenStringName, getNoteAt } from '../data/fretboard';
 import { getCagedPositions, CAGED_COLORS } from '../data/caged';
-import type { CagedFormName, NoteName, ChordType } from '../types';
+import type { Accidental, CagedFormName, NoteName, ChordType } from '../types';
 
 interface CagedMapProps {
   maxFret: number;
@@ -8,7 +8,9 @@ interface CagedMapProps {
   selectedForms: CagedFormName[];
   showPentatonic: boolean;
   showChordTones: boolean;
-  chordType?: ChordType; // メジャー固定（デフォルト）
+  chordType?: ChordType;
+  displayMode?: 'degree' | 'note' | 'both';
+  accidental?: Accidental;
 }
 
 const PADDING_LEFT = 40;
@@ -30,6 +32,8 @@ export function CagedMap({
   showPentatonic,
   showChordTones,
   chordType = 'major',
+  displayMode = 'degree',
+  accidental = 'flat',
 }: CagedMapProps) {
   const totalWidth = PADDING_LEFT + NUT_WIDTH + FRET_WIDTH * maxFret + PADDING_RIGHT;
   const totalHeight = PADDING_TOP + STRING_SPACING * 5 + PADDING_BOTTOM;
@@ -168,6 +172,9 @@ export function CagedMap({
         const cx = posX(pos.fret);
         const cy = stringY(pos.string);
 
+        const noteName = getNoteAt(pos.string, pos.fret, accidental);
+        const textFill = isChord ? '#fff' : color.bg;
+
         return (
           <g key={`${formName}-${i}`}>
             <circle
@@ -179,18 +186,33 @@ export function CagedMap({
               strokeWidth={isChord ? 2 : 1.5}
               strokeDasharray={isPenta ? '3,2' : undefined}
             />
-            <text
-              x={cx}
-              y={cy}
-              textAnchor="middle"
-              dominantBaseline="central"
-              fontSize={isChord ? 9 : 7}
-              fontWeight={700}
-              fill={isChord ? '#fff' : color.bg}
-              style={{ pointerEvents: 'none', userSelect: 'none' }}
-            >
-              {label}
-            </text>
+            {displayMode === 'both' && isChord ? (
+              <>
+                <text x={cx} y={cy - 4} textAnchor="middle" dominantBaseline="central"
+                  fontSize={6} fontWeight={700} fill={textFill}
+                  style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                  {noteName}
+                </text>
+                <text x={cx} y={cy + 4} textAnchor="middle" dominantBaseline="central"
+                  fontSize={6} fontWeight={600} fill={textFill}
+                  style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                  {label}
+                </text>
+              </>
+            ) : (
+              <text
+                x={cx}
+                y={cy}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fontSize={isChord ? 9 : 7}
+                fontWeight={700}
+                fill={textFill}
+                style={{ pointerEvents: 'none', userSelect: 'none' }}
+              >
+                {displayMode === 'note' ? noteName : label}
+              </text>
+            )}
           </g>
         );
       })}
