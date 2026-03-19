@@ -35,7 +35,7 @@ type AppView = 'map' | 'quiz' | 'scale' | 'caged' | 'voicing' | 'open' | 'diaton
 
 function App() {
   const [accidental, setAccidental] = useState<Accidental>('flat');
-  const [view, setView] = useState<AppView>('map');
+  const [view, setView] = useState<AppView>('help');
   const [mapDisplay, setMapDisplay] = useState<'notes' | 'intervals'>('notes');
   const [mapRoot, setMapRoot] = useState<NoteName>('C');
   const [maxFret, setMaxFret] = useState(12);
@@ -215,6 +215,7 @@ function App() {
           centered
           size="large"
           items={[
+            { key: 'help', label: '使い方' },
             { key: 'map', label: '指板マップ' },
             { key: 'quiz', label: 'クイズ' },
             { key: 'scale', label: 'スケール' },
@@ -223,7 +224,6 @@ function App() {
             { key: 'open', label: 'オープン' },
             { key: 'diatonic', label: 'ダイアトニック' },
             { key: 'arpeggio', label: 'アルペジオ' },
-            { key: 'help', label: '使い方' },
           ]}
         />
       </div>
