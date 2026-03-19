@@ -65,7 +65,7 @@ export function VoicingDiagram({
         selected ? 'bg-blue-50 ring-2 ring-blue-400' : 'bg-white hover:bg-gray-50'
       }`}
     >
-      <div className="text-sm font-bold text-gray-700 mb-1">{voicing.label}</div>
+      <div className="text-lg font-bold text-gray-700 mb-1">{voicing.label}</div>
 
       <svg viewBox={`0 0 ${totalWidth} ${totalHeight}`} width={totalWidth} height={totalHeight}>
         {/* フレット番号 */}
