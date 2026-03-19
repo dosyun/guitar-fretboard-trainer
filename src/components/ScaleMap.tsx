@@ -162,7 +162,7 @@ export function ScaleMap({ maxFret, rootNote, scaleName, selectedBox, displayMod
       {/* アクティブなポジション */}
       {displayPositions.map(({ pos, degree }, i) => {
         const isRoot = degree === 'R';
-        const r = displayMode === 'both' ? MARKER_R + 6 : (isRoot ? MARKER_R + 1 : MARKER_R);
+        const r = isRoot ? MARKER_R + 1 : MARKER_R;
         const noteName = getNoteAt(pos.string, pos.fret, accidental);
         return (
           <g key={`pos-${i}`}>
@@ -176,15 +176,15 @@ export function ScaleMap({ maxFret, rootNote, scaleName, selectedBox, displayMod
             />
             {displayMode === 'both' ? (
               <>
-                <text x={posX(pos.fret)} y={stringY(pos.string) - 5}
+                <text x={posX(pos.fret)} y={stringY(pos.string) - 4}
                   textAnchor="middle" dominantBaseline="central"
-                  fontSize={8} fontWeight={700} fill={isRoot ? '#fff' : color.bg}
+                  fontSize={6} fontWeight={700} fill={isRoot ? '#fff' : color.bg}
                   style={{ pointerEvents: 'none', userSelect: 'none' }}>
                   {noteName}
                 </text>
-                <text x={posX(pos.fret)} y={stringY(pos.string) + 5}
+                <text x={posX(pos.fret)} y={stringY(pos.string) + 4}
                   textAnchor="middle" dominantBaseline="central"
-                  fontSize={7} fontWeight={600} fill={isRoot ? '#bfdbfe' : color.bg}
+                  fontSize={6} fontWeight={600} fill={isRoot ? '#bfdbfe' : color.bg}
                   style={{ pointerEvents: 'none', userSelect: 'none' }}>
                   {degree}
                 </text>
