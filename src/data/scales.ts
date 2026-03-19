@@ -3,7 +3,7 @@ import { getNoteIndex } from './fretboard';
 
 // --- 型定義 ---
 
-export type ScaleName = 'major-pentatonic' | 'minor-pentatonic' | 'major' | 'minor';
+export type ScaleName = 'major-pentatonic' | 'minor-pentatonic' | 'major' | 'minor' | 'blues' | 'dorian' | 'mixolydian' | 'altered';
 
 export interface ScaleDefinition {
   name: ScaleName;
@@ -39,9 +39,33 @@ export const SCALES: Record<ScaleName, ScaleDefinition> = {
     intervals: [0, 2, 3, 5, 7, 8, 10],
     degreeLabels: ['R', '2', 'm3', '4', '5', 'm6', 'm7'],
   },
+  'blues': {
+    name: 'blues',
+    label: 'ブルース',
+    intervals: [0, 3, 5, 6, 7, 10],
+    degreeLabels: ['R', 'm3', '4', '♭5', '5', 'm7'],
+  },
+  'dorian': {
+    name: 'dorian',
+    label: 'ドリアン',
+    intervals: [0, 2, 3, 5, 7, 9, 10],
+    degreeLabels: ['R', '2', 'm3', '4', '5', '6', 'm7'],
+  },
+  'mixolydian': {
+    name: 'mixolydian',
+    label: 'ミクソリドアン',
+    intervals: [0, 2, 4, 5, 7, 9, 10],
+    degreeLabels: ['R', '2', '3', '4', '5', '6', 'm7'],
+  },
+  'altered': {
+    name: 'altered',
+    label: 'オルタード',
+    intervals: [0, 1, 3, 4, 6, 8, 10],
+    degreeLabels: ['R', '♭2', '♭3', '3', '♭5', '♭6', 'm7'],
+  },
 };
 
-export const SCALE_LIST: ScaleName[] = ['major-pentatonic', 'minor-pentatonic', 'major', 'minor'];
+export const SCALE_LIST: ScaleName[] = ['major-pentatonic', 'minor-pentatonic', 'major', 'minor', 'blues', 'dorian', 'mixolydian', 'altered'];
 
 // --- ボックスポジション (5ポジション) ---
 // 各ポジションはフレット範囲で区切る。ルートの位置を基準に定義。
@@ -145,6 +169,10 @@ export const SCALE_COLORS: Record<ScaleName, { bg: string; border: string; light
   'minor-pentatonic': { bg: '#2563eb', border: '#1d4ed8', light: '#bfdbfe' },
   'major': { bg: '#16a34a', border: '#15803d', light: '#bbf7d0' },
   'minor': { bg: '#7c3aed', border: '#6d28d9', light: '#ddd6fe' },
+  'blues': { bg: '#b45309', border: '#92400e', light: '#fde68a' },
+  'dorian': { bg: '#0891b2', border: '#0e7490', light: '#cffafe' },
+  'mixolydian': { bg: '#15803d', border: '#166534', light: '#bbf7d0' },
+  'altered': { bg: '#be123c', border: '#9f1239', light: '#fecdd3' },
 };
 
 /** スケール内の音かどうか判定 */
