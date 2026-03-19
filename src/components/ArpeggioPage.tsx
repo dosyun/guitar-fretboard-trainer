@@ -44,7 +44,7 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
   const [root, setRoot] = useState<NoteName>('A');
   const [chordTypeIdx, setChordTypeIdx] = useState(2); // m7
   const [rangeIdx, setRangeIdx] = useState(0);
-  const [labelMode, setLabelMode] = useState<'number' | 'degree' | 'note'>('number');
+  const [labelMode, setLabelMode] = useState<'number' | 'degree' | 'note' | 'both'>('number');
 
   const chordType = CHORD_TYPES[chordTypeIdx];
   const range = FRET_RANGES[rangeIdx];
@@ -119,11 +119,12 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
           <Segmented
             size="small"
             value={labelMode}
-            onChange={v => setLabelMode(v as 'number' | 'degree' | 'note')}
+            onChange={v => setLabelMode(v as 'number' | 'degree' | 'note' | 'both')}
             options={[
               { label: '番号', value: 'number' },
               { label: '度数', value: 'degree' },
               { label: '音名', value: 'note' },
+              { label: '両方', value: 'both' },
             ]}
           />
         </div>
@@ -197,21 +198,35 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
               const cy = stringY(p.string);
               const isRoot = p.interval === 0;
               const noteName = getNoteAt(p.string, p.fret, accidental);
-              const label =
-                labelMode === 'number' ? String(p.num) :
-                labelMode === 'degree' ? DEGREE_LABELS[p.interval] :
-                noteName;
+              const degreeName = DEGREE_LABELS[p.interval];
+              const r = labelMode === 'both' ? MARKER_R + 3 : MARKER_R;
 
               return (
                 <g key={`${p.string}-${p.fret}`}>
-                  <circle cx={cx} cy={cy} r={MARKER_R}
+                  <circle cx={cx} cy={cy} r={r}
                     fill={isRoot ? '#2563eb' : '#374151'}
                     strokeWidth={0} />
-                  <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
-                    fontSize={11} fontWeight={700} fill="#fff"
-                    style={{ pointerEvents: 'none', userSelect: 'none' }}>
-                    {label}
-                  </text>
+                  {labelMode === 'both' ? (
+                    <>
+                      <text x={cx} y={cy - 5} textAnchor="middle" dominantBaseline="central"
+                        fontSize={7} fontWeight={700} fill="#fff"
+                        style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                        {noteName}
+                      </text>
+                      <text x={cx} y={cy + 5} textAnchor="middle" dominantBaseline="central"
+                        fontSize={7} fontWeight={600} fill={isRoot ? '#bfdbfe' : '#93c5fd'}
+                        style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                        {degreeName}
+                      </text>
+                    </>
+                  ) : (
+                    <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
+                      fontSize={11} fontWeight={700} fill="#fff"
+                      style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                      {labelMode === 'number' ? String(p.num) :
+                       labelMode === 'degree' ? degreeName : noteName}
+                    </text>
+                  )}
                 </g>
               );
             })}
