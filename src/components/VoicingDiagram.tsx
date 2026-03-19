@@ -67,7 +67,7 @@ export function VoicingDiagram({
     >
       <div className="text-lg font-bold text-gray-700 mb-1">{voicing.label}</div>
 
-      <svg viewBox={`0 0 ${totalWidth} ${totalHeight}`} width={totalWidth} height={totalHeight}>
+      <svg viewBox={`0 0 ${totalWidth} ${totalHeight}`} className="w-full h-auto">
         {/* フレット番号 */}
         {startFret > 1 && (
           <text x={PADDING_LEFT - 8} y={PADDING_TOP + FRET_SPACING * 0.5}
@@ -159,9 +159,9 @@ export function VoicingDiagram({
       </svg>
 
       {/* フレット番号列 */}
-      <div className="text-xs text-gray-400 mt-0.5 flex">
+      <div className="text-xs text-gray-400 mt-0.5 flex w-full">
         {actualFrets.map((f, i) => (
-          <span key={i} className="text-center" style={{ width: STRING_SPACING }}>
+          <span key={i} className="flex-1 text-center">
             {f === 'x' ? '×' : f}
           </span>
         ))}

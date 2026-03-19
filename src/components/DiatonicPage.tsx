@@ -91,7 +91,7 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
                 const chordName = getChordName(keyIndex, degree);
                 const voicing = voicings.find(v => v.type === degree.type)!;
                 return (
-                  <div key={degree.roman} className="flex flex-col items-center">
+                  <div key={degree.roman} className="flex flex-col items-center w-[22%] sm:w-auto">
                     <div className="text-xs font-bold text-indigo-600 mb-0.5">{degree.roman}</div>
                     <VoicingDiagram
                       voicing={{ ...voicing, label: chordName }}
@@ -142,7 +142,7 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
                 const chordName = getChordName(keyIndex, degree);
                 const voicing = voicings.find(v => v.type === degree.type)!;
                 return (
-                  <div key={i} className="flex flex-col items-center">
+                  <div key={i} className="flex flex-col items-center w-[22%] sm:w-auto">
                     <div className="text-xs font-bold text-indigo-600 mb-0.5">{degree.roman}</div>
                     <VoicingDiagram
                       voicing={{ ...voicing, label: chordName }}
