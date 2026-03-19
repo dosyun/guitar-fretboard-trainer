@@ -14,6 +14,7 @@ import { CagedLegend } from './components/CagedLegend';
 import { CagedQuiz } from './components/CagedQuiz';
 import { VoicingPage } from './components/VoicingPage';
 import { DiatonicPage } from './components/DiatonicPage';
+import { ArpeggioPage } from './components/ArpeggioPage';
 import { OpenChordPage } from './components/OpenChordPage';
 import { HelpPage } from './components/HelpPage';
 import { ScaleMap } from './components/ScaleMap';
@@ -30,7 +31,7 @@ import { Tabs as AntTabs, Segmented, Switch } from 'antd';
 import type { Accidental, FretPosition, NoteName, CagedFormName } from './types';
 import './index.css';
 
-type AppView = 'map' | 'quiz' | 'scale' | 'caged' | 'voicing' | 'open' | 'diatonic' | 'help';
+type AppView = 'map' | 'quiz' | 'scale' | 'caged' | 'voicing' | 'open' | 'diatonic' | 'arpeggio' | 'help';
 
 function App() {
   const [accidental, setAccidental] = useState<Accidental>('flat');
@@ -221,6 +222,7 @@ function App() {
             { key: 'voicing', label: 'ボイシング' },
             { key: 'open', label: 'オープン' },
             { key: 'diatonic', label: 'ダイアトニック' },
+            { key: 'arpeggio', label: 'アルペジオ' },
             { key: 'help', label: '使い方' },
           ]}
         />
@@ -558,6 +560,9 @@ function App() {
 
         {/* ===== ダイアトニックビュー ===== */}
         {view === 'diatonic' && <DiatonicPage accidental={accidental} />}
+
+        {/* ===== アルペジオビュー ===== */}
+        {view === 'arpeggio' && <ArpeggioPage accidental={accidental} />}
 
         {/* ===== 説明書ビュー ===== */}
         {view === 'help' && <HelpPage />}
