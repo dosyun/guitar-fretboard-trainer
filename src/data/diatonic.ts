@@ -45,3 +45,49 @@ export function getChordName(keyIndex: number, degree: DiatonicDegree): string {
 export function getDegreeRoot(keyIndex: number, semitones: number): string {
   return NOTE_NAMES_FLAT[(keyIndex + semitones) % 12];
 }
+
+export interface ChordProgression {
+  name: string;
+  description: string;
+  scale: 'major' | 'minor';
+  degrees: number[]; // MAJOR_DIATONIC or MINOR_DIATONIC のインデックス
+}
+
+export const JAZZ_PROGRESSIONS: ChordProgression[] = [
+  {
+    name: 'ii-V-I',
+    description: 'ジャズの最基本進行',
+    scale: 'major',
+    degrees: [1, 4, 0],
+  },
+  {
+    name: 'ii-V-i (minor)',
+    description: 'マイナーキーの基本進行',
+    scale: 'minor',
+    degrees: [1, 4, 0],
+  },
+  {
+    name: 'I - VI - II - V',
+    description: 'ターンアラウンド（循環コード）',
+    scale: 'major',
+    degrees: [0, 5, 1, 4],
+  },
+  {
+    name: 'IIIm - VI - IIm - V',
+    description: '逆循環コード',
+    scale: 'major',
+    degrees: [2, 5, 1, 4],
+  },
+  {
+    name: 'I - IVmaj7 - IIIm - VIm',
+    description: '下降進行',
+    scale: 'major',
+    degrees: [0, 3, 2, 5],
+  },
+  {
+    name: 'Im - VII - VI - V',
+    description: 'マイナー下降進行',
+    scale: 'minor',
+    degrees: [0, 6, 5, 4],
+  },
+];
