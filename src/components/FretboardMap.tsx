@@ -46,7 +46,7 @@ export function FretboardMap({
 }: FretboardMapProps) {
   // both表示時はマーカーを大きくする
   const isBoth = accidental === 'both';
-  const MARKER_R = isBoth ? 18 : 12;
+  const MARKER_R = isBoth ? 15 : 10;
   const STRING_SPACING = isBoth ? 40 : 24;
   const FRET_WIDTH = isBoth ? 80 : 55;
   const PADDING_LEFT = isBoth ? 50 : 40;

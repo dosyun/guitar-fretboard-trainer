@@ -199,7 +199,7 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
               const isRoot = p.interval === 0;
               const noteName = getNoteAt(p.string, p.fret, accidental);
               const degreeName = DEGREE_LABELS[p.interval];
-              const r = labelMode === 'both' ? MARKER_R + 3 : MARKER_R;
+              const r = MARKER_R;
 
               return (
                 <g key={`${p.string}-${p.fret}`}>
