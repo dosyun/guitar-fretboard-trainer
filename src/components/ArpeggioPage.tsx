@@ -63,10 +63,14 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
   }
   allPositions.sort((a, b) => a.midi - b.midi);
 
+  // 同じMIDI音程に同じ番号を割り当て（重複音対応）
+  const uniqueMidis = [...new Set(allPositions.map(p => p.midi))].sort((a, b) => a - b);
+  const midiToNum = new Map(uniqueMidis.map((midi, i) => [midi, i + 1]));
+
   // 範囲内・範囲外に分ける
   const inRange = allPositions
     .filter(p => p.fret >= range.min && p.fret <= range.max)
-    .map((p, i) => ({ ...p, num: i + 1 }));
+    .map(p => ({ ...p, num: midiToNum.get(p.midi)! }));
   const outOfRange = allPositions.filter(p => p.fret < range.min || p.fret > range.max);
 
   const maxFret = 12;
