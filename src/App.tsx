@@ -55,6 +55,7 @@ function App() {
   const [scaleRoot, setScaleRoot] = useState<NoteName>('A');
   const [scaleName, setScaleName] = useState<ScaleName>('minor-pentatonic');
   const [selectedBox, setSelectedBox] = useState<number | null>(null);
+  const [scaleDisplayMode, setScaleDisplayMode] = useState<'degree' | 'note' | 'both'>('degree');
 
   const { score, recordCorrect, recordWrong, resetScore } = useScore();
 
@@ -416,6 +417,20 @@ function App() {
                   ))}
                 </div>
 
+                {/* 表示モード */}
+                <div className="flex justify-center">
+                  <Segmented
+                    size="small"
+                    value={scaleDisplayMode}
+                    onChange={v => setScaleDisplayMode(v as 'degree' | 'note' | 'both')}
+                    options={[
+                      { label: '度数', value: 'degree' },
+                      { label: '音名', value: 'note' },
+                      { label: '両方', value: 'both' },
+                    ]}
+                  />
+                </div>
+
                 {/* スケールマップ */}
                 <div className="overflow-x-auto bg-white rounded-xl shadow-sm p-2">
                   <ScaleMap
@@ -423,6 +438,8 @@ function App() {
                     rootNote={scaleRoot}
                     scaleName={scaleName}
                     selectedBox={selectedBox}
+                    displayMode={scaleDisplayMode}
+                    accidental={accidental}
                   />
                 </div>
               </>

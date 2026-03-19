@@ -1,13 +1,15 @@
-import { getOpenStringName } from '../data/fretboard';
+import { getOpenStringName, getNoteAt } from '../data/fretboard';
 import { getScalePositions, getScaleBoxPositions, SCALE_COLORS } from '../data/scales';
-import type { NoteName } from '../types';
+import type { Accidental, NoteName } from '../types';
 import type { ScaleName } from '../data/scales';
 
 interface ScaleMapProps {
   maxFret: number;
   rootNote: NoteName;
   scaleName: ScaleName;
-  selectedBox: number | null; // null = 全表示, 0-4 = 特定ボックス
+  selectedBox: number | null;
+  displayMode?: 'degree' | 'note' | 'both';
+  accidental?: Accidental;
 }
 
 const PADDING_LEFT = 40;
@@ -22,7 +24,7 @@ const MARKER_R = 13;
 const SINGLE_DOTS = [3, 5, 7, 9];
 const DOUBLE_DOT = 12;
 
-export function ScaleMap({ maxFret, rootNote, scaleName, selectedBox }: ScaleMapProps) {
+export function ScaleMap({ maxFret, rootNote, scaleName, selectedBox, displayMode = 'degree', accidental = 'flat' }: ScaleMapProps) {
   const totalWidth = PADDING_LEFT + NUT_WIDTH + FRET_WIDTH * maxFret + PADDING_RIGHT;
   const totalHeight = PADDING_TOP + STRING_SPACING * 5 + PADDING_BOTTOM;
   const color = SCALE_COLORS[scaleName];
@@ -160,7 +162,8 @@ export function ScaleMap({ maxFret, rootNote, scaleName, selectedBox }: ScaleMap
       {/* アクティブなポジション */}
       {displayPositions.map(({ pos, degree }, i) => {
         const isRoot = degree === 'R';
-        const r = isRoot ? MARKER_R + 1 : MARKER_R;
+        const r = displayMode === 'both' ? MARKER_R + 6 : (isRoot ? MARKER_R + 1 : MARKER_R);
+        const noteName = getNoteAt(pos.string, pos.fret, accidental);
         return (
           <g key={`pos-${i}`}>
             <circle
@@ -171,18 +174,35 @@ export function ScaleMap({ maxFret, rootNote, scaleName, selectedBox }: ScaleMap
               stroke={color.border}
               strokeWidth={isRoot ? 2.5 : 1.5}
             />
-            <text
-              x={posX(pos.fret)}
-              y={stringY(pos.string)}
-              textAnchor="middle"
-              dominantBaseline="central"
-              fontSize={isRoot ? 10 : 8}
-              fontWeight={700}
-              fill={isRoot ? '#fff' : color.bg}
-              style={{ pointerEvents: 'none', userSelect: 'none' }}
-            >
-              {degree}
-            </text>
+            {displayMode === 'both' ? (
+              <>
+                <text x={posX(pos.fret)} y={stringY(pos.string) - 5}
+                  textAnchor="middle" dominantBaseline="central"
+                  fontSize={8} fontWeight={700} fill={isRoot ? '#fff' : color.bg}
+                  style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                  {noteName}
+                </text>
+                <text x={posX(pos.fret)} y={stringY(pos.string) + 5}
+                  textAnchor="middle" dominantBaseline="central"
+                  fontSize={7} fontWeight={600} fill={isRoot ? '#bfdbfe' : color.bg}
+                  style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                  {degree}
+                </text>
+              </>
+            ) : (
+              <text
+                x={posX(pos.fret)}
+                y={stringY(pos.string)}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fontSize={isRoot ? 10 : 8}
+                fontWeight={700}
+                fill={isRoot ? '#fff' : color.bg}
+                style={{ pointerEvents: 'none', userSelect: 'none' }}
+              >
+                {displayMode === 'note' ? noteName : degree}
+              </text>
+            )}
           </g>
         );
       })}
