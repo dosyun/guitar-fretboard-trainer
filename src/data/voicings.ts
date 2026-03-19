@@ -20,12 +20,12 @@ export const VOICINGS_6TH: ChordVoicing[] = [
   {
     type: '7',
     label: '7th',
-    frets: [0, 2, 0, 1, 0, 0],
+    frets: [0, 'x', 0, 1, 0, 'x'],
   },
   {
     type: 'M7',
     label: 'M7',
-    frets: [0, 2, 1, 1, 0, 0],
+    frets: [0, 'x', 1, 1, 0, 'x'],
   },
   {
     type: 'm',
@@ -35,7 +35,7 @@ export const VOICINGS_6TH: ChordVoicing[] = [
   {
     type: 'm7',
     label: 'm7',
-    frets: [0, 2, 2, 0, 3, 0],
+    frets: [0, 'x', 0, 0, 0, 'x'],
   },
   {
     type: 'm7b5',
