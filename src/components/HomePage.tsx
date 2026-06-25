@@ -67,7 +67,7 @@ export function HomePage({ accidental, onStartDaily, onStartPractice, onStartPha
           onClick={onStartPractice}
           className="w-full text-sm text-dim hover:text-ink transition-colors"
         >
-          自由に練習する（範囲・モードを選ぶ）
+          チャレンジ（問題数を選んで挑戦）
         </button>
       </div>
 

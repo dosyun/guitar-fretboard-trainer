@@ -25,7 +25,7 @@ import { ScaleQuiz } from './components/ScaleQuiz';
 import { useQuiz } from './hooks/useQuiz';
 import { useScore } from './hooks/useScore';
 import { useSession } from './hooks/useSession';
-import { getLastSession, getNoteRecognitionMetrics, getDegreeMetrics, recordPracticeDay } from './data/practiceStore';
+import { getLastSession, recordPracticeDay } from './data/practiceStore';
 import type { SessionSummary } from './types/practice';
 import type { Phase } from './data/phases';
 import { useCagedQuiz } from './hooks/useCagedQuiz';
@@ -82,8 +82,10 @@ function App() {
 
   const { score, recordCorrect, recordWrong, resetScore } = useScore();
   const session = useSession();
-  const [result, setResult] = useState<{ summary: SessionSummary; prev: SessionSummary | null } | null>(null);
-  const [dailyTarget, setDailyTarget] = useState<number | null>(null);
+  const [result, setResult] = useState<{ summary: SessionSummary; prev: SessionSummary | null; kind: 'daily' | 'challenge' } | null>(null);
+  const [sessionTarget, setSessionTarget] = useState<number | null>(null);
+  const [sessionKind, setSessionKind] = useState<'daily' | 'challenge'>('challenge');
+  const [challengeLength, setChallengeLength] = useState<number | null>(10);
 
   const {
     quiz,
@@ -228,60 +230,64 @@ function App() {
   // ===== 練習セッション制御 =====
   const DAILY_COUNT = 35;
 
+  // チャレンジ（自由練習）: ランダム・選んだ問題数・100%でクリア。
   const handleStart = () => {
     setResult(null);
     resetScore();
-    setDailyTarget(null);
+    setSessionKind('challenge');
+    setSessionTarget(challengeLength);
     session.startSession('free');
-    start(quiz.mode, quiz.rootNote);
+    start(quiz.mode, quiz.rootNote, undefined, false);
   };
 
-  // フェーズ起動: 範囲をフェーズのスコープに設定して練習開始（範囲内は弱点優先）。
+  // フェーズ起動: 範囲をフェーズのスコープに設定（範囲内は弱点優先）。
   const handleStartPhase = (p: Phase) => {
     setSelectedStrings(p.strings);
     setFretRange(p.fretRange);
     setSelectedNotes(p.notes);
     setResult(null);
     resetScore();
-    setDailyTarget(null);
+    setSessionKind('challenge');
+    setSessionTarget(challengeLength);
     session.startSession('free');
     setView('practice');
-    start(p.mode, quiz.rootNote, { strings: p.strings, fretRange: p.fretRange, noteFilter: p.notes });
+    start(p.mode, quiz.rootNote, { strings: p.strings, fretRange: p.fretRange, noteFilter: p.notes }, true);
   };
 
   // 今日の練習: 固定35問・位置→音名・弱点優先。Homeから起動。
   const handleStartDaily = () => {
     setResult(null);
     resetScore();
-    setDailyTarget(DAILY_COUNT);
+    setSessionKind('daily');
+    setSessionTarget(DAILY_COUNT);
     session.startSession('daily');
     setView('practice');
-    start('position-to-note', quiz.rootNote);
+    start('position-to-note', quiz.rootNote, undefined, true);
   };
 
   const handleEnd = () => {
     const prev = getLastSession(quiz.mode); // 保存前 = 前回
     const summary = session.finalize();     // 今回を保存
     stop();
-    setDailyTarget(null);
+    setSessionTarget(null);
     if (summary) {
       recordPracticeDay(); // 連続練習日数を更新
-      setResult({ summary, prev });
+      setResult({ summary, prev, kind: sessionKind });
     }
   };
 
-  // モード・範囲・ルートの変更時にセッションを仕切り直す（デイリーは解除）
+  // モード・範囲・ルートの変更時にセッションを仕切り直す（チャレンジ扱い）
   const restartSession = () => {
-    if (started) { setDailyTarget(null); session.startSession('free'); }
+    if (started) { setSessionKind('challenge'); setSessionTarget(challengeLength); session.startSession('free'); }
   };
 
-  // 今日の練習: 規定数に達したら自動終了して結果へ
+  // 規定数に達したら自動終了して結果へ
   useEffect(() => {
-    if (view === 'practice' && dailyTarget != null && started && !result && session.count >= dailyTarget) {
+    if (view === 'practice' && sessionTarget != null && started && !result && session.count >= sessionTarget) {
       handleEnd();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session.count, dailyTarget, started, result, view]);
+  }, [session.count, sessionTarget, started, result, view]);
 
   return (
     <div className="min-h-dvh flex flex-col bg-bg">
@@ -393,7 +399,8 @@ function App() {
           <ResultScreen
             summary={result.summary}
             prev={result.prev}
-            onRestart={handleStart}
+            challenge={result.kind === 'challenge'}
+            onRestart={() => (result.kind === 'daily' ? handleStartDaily() : handleStart())}
             onClose={() => setResult(null)}
           />
         )}
@@ -414,20 +421,11 @@ function App() {
 
             {started && <ScoreBoard score={score} />}
 
-            {started && dailyTarget != null && (
+            {started && sessionTarget != null && (
               <div className="flex justify-center">
                 <span className="inline-flex items-center gap-1.5 text-[11px] text-accent bg-accent-soft border border-accent rounded-full px-2.5 py-0.5">
-                  今日の練習 <span className="font-mono tabular-nums">{session.count}/{dailyTarget}</span>
-                </span>
-              </div>
-            )}
-            {started && dailyTarget == null &&
-              ((quiz.mode !== 'interval' && getNoteRecognitionMetrics().length > 0) ||
-                (quiz.mode === 'interval' && getDegreeMetrics().length > 0)) && (
-              <div className="flex justify-center">
-                <span className="inline-flex items-center gap-1.5 text-[11px] text-dim bg-panel border border-hair rounded-full px-2.5 py-0.5">
-                  <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true" />
-                  弱点を優先して出題中
+                  {sessionKind === 'daily' ? '今日の練習（弱点優先）' : 'チャレンジ'}{' '}
+                  <span className="font-mono tabular-nums">{session.count}/{sessionTarget}</span>
                 </span>
               </div>
             )}
@@ -483,12 +481,28 @@ function App() {
             )}
 
             {!started && (
-              <button
-                onClick={handleStart}
-                className="mx-auto px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
-              >
-                スタート
-              </button>
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-dim">問題数</span>
+                  <Segmented
+                    size="small"
+                    value={challengeLength ?? 0}
+                    onChange={(v) => setChallengeLength(v === 0 ? null : (v as number))}
+                    options={[
+                      { label: '10', value: 10 },
+                      { label: '20', value: 20 },
+                      { label: '50', value: 50 },
+                      { label: '∞', value: 0 },
+                    ]}
+                  />
+                </div>
+                <button
+                  onClick={handleStart}
+                  className="px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
+                >
+                  チャレンジ開始
+                </button>
+              </div>
             )}
 
             <PracticeRangeSelector

@@ -55,7 +55,7 @@ src/
 `'home' | 'practice' | 'theory' | 'stats' | 'settings'`（[docs/adr/0003] のIA）
 
 - **ホーム (home)**: 練習CTA＋進捗readout（累計/正答率/平均反応）＋弱点ティーザー。
-- **練習 (practice)**: 音名・位置・度数の3モードクイズ。セッション制（終了で結果画面）。
+- **練習 (practice)**: 音名・位置・度数の3モード。**チャレンジ**=問題数(10/20/50/∞)を選び純ランダム出題、規定数で自動終了→**100%でクリア判定**。直近6問は重複回避。
 - **理論 (theory)**: `TheoryTab` サブナビ（横スクロールのピル）で7リファレンス表示を集約:
   指板マップ / スケール(8種) / CAGED / ボイシング / オープン(32種) / ダイアトニック / アルペジオ。
 - **成績 (stats)**: 総合サマリ＋推移グラフ(セッション折れ線:正答率/平均反応)＋指板ヒートマップ＋苦手ポジションTOP5＋度数の弱点。
@@ -83,7 +83,9 @@ src/
 ### 弱点自動出題 (M2)
 `practiceStore.pickWeightedPosition()` が弱点スコア順で出題対象を選ぶ。配分 **弱点60% / 復習30% / 新規10%**。
 `useQuiz` の出題生成で音名認識(position-to-note / note-to-position)に適用。度数(interval)は一様のまま。
-記録ゼロの範囲では `null` を返し一様ランダムにフォールバック。練習画面に「弱点を優先して出題中」を表示。
+記録ゼロの範囲では `null` を返し一様ランダムにフォールバック。
+**弱点優先は今日の練習/フェーズ(adaptive=true)のみ**。チャレンジ(自由練習)は純ランダム。
+`useQuiz.start(...,adaptive)` で切替、出題は `buildQuestion` 経由で直近6問の重複を回避(`recentKeys`)。
 度数モードも `pickWeightedIntervalPosition` で弱点優先（**度数=R..M7 を単位**に集計=`getDegreeMetrics`、
 キー `gft-degreestats-v1`）。成績ページに「度数の弱点」バー（緑→琥珀→赤）を表示。
 

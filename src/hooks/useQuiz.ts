@@ -31,14 +31,16 @@ function generateQuestion(
   strings: number[],
   fretRange: [number, number],
   noteFilter: string[] | null,
+  adaptive: boolean,
 ): QuizState {
   if (mode === 'position-to-note' || mode === 'interval') {
-    // 弱点優先で出題。位置→音名はセル、度数はルートからの度数で重み付け。
-    const pos =
-      (mode === 'position-to-note'
+    // adaptive(=デイリー)は弱点優先。チャレンジは純ランダム。
+    const weak = !adaptive
+      ? null
+      : mode === 'position-to-note'
         ? pickWeightedPosition('position-to-note', strings, fretRange, noteFilter, accidental)
-        : pickWeightedIntervalPosition(rootNote, strings, fretRange, noteFilter, accidental)) ??
-      getRandomPosition(maxFret, strings, fretRange, noteFilter, accidental);
+        : pickWeightedIntervalPosition(rootNote, strings, fretRange, noteFilter, accidental);
+    const pos = weak ?? getRandomPosition(maxFret, strings, fretRange, noteFilter, accidental);
     return {
       mode,
       currentPosition: pos,
@@ -48,8 +50,10 @@ function generateQuestion(
       correctAnswer: null,
     };
   }
-  // note-to-position: 弱点セルを選び、その音名を出題（回答は任意の正解位置でOK）
-  const weakPos = pickWeightedPosition('note-to-position', strings, fretRange, noteFilter, accidental);
+  // note-to-position: adaptiveなら弱点セルの音名、そうでなければランダムな音名
+  const weakPos = adaptive
+    ? pickWeightedPosition('note-to-position', strings, fretRange, noteFilter, accidental)
+    : null;
   const note = weakPos
     ? getNoteAt(weakPos.string, weakPos.fret, accidental)
     : getRandomNote(accidental, strings, fretRange, maxFret, noteFilter);
@@ -61,6 +65,12 @@ function generateQuestion(
     feedback: null,
     correctAnswer: null,
   };
+}
+
+/** 重複回避用の問題キー（位置 or 音名）。 */
+function keyOf(q: QuizState): string {
+  if (q.mode === 'note-to-position') return `n:${q.currentNote}`;
+  return q.currentPosition ? `p:${q.currentPosition.string}:${q.currentPosition.fret}` : 'x';
 }
 
 export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, onCorrect, onWrong, onAttempt }: UseQuizOptions) {
@@ -78,16 +88,42 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
   const feedbackTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   // 出題が提示された時刻。回答時間 = answer時刻 - これ。
   const questionShownAt = useRef<number>(Date.now());
+  // 直近に出した問題のキー（近接の重複を避ける）
+  const recentKeys = useRef<string[]>([]);
+  // セッションが弱点優先(デイリー)かどうか
+  const adaptiveRef = useRef<boolean>(false);
+
+  const buildQuestion = useCallback(
+    (
+      mode: QuizMode,
+      rootNote: NoteName,
+      scope?: { strings: number[]; fretRange: [number, number]; noteFilter: string[] | null },
+    ): QuizState => {
+      // scope を渡すと初回出題はその範囲で生成（state更新前のstale回避）。
+      const ss = scope ? scope.strings : strings;
+      const fr = scope ? scope.fretRange : fretRange;
+      const nf = scope ? scope.noteFilter : noteFilter;
+      const ad = adaptiveRef.current;
+      // 直近6問と被らない問題を最大6回まで引き直す。
+      let q = generateQuestion(mode, rootNote, maxFret, accidental, ss, fr, nf, ad);
+      for (let i = 0; i < 6 && recentKeys.current.includes(keyOf(q)); i++) {
+        q = generateQuestion(mode, rootNote, maxFret, accidental, ss, fr, nf, ad);
+      }
+      recentKeys.current = [...recentKeys.current, keyOf(q)].slice(-6);
+      return q;
+    },
+    [maxFret, accidental, strings, fretRange, noteFilter]
+  );
 
   const nextQuestion = useCallback(
     (mode?: QuizMode, rootNote?: NoteName) => {
       const m = mode ?? quiz.mode;
       const r = rootNote ?? quiz.rootNote;
       setShowHint(false);
-      setQuiz(generateQuestion(m, r, maxFret, accidental, strings, fretRange, noteFilter));
+      setQuiz(buildQuestion(m, r));
       questionShownAt.current = Date.now();
     },
-    [quiz.mode, quiz.rootNote, maxFret, accidental, strings, fretRange, noteFilter]
+    [quiz.mode, quiz.rootNote, buildQuestion]
   );
 
   const start = useCallback(
@@ -95,17 +131,16 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       mode: QuizMode,
       rootNote: NoteName = 'C',
       scope?: { strings: number[]; fretRange: [number, number]; noteFilter: string[] | null },
+      adaptive = false,
     ) => {
       setStarted(true);
       setShowHint(false);
-      // scope を渡すと初回出題はその範囲で生成（state更新前のstale回避）。
-      const ss = scope ? scope.strings : strings;
-      const fr = scope ? scope.fretRange : fretRange;
-      const nf = scope ? scope.noteFilter : noteFilter;
-      setQuiz(generateQuestion(mode, rootNote, maxFret, accidental, ss, fr, nf));
+      adaptiveRef.current = adaptive;
+      recentKeys.current = [];
+      setQuiz(buildQuestion(mode, rootNote, scope));
       questionShownAt.current = Date.now();
     },
-    [maxFret, accidental, strings, fretRange, noteFilter]
+    [buildQuestion]
   );
 
   const answerNote = useCallback(
