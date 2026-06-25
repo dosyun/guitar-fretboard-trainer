@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Fretboard } from './components/Fretboard';
 import { FretboardMap } from './components/FretboardMap';
 import { NoteSelector } from './components/NoteSelector';
@@ -25,7 +25,7 @@ import { ScaleQuiz } from './components/ScaleQuiz';
 import { useQuiz } from './hooks/useQuiz';
 import { useScore } from './hooks/useScore';
 import { useSession } from './hooks/useSession';
-import { getLastSession, getNoteRecognitionMetrics } from './data/practiceStore';
+import { getLastSession, getNoteRecognitionMetrics, recordPracticeDay } from './data/practiceStore';
 import type { SessionSummary } from './types/practice';
 import { useCagedQuiz } from './hooks/useCagedQuiz';
 import { useScaleQuiz } from './hooks/useScaleQuiz';
@@ -82,6 +82,7 @@ function App() {
   const { score, recordCorrect, recordWrong, resetScore } = useScore();
   const session = useSession();
   const [result, setResult] = useState<{ summary: SessionSummary; prev: SessionSummary | null } | null>(null);
+  const [dailyTarget, setDailyTarget] = useState<number | null>(null);
 
   const {
     quiz,
@@ -224,24 +225,49 @@ function App() {
   };
 
   // ===== 練習セッション制御 =====
+  const DAILY_COUNT = 35;
+
   const handleStart = () => {
     setResult(null);
     resetScore();
+    setDailyTarget(null);
     session.startSession('free');
     start(quiz.mode, quiz.rootNote);
+  };
+
+  // 今日の練習: 固定35問・位置→音名・弱点優先。Homeから起動。
+  const handleStartDaily = () => {
+    setResult(null);
+    resetScore();
+    setDailyTarget(DAILY_COUNT);
+    session.startSession('daily');
+    setView('practice');
+    start('position-to-note', quiz.rootNote);
   };
 
   const handleEnd = () => {
     const prev = getLastSession(quiz.mode); // 保存前 = 前回
     const summary = session.finalize();     // 今回を保存
     stop();
-    if (summary) setResult({ summary, prev });
+    setDailyTarget(null);
+    if (summary) {
+      recordPracticeDay(); // 連続練習日数を更新
+      setResult({ summary, prev });
+    }
   };
 
-  // モード・範囲・ルートの変更時にセッションを仕切り直す
+  // モード・範囲・ルートの変更時にセッションを仕切り直す（デイリーは解除）
   const restartSession = () => {
-    if (started) session.startSession('free');
+    if (started) { setDailyTarget(null); session.startSession('free'); }
   };
+
+  // 今日の練習: 規定数に達したら自動終了して結果へ
+  useEffect(() => {
+    if (view === 'practice' && dailyTarget != null && started && !result && session.count >= dailyTarget) {
+      handleEnd();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session.count, dailyTarget, started, result, view]);
 
   return (
     <div className="min-h-dvh flex flex-col bg-bg">
@@ -274,6 +300,7 @@ function App() {
         {view === 'home' && (
           <HomePage
             accidental={accidental}
+            onStartDaily={handleStartDaily}
             onStartPractice={() => setView('practice')}
             onOpenStats={() => setView('stats')}
             onShowHelp={() => { setSettingsShowHelp(true); setView('settings'); }}
@@ -372,7 +399,14 @@ function App() {
 
             {started && <ScoreBoard score={score} />}
 
-            {started && quiz.mode !== 'interval' && getNoteRecognitionMetrics().length > 0 && (
+            {started && dailyTarget != null && (
+              <div className="flex justify-center">
+                <span className="inline-flex items-center gap-1.5 text-[11px] text-accent bg-accent-soft border border-accent rounded-full px-2.5 py-0.5">
+                  今日の練習 <span className="font-mono tabular-nums">{session.count}/{dailyTarget}</span>
+                </span>
+              </div>
+            )}
+            {started && dailyTarget == null && quiz.mode !== 'interval' && getNoteRecognitionMetrics().length > 0 && (
               <div className="flex justify-center">
                 <span className="inline-flex items-center gap-1.5 text-[11px] text-dim bg-panel border border-hair rounded-full px-2.5 py-0.5">
                   <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true" />

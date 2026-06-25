@@ -85,6 +85,12 @@ src/
 `useQuiz` の出題生成で音名認識(position-to-note / note-to-position)に適用。度数(interval)は一様のまま。
 記録ゼロの範囲では `null` を返し一様ランダムにフォールバック。練習画面に「弱点を優先して出題中」を表示。
 
+### 今日の練習 / 連続日数 (M2)
+HomePageの「今日の練習をはじめる」→ 固定35問(`DAILY_COUNT`)・位置→音名・弱点優先のデイリーセッション
+(`dailyTarget` state)。規定数に達すると `useEffect` で自動終了→結果。途中で「終了」も可。
+完了(handleEnd)で `recordPracticeDay()` が連続練習日数を更新、Homeに「連続N日」(`getStreak`)表示。
+モード/範囲を手動変更すると `dailyTarget` 解除＝自由練習に戻る。
+
 ### permanenceとリセット
 - 永続化は `practiceStore` に閉じ込め（キー `gft-attempts-v1 / gft-cellstats-v1 / gft-sessions-v1`）。
   量が増えたら IndexedDB へ差し替え可能。`useScore` の連続/最高は別キー。

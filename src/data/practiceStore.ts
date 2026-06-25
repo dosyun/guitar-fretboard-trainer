@@ -112,6 +112,33 @@ export function getNoteRecognitionMetrics(): CellMetrics[] {
   return out;
 }
 
+// ===== 連続練習日数 (streak) =====
+
+const STREAK_KEY = 'gft-streak-v1';
+interface StreakData { lastDay: string; streak: number }
+
+function dayKey(offsetDays = 0): string {
+  const d = new Date(Date.now() - offsetDays * DAY_MS);
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+
+/** 今日の練習完了を記録し、更新後の連続日数を返す。同日2回目以降は据え置き。 */
+export function recordPracticeDay(): number {
+  const today = dayKey(0);
+  const data = load<StreakData>(STREAK_KEY, { lastDay: '', streak: 0 });
+  if (data.lastDay === today) return data.streak;
+  const streak = data.lastDay === dayKey(1) ? data.streak + 1 : 1;
+  save(STREAK_KEY, { lastDay: today, streak });
+  return streak;
+}
+
+/** 現在の連続練習日数。最終練習が今日/昨日でなければ途切れて0。 */
+export function getStreak(): number {
+  const data = load<StreakData>(STREAK_KEY, { lastDay: '', streak: 0 });
+  if (!data.lastDay) return 0;
+  return data.lastDay === dayKey(0) || data.lastDay === dayKey(1) ? data.streak : 0;
+}
+
 export function saveSession(summary: SessionSummary): void {
   const sessions = load<SessionSummary[]>(SESSIONS_KEY, []);
   sessions.push(summary);
