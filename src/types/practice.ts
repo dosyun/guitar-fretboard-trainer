@@ -79,3 +79,23 @@ export interface CellMetrics {
   avgMs: number;
   lastAt: number;
 }
+
+/**
+ * 度数(interval)の弱点集計。ルート依存で指板セルには混ぜないため、
+ * 度数そのもの(R, m2, ... M7)を単位にする（[CONTEXT.md] 出題対象）。
+ */
+export interface DegreeStat {
+  n: number;
+  correct: number;
+  sumMs: number;
+  lastAt: number;
+}
+export type DegreeStatMap = Partial<Record<IntervalName, DegreeStat>>;
+
+export interface DegreeMetrics {
+  degree: IntervalName;
+  n: number;
+  errorRate: number;
+  avgMs: number;
+  lastAt: number;
+}

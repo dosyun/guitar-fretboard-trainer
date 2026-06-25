@@ -16,13 +16,16 @@ import type {
   CellStat,
   QuizType,
   CellMetrics,
+  DegreeStatMap,
+  DegreeMetrics,
 } from '../types/practice';
 import { cellKey, isNoteRecognition } from '../types/practice';
-import { getNoteAt } from './fretboard';
-import type { FretPosition, Accidental } from '../types';
+import { getNoteAt, getIntervalAt } from './fretboard';
+import type { FretPosition, Accidental, NoteName, IntervalName } from '../types';
 
 const ATTEMPTS_KEY = 'gft-attempts-v1';
 const CELLS_KEY = 'gft-cellstats-v1';
+const DEGREES_KEY = 'gft-degreestats-v1';
 const SESSIONS_KEY = 'gft-sessions-v1';
 const MAX_ATTEMPTS = 2000;
 
@@ -72,6 +75,36 @@ export function recordAttempt(attempt: PracticeAttempt): void {
     };
     save(CELLS_KEY, cells);
   }
+
+  // 度数(interval)は度数そのものを単位に集計
+  if (attempt.quizType === 'interval' && attempt.degree) {
+    const dmap = load<DegreeStatMap>(DEGREES_KEY, {});
+    const cur = dmap[attempt.degree] ?? { n: 0, correct: 0, sumMs: 0, lastAt: 0 };
+    dmap[attempt.degree] = {
+      n: cur.n + 1,
+      correct: cur.correct + (attempt.isCorrect ? 1 : 0),
+      sumMs: cur.sumMs + attempt.responseTimeMs,
+      lastAt: attempt.createdAt,
+    };
+    save(DEGREES_KEY, dmap);
+  }
+}
+
+/** 度数モードの弱点指標（出題済みの度数のみ）。 */
+export function getDegreeMetrics(): DegreeMetrics[] {
+  const dmap = load<DegreeStatMap>(DEGREES_KEY, {});
+  const out: DegreeMetrics[] = [];
+  for (const [degree, s] of Object.entries(dmap)) {
+    if (!s) continue;
+    out.push({
+      degree: degree as IntervalName,
+      n: s.n,
+      errorRate: s.n > 0 ? 1 - s.correct / s.n : 0,
+      avgMs: s.n > 0 ? s.sumMs / s.n : 0,
+      lastAt: s.lastAt,
+    });
+  }
+  return out;
 }
 
 export function getCellStats(): CellStatMap {
@@ -161,7 +194,7 @@ export function getAllAttempts(): PracticeAttempt[] {
 
 /** すべての練習データを消去する (設定のリセット用)。 */
 export function clearPracticeData(): void {
-  [ATTEMPTS_KEY, CELLS_KEY, SESSIONS_KEY].forEach((k) => {
+  [ATTEMPTS_KEY, CELLS_KEY, DEGREES_KEY, SESSIONS_KEY].forEach((k) => {
     try {
       localStorage.removeItem(k);
     } catch {
@@ -181,11 +214,30 @@ const clampU = (x: number) => Math.min(1, Math.max(0, x));
  * 弱点スコア = 誤答率0.45 + 反応の遅さ0.35 + 経過(staleness)0.15。
  * (importance 0.05 は将来。現状は重要度重みなし)
  */
-function statWeakness(stat: CellStat, now: number): number {
+type WeakStat = { n: number; correct: number; sumMs: number; lastAt: number };
+
+function statWeakness(stat: WeakStat, now: number): number {
   const errorRate = 1 - stat.correct / stat.n;
   const norm = clampU((stat.sumMs / stat.n - SEL_FAST_MS) / (SEL_SLOW_MS - SEL_FAST_MS));
   const staleness = clampU((now - stat.lastAt) / (14 * DAY_MS));
   return errorRate * 0.45 + norm * 0.35 + staleness * 0.15;
+}
+
+/** 配分 弱点60% / 復習30% / 新規10% でセルを1つ選ぶ。 */
+function rollBuckets(tested: { pos: FretPosition; w: number }[], untested: FretPosition[]): FretPosition {
+  const uniform = (arr: FretPosition[]) => arr[Math.floor(Math.random() * arr.length)];
+  const roll = Math.random();
+  if (roll < 0.6) {
+    const total = tested.reduce((a, t) => a + (t.w + 0.05), 0);
+    let r = Math.random() * total;
+    for (const t of tested) {
+      r -= t.w + 0.05;
+      if (r <= 0) return t.pos;
+    }
+    return tested[tested.length - 1].pos;
+  }
+  if (roll < 0.9) return uniform(tested.map((t) => t.pos));
+  return untested.length ? uniform(untested) : uniform(tested.map((t) => t.pos));
 }
 
 /**
@@ -221,24 +273,42 @@ export function pickWeightedPosition(
   }
   // 記録ゼロなら適応しない（呼び出し側で一様 random）
   if (tested.length === 0) return null;
+  return rollBuckets(tested, untested);
+}
 
-  const uniform = (arr: FretPosition[]) => arr[Math.floor(Math.random() * arr.length)];
-  const roll = Math.random();
-
-  // 弱点 60%: 弱点スコアで重み付き抽選（弱いほど出やすい）
-  if (roll < 0.6) {
-    const total = tested.reduce((a, t) => a + (t.w + 0.05), 0);
-    let r = Math.random() * total;
-    for (const t of tested) {
-      r -= t.w + 0.05;
-      if (r <= 0) return t.pos;
+/**
+ * 度数モードの弱点優先選択。各候補の (ルートからの) 度数の弱点で重み付け。
+ * 度数の記録が無ければ null（呼び出し側で一様 random）。
+ */
+export function pickWeightedIntervalPosition(
+  rootNote: NoteName,
+  strings: number[],
+  fretRange: [number, number],
+  noteFilter: string[] | null,
+  accidental: Accidental,
+): FretPosition | null {
+  const ss = strings.length ? strings : [0, 1, 2, 3, 4, 5];
+  const [lo, hi] = fretRange;
+  const candidates: FretPosition[] = [];
+  for (const s of ss) {
+    for (let f = lo; f <= hi; f++) {
+      if (noteFilter && noteFilter.length && !noteFilter.includes(getNoteAt(s, f, accidental))) continue;
+      candidates.push({ string: s, fret: f });
     }
-    return tested[tested.length - 1].pos;
   }
-  // 通常復習 30%: 既習から一様
-  if (roll < 0.9) return uniform(tested.map((t) => t.pos));
-  // 新規 10%: 未出題から一様（無ければ既習）
-  return untested.length ? uniform(untested) : uniform(tested.map((t) => t.pos));
+  if (candidates.length === 0) return null;
+
+  const dmap = load<DegreeStatMap>(DEGREES_KEY, {});
+  const now = Date.now();
+  const tested: { pos: FretPosition; w: number }[] = [];
+  const untested: FretPosition[] = [];
+  for (const c of candidates) {
+    const stat = dmap[getIntervalAt(c.string, c.fret, rootNote)];
+    if (stat && stat.n > 0) tested.push({ pos: c, w: statWeakness(stat, now) });
+    else untested.push(c);
+  }
+  if (tested.length === 0) return null;
+  return rollBuckets(tested, untested);
 }
 
 /** 配列の中央値 (セッション結果用)。 */

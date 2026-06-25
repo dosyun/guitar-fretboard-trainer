@@ -84,6 +84,8 @@ src/
 `practiceStore.pickWeightedPosition()` が弱点スコア順で出題対象を選ぶ。配分 **弱点60% / 復習30% / 新規10%**。
 `useQuiz` の出題生成で音名認識(position-to-note / note-to-position)に適用。度数(interval)は一様のまま。
 記録ゼロの範囲では `null` を返し一様ランダムにフォールバック。練習画面に「弱点を優先して出題中」を表示。
+度数モードも `pickWeightedIntervalPosition` で弱点優先（**度数=R..M7 を単位**に集計=`getDegreeMetrics`、
+キー `gft-degreestats-v1`）。成績ページに「度数の弱点」バー（緑→琥珀→赤）を表示。
 
 ### 今日の練習 / 連続日数 (M2)
 HomePageの「今日の練習をはじめる」→ 固定35問(`DAILY_COUNT`)・位置→音名・弱点優先のデイリーセッション

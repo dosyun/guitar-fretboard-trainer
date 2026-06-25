@@ -1,8 +1,8 @@
 import { FretboardHeatmap } from './FretboardHeatmap';
-import { getAllSessions, getNoteRecognitionMetrics } from '../data/practiceStore';
+import { getAllSessions, getNoteRecognitionMetrics, getDegreeMetrics } from '../data/practiceStore';
 import { getNoteLabel } from '../data/fretboard';
 import type { Accidental } from '../types';
-import type { CellMetrics } from '../types/practice';
+import type { CellMetrics, DegreeMetrics } from '../types/practice';
 
 interface StatsPageProps {
   maxFret: number;
@@ -15,10 +15,14 @@ const SLOW_MS = 4000;
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const weakness = (m: CellMetrics) =>
   0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
+const degreeWeak = (m: DegreeMetrics) =>
+  0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
+const heatColor = (w: number) => (w < 0.25 ? 'var(--correct)' : w < 0.55 ? 'var(--accent)' : 'var(--wrong)');
 
 export function StatsPage({ maxFret, accidental }: StatsPageProps) {
   const sessions = getAllSessions();
   const metrics = getNoteRecognitionMetrics();
+  const degreeWorst = [...getDegreeMetrics()].sort((a, b) => degreeWeak(b) - degreeWeak(a));
 
   const totalAttempts = sessions.reduce((a, s) => a + s.count, 0);
   const totalCorrect = sessions.reduce((a, s) => a + s.correct, 0);
@@ -88,6 +92,32 @@ export function StatsPage({ maxFret, accidental }: StatsPageProps) {
                     </span>
                   </li>
                 ))}
+              </ul>
+            </div>
+          )}
+
+          {/* 度数の弱点（度数モード） */}
+          {degreeWorst.length > 0 && (
+            <div className="space-y-2">
+              <h2 className="text-sm font-medium text-ink">度数の弱点（度数モード）</h2>
+              <ul className="space-y-1.5">
+                {degreeWorst.map((d) => {
+                  const w = degreeWeak(d);
+                  return (
+                    <li key={d.degree} className="flex items-center gap-3 text-sm">
+                      <span className="font-mono text-ink w-12 shrink-0">{d.degree}</span>
+                      <div className="flex-1 h-2 rounded-full bg-panel overflow-hidden">
+                        <div
+                          className="h-full rounded-full"
+                          style={{ width: `${Math.max(4, Math.round(w * 100))}%`, background: heatColor(w) }}
+                        />
+                      </div>
+                      <span className="font-mono tabular-nums text-dim text-xs w-24 text-right shrink-0">
+                        {Math.round(d.errorRate * 100)}% / {sec(d.avgMs)}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
