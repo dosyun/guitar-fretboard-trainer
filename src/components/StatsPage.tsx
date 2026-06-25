@@ -1,4 +1,5 @@
 import { FretboardHeatmap } from './FretboardHeatmap';
+import { ProgressChart } from './ProgressChart';
 import { getAllSessions, getNoteRecognitionMetrics, getDegreeMetrics } from '../data/practiceStore';
 import { getNoteLabel } from '../data/fretboard';
 import type { Accidental } from '../types';
@@ -61,6 +62,9 @@ export function StatsPage({ maxFret, accidental }: StatsPageProps) {
             <Stat label="総合正答率" value={`${accuracy}%`} />
             <Stat label="平均反応" value={sec(avgMs)} />
           </div>
+
+          {/* 推移グラフ */}
+          <ProgressChart sessions={sessions} />
 
           {/* ヒートマップ */}
           <div className="space-y-2">
