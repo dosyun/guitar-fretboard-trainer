@@ -14,15 +14,15 @@ export function SettingsPanel({ accidental, maxFret, onAccidentalChange, onMaxFr
   return (
     <div className="flex items-center justify-center gap-4 text-sm flex-wrap">
       <div className="flex items-center gap-1">
-        <span className="text-gray-500">表記:</span>
+        <span className="text-dim">表記:</span>
         {([['sharp', '#'], ['flat', '♭'], ['both', '#/♭']] as const).map(([val, label]) => (
           <button
             key={val}
             onClick={() => onAccidentalChange(val)}
-            className={`px-2 py-1 rounded text-sm font-medium transition-colors ${
+            className={`px-2 py-1 rounded text-sm font-medium font-mono transition-colors ${
               accidental === val
-                ? 'bg-gray-700 text-white'
-                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+                ? 'bg-accent-soft text-accent border border-accent'
+                : 'bg-panel hover:bg-accent-soft text-dim border border-hair'
             }`}
           >
             {label}
@@ -30,11 +30,11 @@ export function SettingsPanel({ accidental, maxFret, onAccidentalChange, onMaxFr
         ))}
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-gray-500">フレット:</span>
+        <span className="text-dim">フレット:</span>
         <select
           value={maxFret}
           onChange={(e) => onMaxFretChange(Number(e.target.value))}
-          className="px-2 py-1 rounded bg-gray-100 border border-gray-200 text-gray-700 font-medium text-sm"
+          className="px-2 py-1 rounded bg-panel border border-hair text-ink font-medium font-mono text-sm"
         >
           {FRET_OPTIONS.map((f) => (
             <option key={f} value={f}>{f}F</option>
@@ -43,7 +43,7 @@ export function SettingsPanel({ accidental, maxFret, onAccidentalChange, onMaxFr
       </div>
       <button
         onClick={onReset}
-        className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-500"
+        className="px-3 py-1 rounded bg-panel hover:bg-accent-soft text-dim border border-hair transition-colors"
       >
         スコアリセット
       </button>

@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
-import type { QuizMode, QuizState, FretPosition, NoteName, Accidental } from '../types';
+import type { QuizMode, QuizState, FretPosition, NoteName, IntervalName, Accidental } from '../types';
+import type { AttemptInput } from '../types/practice';
 import {
   getNoteAt,
   getIntervalAt,
@@ -18,6 +19,7 @@ interface UseQuizOptions {
   noteFilter: string[] | null;
   onCorrect: () => void;
   onWrong: () => void;
+  onAttempt?: (input: AttemptInput) => void;
 }
 
 function generateQuestion(
@@ -52,7 +54,7 @@ function generateQuestion(
   };
 }
 
-export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, onCorrect, onWrong }: UseQuizOptions) {
+export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, onCorrect, onWrong, onAttempt }: UseQuizOptions) {
   const [quiz, setQuiz] = useState<QuizState>({
     mode: 'position-to-note',
     currentPosition: null,
@@ -65,6 +67,8 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
   const [started, setStarted] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const feedbackTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // 出題が提示された時刻。回答時間 = answer時刻 - これ。
+  const questionShownAt = useRef<number>(Date.now());
 
   const nextQuestion = useCallback(
     (mode?: QuizMode, rootNote?: NoteName) => {
@@ -72,6 +76,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       const r = rootNote ?? quiz.rootNote;
       setShowHint(false);
       setQuiz(generateQuestion(m, r, maxFret, accidental, strings, fretRange, noteFilter));
+      questionShownAt.current = Date.now();
     },
     [quiz.mode, quiz.rootNote, maxFret, accidental, strings, fretRange, noteFilter]
   );
@@ -81,6 +86,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       setStarted(true);
       setShowHint(false);
       setQuiz(generateQuestion(mode, rootNote, maxFret, accidental, strings, fretRange, noteFilter));
+      questionShownAt.current = Date.now();
     },
     [maxFret, accidental, strings, fretRange, noteFilter]
   );
@@ -100,6 +106,15 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       if (isCorrect) onCorrect();
       else onWrong();
 
+      onAttempt?.({
+        quizType: 'position-to-note',
+        isCorrect,
+        responseTimeMs: Date.now() - questionShownAt.current,
+        string: quiz.currentPosition.string,
+        fret: quiz.currentPosition.fret,
+        note: correct as NoteName,
+      });
+
       setQuiz((prev) => ({
         ...prev,
         feedback: isCorrect ? 'correct' : 'wrong',
@@ -111,7 +126,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
         nextQuestion();
       }, FEEDBACK_DELAY);
     },
-    [quiz.feedback, quiz.currentPosition, accidental, onCorrect, onWrong, nextQuestion]
+    [quiz.feedback, quiz.currentPosition, accidental, onCorrect, onWrong, onAttempt, nextQuestion]
   );
 
   const answerInterval = useCallback(
@@ -129,6 +144,17 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       if (isCorrect) onCorrect();
       else onWrong();
 
+      onAttempt?.({
+        quizType: 'interval',
+        isCorrect,
+        responseTimeMs: Date.now() - questionShownAt.current,
+        string: quiz.currentPosition.string,
+        fret: quiz.currentPosition.fret,
+        note: getNoteAt(quiz.currentPosition.string, quiz.currentPosition.fret, accidental) as NoteName,
+        rootNote: quiz.rootNote,
+        degree: correct as IntervalName,
+      });
+
       setQuiz((prev) => ({
         ...prev,
         feedback: isCorrect ? 'correct' : 'wrong',
@@ -140,7 +166,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
         nextQuestion();
       }, FEEDBACK_DELAY);
     },
-    [quiz.feedback, quiz.currentPosition, quiz.rootNote, onCorrect, onWrong, nextQuestion]
+    [quiz.feedback, quiz.currentPosition, quiz.rootNote, accidental, onCorrect, onWrong, onAttempt, nextQuestion]
   );
 
   const answerPosition = useCallback(
@@ -155,6 +181,16 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       if (isCorrect) onCorrect();
       else onWrong();
 
+      onAttempt?.({
+        quizType: 'note-to-position',
+        isCorrect,
+        responseTimeMs: Date.now() - questionShownAt.current,
+        // タップしたセルを対象にする (「このセルを音名Xだと思った」の正誤)
+        string: pos.string,
+        fret: pos.fret,
+        note: quiz.currentNote as NoteName,
+      });
+
       setQuiz((prev) => ({
         ...prev,
         feedback: isCorrect ? 'correct' : 'wrong',
@@ -166,7 +202,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
         nextQuestion();
       }, FEEDBACK_DELAY);
     },
-    [quiz.feedback, quiz.currentNote, maxFret, accidental, onCorrect, onWrong, nextQuestion]
+    [quiz.feedback, quiz.currentNote, maxFret, accidental, onCorrect, onWrong, onAttempt, nextQuestion]
   );
 
   const setMode = useCallback(
@@ -183,6 +219,12 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
     [start, quiz.mode]
   );
 
+  const stop = useCallback(() => {
+    clearTimeout(feedbackTimer.current);
+    setStarted(false);
+    setShowHint(false);
+  }, []);
+
   const toggleHint = useCallback(() => {
     setShowHint((prev) => !prev);
   }, []);
@@ -198,6 +240,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
     started,
     showHint,
     start,
+    stop,
     answerNote,
     answerInterval,
     answerPosition,

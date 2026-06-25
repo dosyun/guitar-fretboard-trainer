@@ -1,4 +1,5 @@
 import { getNoteIndex } from '../data/fretboard';
+import { BOARD } from '../data/boardPalette';
 import type { NoteName } from '../types';
 
 interface VoicingDiagramProps {
@@ -62,16 +63,16 @@ export function VoicingDiagram({
     <div
       onClick={onClick}
       className={`flex flex-col items-center cursor-pointer rounded-xl p-2 transition-all ${
-        selected ? 'bg-blue-50 ring-2 ring-blue-400' : 'bg-white hover:bg-gray-50'
+        selected ? 'bg-accent-soft ring-2 ring-accent' : 'bg-surface hover:bg-panel'
       }`}
     >
-      <div className="text-lg font-bold text-gray-700 mb-1">{voicing.label}</div>
+      <div className="text-lg font-bold text-ink mb-1">{voicing.label}</div>
 
       <svg viewBox={`0 0 ${totalWidth} ${totalHeight}`} className="w-full h-auto">
         {/* フレット番号 */}
         {startFret > 1 && (
           <text x={PADDING_LEFT - 8} y={PADDING_TOP + FRET_SPACING * 0.5}
-            textAnchor="end" dominantBaseline="central" fontSize={20} fill="#6b7280">
+            textAnchor="end" dominantBaseline="central" fontSize={20} fill={BOARD.stringLabel}>
             {startFret}fr
           </text>
         )}
@@ -80,7 +81,7 @@ export function VoicingDiagram({
         {startFret === 1 && (
           <rect x={PADDING_LEFT} y={PADDING_TOP - 10}
             width={STRING_SPACING * (STRINGS - 1)} height={10}
-            fill="#374151" rx={2} />
+            fill={BOARD.nut} rx={2} />
         )}
 
         {/* フレット線 */}
@@ -88,7 +89,7 @@ export function VoicingDiagram({
           <line key={`fret-${i}`}
             x1={PADDING_LEFT} y1={PADDING_TOP + FRET_SPACING * i}
             x2={PADDING_LEFT + STRING_SPACING * (STRINGS - 1)} y2={PADDING_TOP + FRET_SPACING * i}
-            stroke="#d1d5db" strokeWidth={1} />
+            stroke={BOARD.fretwire} strokeWidth={1} />
         ))}
 
         {/* 弦 */}
@@ -96,7 +97,7 @@ export function VoicingDiagram({
           <line key={`string-${i}`}
             x1={PADDING_LEFT + STRING_SPACING * i} y1={PADDING_TOP}
             x2={PADDING_LEFT + STRING_SPACING * i} y2={PADDING_TOP + FRET_SPACING * FRETS}
-            stroke="#6b7280" strokeWidth={2 + (STRINGS - 1 - i) * 0.6} />
+            stroke={BOARD.string} strokeWidth={2 + (STRINGS - 1 - i) * 0.6} />
         ))}
 
         {/* ミュート・開放弦 */}
@@ -106,11 +107,11 @@ export function VoicingDiagram({
           if (fret === 'x') return (
             <text key={`top-${strIdx}`} x={cx} y={cy}
               textAnchor="middle" dominantBaseline="central"
-              fontSize={26} fill="#ef4444" fontWeight={700}>×</text>
+              fontSize={26} fill="var(--wrong)" fontWeight={700}>×</text>
           );
           if (fret === 0) return (
             <circle key={`top-${strIdx}`} cx={cx} cy={cy} r={12}
-              fill="none" stroke="#374151" strokeWidth={3} />
+              fill="none" stroke={BOARD.string} strokeWidth={3} />
           );
           return null;
         })}
@@ -132,23 +133,23 @@ export function VoicingDiagram({
 
           return (
             <g key={`dot-${strIdx}`}>
-              <circle cx={cx} cy={cy} r={DOT_R} fill={isRoot ? '#2563eb' : '#374151'} />
+              <circle cx={cx} cy={cy} r={DOT_R} fill={isRoot ? 'var(--accent)' : '#3a3a42'} />
               {displayMode === 'both' ? (
                 <>
                   <text x={cx} y={cy - 10} textAnchor="middle" dominantBaseline="central"
-                    fontSize={17} fill="#fff" fontWeight={700}
+                    fontSize={17} fill={isRoot ? '#1b1813' : '#fff'} fontWeight={700}
                     style={{ pointerEvents: 'none', userSelect: 'none' }}>
                     {noteName}
                   </text>
                   <text x={cx} y={cy + 10} textAnchor="middle" dominantBaseline="central"
-                    fontSize={17} fill={isRoot ? '#bfdbfe' : '#93c5fd'}
+                    fontSize={17} fill={isRoot ? '#5b3d09' : '#cbd5e1'}
                     style={{ pointerEvents: 'none', userSelect: 'none' }}>
                     {degreeName}
                   </text>
                 </>
               ) : (
                 <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
-                  fontSize={18} fill="#fff" fontWeight={700}
+                  fontSize={18} fill={isRoot ? '#1b1813' : '#fff'} fontWeight={700}
                   style={{ pointerEvents: 'none', userSelect: 'none' }}>
                   {displayMode === 'degree' ? degreeName : noteName}
                 </text>
@@ -159,7 +160,7 @@ export function VoicingDiagram({
       </svg>
 
       {/* フレット番号列 */}
-      <div className="text-xs text-gray-400 mt-0.5 flex w-full">
+      <div className="text-xs text-dim mt-0.5 flex w-full">
         {actualFrets.map((f, i) => (
           <span key={i} className="flex-1 text-center">
             {f === 'x' ? '×' : f}

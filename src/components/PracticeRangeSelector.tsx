@@ -14,6 +14,10 @@ interface PracticeRangeSelectorProps {
 
 const STRING_LABELS = ['6弦(E)', '5弦(A)', '4弦(D)', '3弦(G)', '2弦(B)', '1弦(E)'];
 
+const PRESET_BTN =
+  'px-2 py-0.5 rounded text-xs bg-panel text-dim hover:bg-accent-soft border border-hair transition-colors';
+const SELECT_CLS = 'text-xs bg-panel text-ink border border-hair rounded px-2 py-1 font-mono';
+
 export function PracticeRangeSelector({
   selectedStrings,
   fretRange,
@@ -59,21 +63,21 @@ export function PracticeRangeSelector({
     selectedNotes === null || selectedNotes.includes(note);
 
   return (
-    <div className="space-y-3 bg-white rounded-lg p-3 border border-gray-200">
-      <div className="text-sm font-medium text-gray-600">練習範囲</div>
+    <div className="space-y-3 bg-surface rounded-lg p-3 border border-hair">
+      <div className="text-sm font-medium text-dim">練習範囲</div>
 
       {/* 弦の選択 */}
       <div className="flex items-center gap-1 flex-wrap">
-        <span className="text-xs text-gray-400 w-8">弦:</span>
+        <span className="text-xs text-dim w-8">弦:</span>
         {STRING_LABELS.map((label, i) => (
           <button
             key={i}
             onClick={() => toggleString(i)}
             className={`
-              px-2 py-1 rounded text-xs font-medium transition-colors
+              px-2 py-1 rounded text-xs font-medium transition-colors border
               ${selectedStrings.includes(i)
-                ? 'bg-blue-100 text-blue-700 border border-blue-300'
-                : 'bg-gray-50 text-gray-400 border border-gray-200'
+                ? 'bg-accent-soft text-accent border-accent'
+                : 'bg-panel text-dim border-hair'
               }
             `}
           >
@@ -82,7 +86,7 @@ export function PracticeRangeSelector({
         ))}
         <button
           onClick={() => onStringsChange([0, 1, 2, 3, 4, 5])}
-          className="px-2 py-1 rounded text-xs text-gray-500 hover:bg-gray-100"
+          className="px-2 py-1 rounded text-xs text-dim hover:bg-panel"
         >
           全弦
         </button>
@@ -90,11 +94,11 @@ export function PracticeRangeSelector({
 
       {/* フレット範囲 */}
       <div className="flex items-center gap-2">
-        <span className="text-xs text-gray-400 w-8">F:</span>
+        <span className="text-xs text-dim w-8">F:</span>
         <select
           value={fretRange[0]}
           onChange={(e) => onFretRangeChange([Number(e.target.value), fretRange[1]])}
-          className="text-xs border border-gray-200 rounded px-2 py-1"
+          className={SELECT_CLS}
         >
           {Array.from({ length: maxFret + 1 }, (_, i) => (
             <option key={i} value={i} disabled={i > fretRange[1]}>
@@ -102,11 +106,11 @@ export function PracticeRangeSelector({
             </option>
           ))}
         </select>
-        <span className="text-xs text-gray-400">〜</span>
+        <span className="text-xs text-dim">〜</span>
         <select
           value={fretRange[1]}
           onChange={(e) => onFretRangeChange([fretRange[0], Number(e.target.value)])}
-          className="text-xs border border-gray-200 rounded px-2 py-1"
+          className={SELECT_CLS}
         >
           {Array.from({ length: maxFret + 1 }, (_, i) => (
             <option key={i} value={i} disabled={i < fretRange[0]}>
@@ -114,12 +118,12 @@ export function PracticeRangeSelector({
             </option>
           ))}
         </select>
-        <span className="text-xs text-gray-400">フレット</span>
+        <span className="text-xs text-dim">フレット</span>
       </div>
 
       {/* 音名フィルター */}
       <div className="flex items-center gap-1 flex-wrap">
-        <span className="text-xs text-gray-400 w-8">音:</span>
+        <span className="text-xs text-dim w-8">音:</span>
         {allNotes.map((note) => {
           const color = NOTE_COLORS[note];
           const selected = isNoteSelected(note);
@@ -129,10 +133,10 @@ export function PracticeRangeSelector({
               onClick={() => toggleNote(note)}
               style={selected ? { background: color.bg, color: color.text, borderColor: color.border } : {}}
               className={`
-                w-8 h-7 rounded text-xs font-semibold transition-opacity border
+                size-7 rounded text-xs font-semibold font-mono transition-opacity border
                 ${selected
                   ? 'opacity-100'
-                  : 'bg-gray-100 text-gray-400 border-gray-200 opacity-50'
+                  : 'bg-panel text-dim border-hair opacity-60'
                 }
               `}
             >
@@ -142,7 +146,7 @@ export function PracticeRangeSelector({
         })}
         <button
           onClick={() => onNotesChange(null)}
-          className="px-2 py-1 rounded text-xs text-gray-500 hover:bg-gray-100"
+          className="px-2 py-1 rounded text-xs text-dim hover:bg-panel"
         >
           全音
         </button>
@@ -150,40 +154,40 @@ export function PracticeRangeSelector({
 
       {/* プリセット */}
       <div className="flex gap-1 flex-wrap">
-        <span className="text-xs text-gray-400 w-8">例:</span>
+        <span className="text-xs text-dim w-8">例:</span>
         <button
           onClick={() => { onStringsChange([0, 1, 2, 3, 4, 5]); onFretRangeChange([0, 4]); onNotesChange(null); }}
-          className="px-2 py-0.5 rounded text-xs bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-200"
+          className={PRESET_BTN}
         >
           開放〜4F
         </button>
         <button
           onClick={() => { onStringsChange([0, 1, 2, 3, 4, 5]); onFretRangeChange([5, 9]); onNotesChange(null); }}
-          className="px-2 py-0.5 rounded text-xs bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-200"
+          className={PRESET_BTN}
         >
           5〜9F
         </button>
         <button
           onClick={() => { onStringsChange([0, 1, 2, 3, 4, 5]); onFretRangeChange([0, 12]); onNotesChange(null); }}
-          className="px-2 py-0.5 rounded text-xs bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-200"
+          className={PRESET_BTN}
         >
           全範囲
         </button>
         <button
           onClick={() => { onStringsChange([0]); onFretRangeChange([0, 12]); onNotesChange(null); }}
-          className="px-2 py-0.5 rounded text-xs bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-200"
+          className={PRESET_BTN}
         >
           6弦のみ
         </button>
         <button
           onClick={() => { onNotesChange(['C', 'E', 'G']); }}
-          className="px-2 py-0.5 rounded text-xs bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-200"
+          className={PRESET_BTN}
         >
           C E G
         </button>
         <button
           onClick={() => { onNotesChange(['C', 'D', 'E', 'F', 'G', 'A', 'B']); }}
-          className="px-2 py-0.5 rounded text-xs bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-200"
+          className={PRESET_BTN}
         >
           ナチュラルのみ
         </button>

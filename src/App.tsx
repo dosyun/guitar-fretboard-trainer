@@ -17,10 +17,16 @@ import { DiatonicPage } from './components/DiatonicPage';
 import { ArpeggioPage } from './components/ArpeggioPage';
 import { OpenChordPage } from './components/OpenChordPage';
 import { HelpPage } from './components/HelpPage';
+import { HomePage } from './components/HomePage';
+import { ResultScreen } from './components/ResultScreen';
+import { StatsPage } from './components/StatsPage';
 import { ScaleMap } from './components/ScaleMap';
 import { ScaleQuiz } from './components/ScaleQuiz';
 import { useQuiz } from './hooks/useQuiz';
 import { useScore } from './hooks/useScore';
+import { useSession } from './hooks/useSession';
+import { getLastSession } from './data/practiceStore';
+import type { SessionSummary } from './types/practice';
 import { useCagedQuiz } from './hooks/useCagedQuiz';
 import { useScaleQuiz } from './hooks/useScaleQuiz';
 import { getNoteAt, getIntervalAt, getAllPositionsForNote } from './data/fretboard';
@@ -31,11 +37,24 @@ import { Tabs as AntTabs, Segmented, Switch } from 'antd';
 import type { Accidental, FretPosition, NoteName, CagedFormName } from './types';
 import './index.css';
 
-type AppView = 'map' | 'quiz' | 'scale' | 'caged' | 'voicing' | 'open' | 'diatonic' | 'arpeggio' | 'help';
+type AppView = 'home' | 'practice' | 'theory' | 'stats' | 'settings';
+type TheoryTab = 'map' | 'scale' | 'caged' | 'voicing' | 'open' | 'diatonic' | 'arpeggio';
+
+const THEORY_TABS: { key: TheoryTab; label: string }[] = [
+  { key: 'map', label: '指板マップ' },
+  { key: 'scale', label: 'スケール' },
+  { key: 'caged', label: 'CAGED' },
+  { key: 'voicing', label: 'ボイシング' },
+  { key: 'open', label: 'オープン' },
+  { key: 'diatonic', label: 'ダイアトニック' },
+  { key: 'arpeggio', label: 'アルペジオ' },
+];
 
 function App() {
   const [accidental, setAccidental] = useState<Accidental>('flat');
-  const [view, setView] = useState<AppView>('help');
+  const [view, setView] = useState<AppView>('home');
+  const [theoryTab, setTheoryTab] = useState<TheoryTab>('map');
+  const [settingsShowHelp, setSettingsShowHelp] = useState(false);
   const [mapDisplay, setMapDisplay] = useState<'notes' | 'intervals'>('notes');
   const [mapRoot, setMapRoot] = useState<NoteName>('C');
   const [maxFret, setMaxFret] = useState(12);
@@ -61,12 +80,15 @@ function App() {
   const [scaleDisplayMode, setScaleDisplayMode] = useState<'degree' | 'note' | 'both'>('degree');
 
   const { score, recordCorrect, recordWrong, resetScore } = useScore();
+  const session = useSession();
+  const [result, setResult] = useState<{ summary: SessionSummary; prev: SessionSummary | null } | null>(null);
 
   const {
     quiz,
     started,
     showHint,
     start,
+    stop,
     answerNote,
     answerInterval,
     answerPosition,
@@ -82,6 +104,7 @@ function App() {
     noteFilter: selectedNotes,
     onCorrect: recordCorrect,
     onWrong: recordWrong,
+    onAttempt: session.record,
   });
 
   // CAGED用の別スコア
@@ -200,38 +223,84 @@ function App() {
     return '不正解...';
   };
 
+  // ===== 練習セッション制御 =====
+  const handleStart = () => {
+    setResult(null);
+    resetScore();
+    session.startSession('free');
+    start(quiz.mode, quiz.rootNote);
+  };
+
+  const handleEnd = () => {
+    const prev = getLastSession(quiz.mode); // 保存前 = 前回
+    const summary = session.finalize();     // 今回を保存
+    stop();
+    if (summary) setResult({ summary, prev });
+  };
+
+  // モード・範囲・ルートの変更時にセッションを仕切り直す
+  const restartSession = () => {
+    if (started) session.startSession('free');
+  };
+
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#f0f4f8' }}>
-      <header className="bg-gradient-to-r from-blue-600 to-indigo-600 py-4 px-4 shadow-lg">
-        <h1 className="text-xl font-bold text-white text-center tracking-tight">
+    <div className="min-h-dvh flex flex-col bg-bg">
+      <header className="bg-surface border-b border-hair py-3 px-4">
+        <h1 className="font-mono text-base font-medium text-ink text-center flex items-center justify-center gap-2">
+          <span className="inline-block size-2 rounded-sm bg-accent" aria-hidden="true" />
           Guitar Fretboard Trainer
         </h1>
       </header>
 
-      <div className="sticky top-0 z-10 bg-gray-50 px-4 pt-2 border-b border-gray-200 shadow-sm">
+      <div className="sticky top-0 z-nav bg-surface px-4 pt-2 border-b border-hair">
         <AntTabs
           activeKey={view}
           onChange={(v) => setView(v as AppView)}
           centered
           size="large"
           items={[
-            { key: 'help', label: '使い方' },
-            { key: 'map', label: '指板マップ' },
-            { key: 'quiz', label: 'クイズ' },
-            { key: 'scale', label: 'スケール' },
-            { key: 'caged', label: 'CAGED' },
-            { key: 'voicing', label: 'ボイシング' },
-            { key: 'open', label: 'オープン' },
-            { key: 'diatonic', label: 'ダイアトニック' },
-            { key: 'arpeggio', label: 'アルペジオ' },
+            { key: 'home', label: 'ホーム' },
+            { key: 'practice', label: '練習' },
+            { key: 'theory', label: '理論' },
+            { key: 'stats', label: '成績' },
+            { key: 'settings', label: '設定' },
           ]}
         />
       </div>
 
       <div className="flex-1 flex flex-col gap-3 px-4 pb-4 w-full">
 
+        {/* ===== ホームビュー ===== */}
+        {view === 'home' && (
+          <HomePage
+            accidental={accidental}
+            onStartPractice={() => setView('practice')}
+            onOpenStats={() => setView('stats')}
+            onShowHelp={() => { setSettingsShowHelp(true); setView('settings'); }}
+          />
+        )}
+
+        {/* ===== 理論ビュー: サブナビ ===== */}
+        {view === 'theory' && (
+          <div className="flex gap-1 overflow-x-auto pb-1 -mx-1 px-1">
+            {THEORY_TABS.map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setTheoryTab(t.key)}
+                className={`whitespace-nowrap px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                  theoryTab === t.key
+                    ? 'bg-accent-soft text-accent border-accent'
+                    : 'bg-panel text-dim border-hair'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* ===== マップビュー ===== */}
-        {view === 'map' && (
+        {view === 'theory' && theoryTab === 'map' && (
           <>
             <div className="flex justify-center">
               <Segmented
@@ -248,7 +317,7 @@ function App() {
               <RootSelector current={mapRoot} accidental={accidental} onChange={setMapRoot} />
             )}
 
-            <div className="overflow-x-auto bg-white rounded-xl shadow-sm p-2">
+            <div className="overflow-x-auto bg-surface rounded-xl border border-hair p-2">
               <FretboardMap
                 maxFret={maxFret}
                 accidental={accidental}
@@ -271,25 +340,33 @@ function App() {
               onNotesChange={setSelectedNotes}
             />
 
-            <p className="text-xs text-gray-400 text-center">
+            <p className="text-xs text-dim text-center text-pretty">
               マップで全体を確認してからクイズに挑戦しよう。範囲を絞って段階的に覚えるのがおすすめ!
             </p>
           </>
         )}
 
         {/* ===== クイズビュー ===== */}
-        {view === 'quiz' && (
+        {view === 'practice' && result && (
+          <ResultScreen
+            summary={result.summary}
+            prev={result.prev}
+            onRestart={handleStart}
+            onClose={() => setResult(null)}
+          />
+        )}
+        {view === 'practice' && !result && (
           <>
             <ModeSelector
               current={quiz.mode}
-              onChange={(mode) => { setMode(mode); resetScore(); }}
+              onChange={(mode) => { setMode(mode); resetScore(); restartSession(); }}
             />
 
             {quiz.mode === 'interval' && (
               <RootSelector
                 current={quiz.rootNote}
                 accidental={accidental}
-                onChange={(root) => { setRootNote(root as NoteName); resetScore(); }}
+                onChange={(root) => { setRootNote(root as NoteName); resetScore(); restartSession(); }}
               />
             )}
 
@@ -297,7 +374,7 @@ function App() {
 
             {started && (
               <div className="text-center">
-                <p className="text-gray-700 font-medium">{getPrompt()}</p>
+                <p className="text-ink font-medium">{getPrompt()}</p>
                 {quiz.feedback && (
                   <p className={`text-lg font-bold mt-1 ${
                     quiz.feedback === 'correct' ? 'text-green-600' : 'text-red-500'
@@ -310,14 +387,14 @@ function App() {
 
             {started && !quiz.feedback && (quiz.mode === 'position-to-note' || quiz.mode === 'interval') && (
               <div className="text-center">
-                <button onClick={toggleHint} className="text-xs text-blue-500 hover:text-blue-700 underline">
+                <button onClick={toggleHint} className="text-xs text-accent hover:opacity-80 underline">
                   {showHint ? 'ヒントを隠す' : 'ヒントを見る'}
                 </button>
-                {showHint && <p className="text-xs text-gray-500 mt-1">{getHintText()}</p>}
+                {showHint && <p className="text-xs text-dim mt-1">{getHintText()}</p>}
               </div>
             )}
 
-            <div className="overflow-x-auto bg-white rounded-xl shadow-sm p-2">
+            <div className="overflow-x-auto bg-surface rounded-xl border border-hair p-2">
               <Fretboard
                 maxFret={maxFret}
                 accidental={accidental}
@@ -336,10 +413,19 @@ function App() {
               <IntervalSelector feedback={quiz.feedback} correctAnswer={quiz.correctAnswer} onSelect={answerInterval} />
             )}
 
+            {started && (
+              <button
+                onClick={handleEnd}
+                className="mx-auto px-6 py-2 text-sm bg-panel text-dim border border-hair rounded-lg hover:bg-accent-soft transition-colors"
+              >
+                終了して結果を見る
+              </button>
+            )}
+
             {!started && (
               <button
-                onClick={() => start(quiz.mode, quiz.rootNote)}
-                className="mx-auto px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors"
+                onClick={handleStart}
+                className="mx-auto px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
               >
                 スタート
               </button>
@@ -351,15 +437,18 @@ function App() {
               maxFret={maxFret}
               accidental={accidental}
               selectedNotes={selectedNotes}
-              onStringsChange={(s) => { setSelectedStrings(s); if (started) start(quiz.mode, quiz.rootNote); resetScore(); }}
-              onFretRangeChange={(r) => { setFretRange(r); if (started) start(quiz.mode, quiz.rootNote); resetScore(); }}
-              onNotesChange={(n) => { setSelectedNotes(n); if (started) start(quiz.mode, quiz.rootNote); resetScore(); }}
+              onStringsChange={(s) => { setSelectedStrings(s); if (started) { start(quiz.mode, quiz.rootNote); session.startSession('free'); } resetScore(); }}
+              onFretRangeChange={(r) => { setFretRange(r); if (started) { start(quiz.mode, quiz.rootNote); session.startSession('free'); } resetScore(); }}
+              onNotesChange={(n) => { setSelectedNotes(n); if (started) { start(quiz.mode, quiz.rootNote); session.startSession('free'); } resetScore(); }}
             />
           </>
         )}
 
+        {/* ===== 成績ビュー ===== */}
+        {view === 'stats' && <StatsPage maxFret={maxFret} accidental={accidental} />}
+
         {/* ===== スケールビュー ===== */}
-        {view === 'scale' && (
+        {view === 'theory' && theoryTab === 'scale' && (
           <>
             {/* サブタブ */}
             <div className="flex justify-center">
@@ -384,7 +473,7 @@ function App() {
                     onClick={() => { setScaleName(s); setSelectedBox(null); }}
                     style={selected ? { background: sc.bg, color: '#fff', borderColor: sc.border } : {}}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium border-2 transition-opacity ${
-                      selected ? '' : 'bg-gray-100 text-gray-500 border-gray-200'
+                      selected ? '' : 'bg-panel text-dim border-hair'
                     }`}
                   >
                     {SCALES[s].label}
@@ -400,11 +489,11 @@ function App() {
               <>
                 {/* ポジション選択 */}
                 <div className="flex gap-1 justify-center items-center">
-                  <span className="text-sm text-gray-500">ポジション:</span>
+                  <span className="text-sm text-dim">ポジション:</span>
                   <button
                     onClick={() => setSelectedBox(null)}
                     className={`px-3 py-1 rounded text-sm font-medium ${
-                      selectedBox === null ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-500'
+                      selectedBox === null ? 'bg-accent-soft text-accent' : 'bg-panel text-dim'
                     }`}
                   >
                     全体
@@ -414,7 +503,7 @@ function App() {
                       key={i}
                       onClick={() => setSelectedBox(i)}
                       className={`px-3 py-1 rounded text-sm font-medium ${
-                        selectedBox === i ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-500'
+                        selectedBox === i ? 'bg-accent-soft text-accent' : 'bg-panel text-dim'
                       }`}
                     >
                       {i + 1}
@@ -437,7 +526,7 @@ function App() {
                 </div>
 
                 {/* スケールマップ */}
-                <div className="overflow-x-auto bg-white rounded-xl shadow-sm p-2">
+                <div className="overflow-x-auto bg-surface rounded-xl border border-hair p-2">
                   <ScaleMap
                     maxFret={maxFret}
                     rootNote={scaleRoot}
@@ -470,7 +559,7 @@ function App() {
         )}
 
         {/* ===== CAGEDビュー ===== */}
-        {view === 'caged' && (
+        {view === 'theory' && theoryTab === 'caged' && (
           <>
             {/* サブタブ: 表示 / クイズ */}
             <div className="flex justify-center">
@@ -494,11 +583,11 @@ function App() {
 
                 {/* 表示トグル */}
                 <div className="flex gap-4 justify-center items-center flex-wrap">
-                  <label className="flex items-center gap-2 text-sm text-gray-600">
+                  <label className="flex items-center gap-2 text-sm text-dim">
                     <Switch size="small" checked={showChordTones} onChange={setShowChordTones} />
                     コードトーン
                   </label>
-                  <label className="flex items-center gap-2 text-sm text-gray-600">
+                  <label className="flex items-center gap-2 text-sm text-dim">
                     <Switch size="small" checked={showPentatonic} onChange={setShowPentatonic} />
                     ペンタトニック
                   </label>
@@ -515,7 +604,7 @@ function App() {
                 </div>
 
                 {/* CAGED指板マップ */}
-                <div className="overflow-x-auto bg-white rounded-xl shadow-sm p-2">
+                <div className="overflow-x-auto bg-surface rounded-xl border border-hair p-2">
                   <CagedMap
                     maxFret={maxFret}
                     rootNote={cagedRoot}
@@ -551,30 +640,40 @@ function App() {
         )}
 
         {/* ===== ボイシングビュー ===== */}
-        {view === 'voicing' && (
+        {view === 'theory' && theoryTab === 'voicing' && (
           <VoicingPage accidental={accidental} />
         )}
 
         {/* ===== オープンコードビュー ===== */}
-        {view === 'open' && <OpenChordPage />}
+        {view === 'theory' && theoryTab === 'open' && <OpenChordPage />}
 
         {/* ===== ダイアトニックビュー ===== */}
-        {view === 'diatonic' && <DiatonicPage accidental={accidental} />}
+        {view === 'theory' && theoryTab === 'diatonic' && <DiatonicPage accidental={accidental} />}
 
         {/* ===== アルペジオビュー ===== */}
-        {view === 'arpeggio' && <ArpeggioPage accidental={accidental} />}
+        {view === 'theory' && theoryTab === 'arpeggio' && <ArpeggioPage accidental={accidental} />}
 
-        {/* ===== 説明書ビュー ===== */}
-        {view === 'help' && <HelpPage />}
-
-        {/* 設定 */}
-        <SettingsPanel
-          accidental={accidental}
-          maxFret={maxFret}
-          onAccidentalChange={setAccidental}
-          onMaxFretChange={(f) => { setMaxFret(f); setFretRange([0, f]); }}
-          onReset={() => { resetScore(); cagedResetScore(); }}
-        />
+        {/* ===== 設定ビュー（設定＋使い方） ===== */}
+        {view === 'settings' && (
+          <div className="space-y-5">
+            <SettingsPanel
+              accidental={accidental}
+              maxFret={maxFret}
+              onAccidentalChange={setAccidental}
+              onMaxFretChange={(f) => { setMaxFret(f); setFretRange([0, f]); }}
+              onReset={() => { resetScore(); cagedResetScore(); }}
+            />
+            <div className="flex justify-center">
+              <button
+                onClick={() => setSettingsShowHelp((v) => !v)}
+                className="text-sm text-accent hover:opacity-80 underline"
+              >
+                {settingsShowHelp ? '使い方ガイドを閉じる' : '使い方ガイドを開く'}
+              </button>
+            </div>
+            {settingsShowHelp && <HelpPage />}
+          </div>
+        )}
       </div>
     </div>
   );

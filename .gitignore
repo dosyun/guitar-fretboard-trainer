@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Temp screenshots / scratch images
+temp/
+.playwright-mcp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

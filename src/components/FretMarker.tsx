@@ -1,4 +1,5 @@
 import { NOTE_COLORS } from '../data/fretboard';
+import { MARKER } from '../data/boardPalette';
 import type { Feedback } from '../types';
 
 interface FretMarkerProps {
@@ -22,33 +23,33 @@ export function FretMarker({
 }: FretMarkerProps) {
   let fill = 'transparent';
   let stroke = 'transparent';
-  let textColor = '#374151';
+  let textColor: string = MARKER.labelText;
 
   const color = noteColor ? NOTE_COLORS[noteColor] : null;
 
   if (highlighted && feedback === 'correct') {
-    fill = '#22c55e';
-    stroke = '#16a34a';
-    textColor = '#fff';
+    fill = MARKER.correctBg;
+    stroke = MARKER.correctBorder;
+    textColor = MARKER.correctText;
   } else if (highlighted && feedback === 'wrong') {
-    fill = '#ef4444';
-    stroke = '#dc2626';
-    textColor = '#fff';
+    fill = MARKER.wrongBg;
+    stroke = MARKER.wrongBorder;
+    textColor = MARKER.wrongText;
   } else if (highlighted && color) {
     fill = color.bg;
     stroke = color.border;
     textColor = color.text;
   } else if (highlighted) {
-    fill = '#3b82f6';
-    stroke = '#2563eb';
-    textColor = '#fff';
+    fill = MARKER.highlightBg;
+    stroke = MARKER.highlightBorder;
+    textColor = MARKER.highlightText;
   } else if (showLabel && color) {
     fill = color.bg;
     stroke = color.border;
     textColor = color.text;
   } else if (showLabel) {
-    fill = '#e5e7eb';
-    stroke = '#d1d5db';
+    fill = MARKER.labelBg;
+    stroke = MARKER.labelBorder;
   }
 
   return (

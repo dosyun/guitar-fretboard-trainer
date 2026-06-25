@@ -2,49 +2,100 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================================================================
+   ダーク・スタジオ系トークン (docs/adr/0003)
+   素材: エボニー指板(暖色の濃茶) / ニッケルのフレットワイヤー /
+         白蝶貝のインレイ(暖色オフホワイト) / 真空管アンプの琥珀光(アクセント)
+   ========================================================================= */
+:root {
+  color-scheme: dark;
+
+  --bg: #0e0f12;            /* コントロールルームの近黒 */
+  --surface: #1b1813;       /* エボニー指板の暖色ダーク */
+  --panel: #232019;         /* 一段持ち上げた面 */
+  --hair: #322c22;          /* 暖色のヘアライン境界 */
+  --ink: #ece5d6;           /* 白蝶貝インレイ = 主テキスト */
+  --dim: #9c9384;           /* 暖色グレー = 副次テキスト */
+
+  --accent: #f5a623;        /* アンプの琥珀光 = 唯一のアクセント */
+  --accent-soft: #3a2c12;   /* 琥珀の微光 (背景/ホバー) */
+
+  --correct: #46c98b;       /* in-tune グリーン (状態色) */
+  --wrong: #ef5350;         /* 状態色 */
+}
+
+* {
+  border-color: var(--hair);
+}
+
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family: system-ui, -apple-system, 'Segoe UI', 'Hiragino Kaku Gothic ProN',
+    'Noto Sans JP', Meiryo, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f0f4f8;
+  background: var(--bg);
+  color: var(--ink);
 }
 
 #root {
-  min-height: 100svh;
+  min-height: 100dvh;
 }
 
-/* Ant Design タブの強調 */
+/* データ readout の数字を揃える (回答時間・正答率など) */
+.font-mono {
+  font-feature-settings: 'tnum' 1;
+}
+
+/* =========================================================================
+   Ant Design — ダーク向け微調整 (darkAlgorithm は ConfigProvider 側)
+   ========================================================================= */
 .ant-tabs-tab {
-  font-weight: 600 !important;
-  font-size: 15px !important;
-  padding: 12px 18px !important;
-  color: #6b7280 !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  padding: 10px 12px !important;
+  color: var(--dim) !important;
+}
+.ant-tabs-tab + .ant-tabs-tab {
+  margin: 0 0 0 4px !important;
 }
 .ant-tabs-tab:hover {
-  color: #2563eb !important;
+  color: var(--ink) !important;
 }
 .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #2563eb !important;
+  color: var(--accent) !important;
 }
 .ant-tabs-ink-bar {
-  background: #2563eb !important;
-  height: 3px !important;
-  border-radius: 3px !important;
+  background: var(--accent) !important;
+  height: 2px !important;
+  border-radius: 2px !important;
 }
 
-/* Segmented を見やすく */
 .ant-segmented {
-  background: #e2e8f0 !important;
+  background: var(--panel) !important;
   border-radius: 10px !important;
   padding: 3px !important;
 }
+.ant-segmented-item {
+  color: var(--dim) !important;
+}
 .ant-segmented-item-selected {
-  background: #2563eb !important;
-  color: #fff !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
   border-radius: 8px !important;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3) !important;
+  box-shadow: none !important;
 }
 .ant-segmented-item-label {
   font-weight: 600 !important;
+}
+
+/* モーション配慮 (baseline-ui) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

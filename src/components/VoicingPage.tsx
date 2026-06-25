@@ -32,8 +32,8 @@ export function VoicingPage({ accidental }: VoicingPageProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* バレーコードセクション */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
-        <h2 className="text-sm font-bold text-gray-700 mb-3">バレーコード</h2>
+      <div className="bg-surface rounded-xl shadow-sm p-4">
+        <h2 className="text-sm font-bold text-ink mb-3">バレーコード</h2>
 
         {/* ルート音・コードタイプ・表示切替 */}
         <RootSelector current={rootNote} accidental={accidental} onChange={setRootNote} />
@@ -45,8 +45,8 @@ export function VoicingPage({ accidental }: VoicingPageProps) {
               onClick={() => setSelectedType(type)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium border-2 transition-all ${
                 selectedType === type
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                  ? 'bg-accent text-bg border-accent'
+                  : 'bg-panel text-dim border-hair hover:border-accent'
               }`}
             >
               {TYPE_LABELS[type]}
@@ -70,49 +70,49 @@ export function VoicingPage({ accidental }: VoicingPageProps) {
         {/* 3列グリッド */}
         <div className="grid grid-cols-3 gap-3 mt-4">
           <div className="flex flex-col items-center">
-            <div className="text-xs font-bold text-gray-500 mb-2">6弦ルート</div>
+            <div className="text-xs font-bold text-dim mb-2">6弦ルート</div>
             <VoicingDiagram voicing={voicing6} rootNote={rootNote} displayMode={displayMode} />
-            <div className="text-xs text-gray-400 mt-1 text-center">Eフォーム系</div>
+            <div className="text-xs text-dim mt-1 text-center">Eフォーム系</div>
           </div>
           <div className="flex flex-col items-center">
-            <div className="text-xs font-bold text-gray-500 mb-2">5弦ルート</div>
+            <div className="text-xs font-bold text-dim mb-2">5弦ルート</div>
             <VoicingDiagram voicing={voicing5} rootNote={rootNote} displayMode={displayMode} />
-            <div className="text-xs text-gray-400 mt-1 text-center">Aフォーム系</div>
+            <div className="text-xs text-dim mt-1 text-center">Aフォーム系</div>
           </div>
           <div className="flex flex-col items-center">
-            <div className="text-xs font-bold text-gray-500 mb-2">4弦ルート</div>
+            <div className="text-xs font-bold text-dim mb-2">4弦ルート</div>
             <VoicingDiagram voicing={voicing4} rootNote={rootNote} displayMode={displayMode} />
-            <div className="text-xs text-gray-400 mt-1 text-center">Dフォーム系</div>
+            <div className="text-xs text-dim mt-1 text-center">Dフォーム系</div>
           </div>
         </div>
       </div>
 
       {/* 凡例 */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
-        <h3 className="text-sm font-bold text-gray-700 mb-2">構成音の見方</h3>
-        <div className="flex gap-4 text-xs text-gray-500 flex-wrap">
+      <div className="bg-surface rounded-xl shadow-sm p-4">
+        <h3 className="text-sm font-bold text-ink mb-2">構成音の見方</h3>
+        <div className="flex gap-4 text-xs text-dim flex-wrap">
           <div className="flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
-              <span className="text-white text-[9px] font-bold">R</span>
+            <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center">
+              <span className="text-bg text-[9px] font-bold">R</span>
             </div>
             <span>ルート音</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-full bg-gray-800 flex items-center justify-center">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#3a3a42' }}>
               <span className="text-white text-[9px] font-bold">3</span>
             </div>
             <span>その他の構成音</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-red-500 font-bold text-sm">×</span>
+            <span className="text-wrong font-bold text-sm">×</span>
             <span>ミュート</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-full border-2 border-gray-700" />
+            <div className="w-5 h-5 rounded-full border-2 border-hair" />
             <span>開放弦</span>
           </div>
         </div>
-        <p className="text-xs text-gray-400 mt-2">「両方」モード: 上段=音名、下段=度数</p>
+        <p className="text-xs text-dim mt-2">「両方」モード: 上段=音名、下段=度数</p>
       </div>
     </div>
   );

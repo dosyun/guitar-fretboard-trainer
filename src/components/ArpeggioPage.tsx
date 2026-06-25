@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { RootSelector } from './RootSelector';
 import { getNoteIndex, getNoteAt, getOpenStringName } from '../data/fretboard';
+import { BOARD } from '../data/boardPalette';
 import type { Accidental, NoteName } from '../types';
 import { Segmented } from 'antd';
 
@@ -82,7 +83,7 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="bg-white rounded-xl shadow-sm p-4">
+      <div className="bg-surface rounded-xl shadow-sm p-4">
         {/* ルート選択 */}
         <RootSelector current={root} accidental={accidental} onChange={setRoot} />
 
@@ -92,8 +93,8 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
             <button key={ct.key} onClick={() => setChordTypeIdx(i)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium border-2 transition-all ${
                 chordTypeIdx === i
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                  ? 'bg-accent text-bg border-accent'
+                  : 'bg-panel text-dim border-hair hover:border-accent'
               }`}>
               {root}{ct.label}
             </button>
@@ -106,8 +107,8 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
             <button key={r.label} onClick={() => setRangeIdx(i)}
               className={`px-3 py-1 rounded-lg text-sm font-medium border-2 transition-all ${
                 rangeIdx === i
-                  ? 'bg-gray-700 text-white border-gray-700'
-                  : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                  ? 'bg-accent-soft text-accent border-accent'
+                  : 'bg-panel text-dim border-hair hover:border-accent'
               }`}>
               {r.label}
             </button>
@@ -130,7 +131,7 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
         </div>
 
         {/* フレットボード */}
-        <div className="overflow-x-auto mt-4 bg-white rounded-xl">
+        <div className="overflow-x-auto mt-4 bg-surface rounded-xl">
           <svg viewBox={`0 0 ${totalWidth} ${totalHeight}`}
             className="w-full" style={{ minWidth: `${maxFret * 50}px` }}>
 
@@ -138,49 +139,49 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
             <rect x={PADDING_LEFT} y={PADDING_TOP - STRING_SPACING / 2}
               width={NUT_WIDTH + FRET_WIDTH * maxFret}
               height={STRING_SPACING * 5 + STRING_SPACING}
-              rx={2} fill="#fef3c7" />
+              rx={2} fill={BOARD.board} />
 
             {/* ナット */}
             <rect x={PADDING_LEFT} y={PADDING_TOP - STRING_SPACING / 2}
               width={NUT_WIDTH} height={STRING_SPACING * 5 + STRING_SPACING}
-              fill="#78716c" rx={1} />
+              fill={BOARD.nut} rx={1} />
 
             {/* フレット線 */}
             {Array.from({ length: maxFret }, (_, i) => i + 1).map(f => (
               <line key={f} x1={fretX(f)} y1={PADDING_TOP - STRING_SPACING / 2}
                 x2={fretX(f)} y2={PADDING_TOP + STRING_SPACING * 5 + STRING_SPACING / 2}
-                stroke="#a8a29e" strokeWidth={1.5} />
+                stroke={BOARD.fretwire} strokeWidth={1.5} />
             ))}
 
             {/* ポジションマーク */}
             {SINGLE_DOTS.map(f => (
               <circle key={f} cx={fretX(f) - FRET_WIDTH / 2}
-                cy={PADDING_TOP + STRING_SPACING * 2.5} r={5} fill="#d6d3d1" />
+                cy={PADDING_TOP + STRING_SPACING * 2.5} r={5} fill={BOARD.inlay} />
             ))}
             <circle cx={fretX(DOUBLE_DOT) - FRET_WIDTH / 2}
-              cy={PADDING_TOP + STRING_SPACING * 1.5} r={5} fill="#d6d3d1" />
+              cy={PADDING_TOP + STRING_SPACING * 1.5} r={5} fill={BOARD.inlay} />
             <circle cx={fretX(DOUBLE_DOT) - FRET_WIDTH / 2}
-              cy={PADDING_TOP + STRING_SPACING * 3.5} r={5} fill="#d6d3d1" />
+              cy={PADDING_TOP + STRING_SPACING * 3.5} r={5} fill={BOARD.inlay} />
 
             {/* フレット番号 */}
             {Array.from({ length: maxFret }, (_, i) => i + 1).map(f => (
               <text key={f} x={fretX(f) - FRET_WIDTH / 2}
                 y={PADDING_TOP - STRING_SPACING / 2 - 6}
-                textAnchor="middle" fontSize={9} fill="#9ca3af">{f}</text>
+                textAnchor="middle" fontSize={9} fill={BOARD.fretNumber}>{f}</text>
             ))}
 
             {/* 弦 */}
             {Array.from({ length: 6 }, (_, s) => (
               <line key={s} x1={PADDING_LEFT} y1={stringY(s)}
                 x2={PADDING_LEFT + NUT_WIDTH + FRET_WIDTH * maxFret} y2={stringY(s)}
-                stroke="#78716c" strokeWidth={1 + s * 0.3} />
+                stroke={BOARD.string} strokeWidth={1 + s * 0.3} />
             ))}
 
             {/* 弦名 */}
             {Array.from({ length: 6 }, (_, s) => (
               <text key={s} x={PADDING_LEFT - 28} y={stringY(s)}
                 textAnchor="middle" dominantBaseline="central"
-                fontSize={10} fill="#6b7280" fontWeight={500}>
+                fontSize={10} fill={BOARD.stringLabel} fontWeight={500}>
                 {getOpenStringName(s)}
               </text>
             ))}
@@ -204,24 +205,24 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
               return (
                 <g key={`${p.string}-${p.fret}`}>
                   <circle cx={cx} cy={cy} r={r}
-                    fill={isRoot ? '#2563eb' : '#374151'}
+                    fill={isRoot ? 'var(--accent)' : '#3a3a42'}
                     strokeWidth={0} />
                   {labelMode === 'both' ? (
                     <>
                       <text x={cx} y={cy - 5} textAnchor="middle" dominantBaseline="central"
-                        fontSize={7} fontWeight={700} fill="#fff"
+                        fontSize={7} fontWeight={700} fill={isRoot ? '#1b1813' : '#fff'}
                         style={{ pointerEvents: 'none', userSelect: 'none' }}>
                         {noteName}
                       </text>
                       <text x={cx} y={cy + 5} textAnchor="middle" dominantBaseline="central"
-                        fontSize={7} fontWeight={600} fill={isRoot ? '#bfdbfe' : '#93c5fd'}
+                        fontSize={7} fontWeight={600} fill={isRoot ? '#5b3d09' : '#cbd5e1'}
                         style={{ pointerEvents: 'none', userSelect: 'none' }}>
                         {degreeName}
                       </text>
                     </>
                   ) : (
                     <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
-                      fontSize={11} fontWeight={700} fill="#fff"
+                      fontSize={11} fontWeight={700} fill={isRoot ? '#1b1813' : '#fff'}
                       style={{ pointerEvents: 'none', userSelect: 'none' }}>
                       {labelMode === 'number' ? String(p.num) :
                        labelMode === 'degree' ? degreeName : noteName}
@@ -235,15 +236,15 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
       </div>
 
       {/* 説明 */}
-      <div className="bg-white rounded-xl shadow-sm p-4 text-xs text-gray-500 flex flex-col gap-1">
+      <div className="bg-surface rounded-xl shadow-sm p-4 text-xs text-dim flex flex-col gap-1">
         <p>番号 = 低い音から高い音へのアルペジオ順。</p>
         <p>フレット範囲を絞ると、そのポジション内での練習に使えます。</p>
         <div className="flex gap-3 mt-1">
           <span className="flex items-center gap-1">
-            <span className="inline-block w-4 h-4 rounded-full bg-blue-600" />ルート音
+            <span className="inline-block w-4 h-4 rounded-full bg-accent" />ルート音
           </span>
           <span className="flex items-center gap-1">
-            <span className="inline-block w-4 h-4 rounded-full bg-gray-700" />コードトーン
+            <span className="inline-block w-4 h-4 rounded-full" style={{ background: '#3a3a42' }} />コードトーン
           </span>
         </div>
       </div>

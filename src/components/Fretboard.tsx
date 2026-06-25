@@ -1,5 +1,6 @@
 import { FretMarker } from './FretMarker';
 import { getOpenStringName, getNoteAt } from '../data/fretboard';
+import { BOARD } from '../data/boardPalette';
 import type { FretPosition, Feedback, Accidental } from '../types';
 
 interface FretboardProps {
@@ -67,7 +68,7 @@ export function Fretboard({
         width={NUT_WIDTH + FRET_WIDTH * maxFret}
         height={STRING_SPACING * 5 + STRING_SPACING}
         rx={2}
-        fill="#fef3c7"
+        fill={BOARD.board}
       />
 
       {/* ナット */}
@@ -76,7 +77,7 @@ export function Fretboard({
         y={PADDING_TOP - STRING_SPACING / 2}
         width={NUT_WIDTH}
         height={STRING_SPACING * 5 + STRING_SPACING}
-        fill="#78716c"
+        fill={BOARD.nut}
         rx={1}
       />
 
@@ -88,7 +89,7 @@ export function Fretboard({
           y1={PADDING_TOP - STRING_SPACING / 2}
           x2={fretX(f)}
           y2={PADDING_TOP + STRING_SPACING * 5 + STRING_SPACING / 2}
-          stroke="#a8a29e"
+          stroke={BOARD.fretwire}
           strokeWidth={1.5}
         />
       ))}
@@ -100,7 +101,7 @@ export function Fretboard({
           cx={fretX(f) - FRET_WIDTH / 2}
           cy={PADDING_TOP + STRING_SPACING * 2.5}
           r={5}
-          fill="#d6d3d1"
+          fill={BOARD.inlay}
         />
       ))}
       {DOUBLE_DOT <= maxFret && (
@@ -109,13 +110,13 @@ export function Fretboard({
             cx={fretX(DOUBLE_DOT) - FRET_WIDTH / 2}
             cy={PADDING_TOP + STRING_SPACING * 1.5}
             r={5}
-            fill="#d6d3d1"
+            fill={BOARD.inlay}
           />
           <circle
             cx={fretX(DOUBLE_DOT) - FRET_WIDTH / 2}
             cy={PADDING_TOP + STRING_SPACING * 3.5}
             r={5}
-            fill="#d6d3d1"
+            fill={BOARD.inlay}
           />
         </>
       )}
@@ -128,7 +129,7 @@ export function Fretboard({
           y={PADDING_TOP - STRING_SPACING / 2 - 6}
           textAnchor="middle"
           fontSize={9}
-          fill="#9ca3af"
+          fill={BOARD.fretNumber}
         >
           {f}
         </text>
@@ -144,7 +145,7 @@ export function Fretboard({
             y1={stringY(s)}
             x2={PADDING_LEFT + NUT_WIDTH + FRET_WIDTH * maxFret}
             y2={stringY(s)}
-            stroke="#78716c"
+            stroke={BOARD.string}
             strokeWidth={thickness}
           />
         );
@@ -159,7 +160,7 @@ export function Fretboard({
           textAnchor="middle"
           dominantBaseline="central"
           fontSize={10}
-          fill="#6b7280"
+          fill={BOARD.stringLabel}
           fontWeight={500}
         >
           {getOpenStringName(s)}

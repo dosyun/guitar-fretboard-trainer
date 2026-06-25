@@ -1,11 +1,11 @@
 export function HelpPage() {
   return (
-    <div className="max-w-2xl mx-auto space-y-6 text-sm text-gray-700 leading-relaxed">
-      <h2 className="text-xl font-bold text-gray-900">使い方ガイド</h2>
+    <div className="max-w-2xl mx-auto space-y-6 text-sm text-ink leading-relaxed">
+      <h2 className="text-xl font-bold text-ink">使い方ガイド</h2>
 
       {/* 指板マップ */}
-      <section className="bg-white rounded-lg p-4 border border-gray-200 space-y-2">
-        <h3 className="text-base font-bold text-gray-800">指板マップ</h3>
+      <section className="bg-surface rounded-lg p-4 border border-hair space-y-2">
+        <h3 className="text-base font-bold text-ink">指板マップ</h3>
         <p>指板上の全ポジションの音名・度数を一覧表示します。まず全体像を把握するのに使いましょう。</p>
         <ul className="list-disc ml-5 space-y-1">
           <li><strong>音名 / 度数</strong> — 表示モードを切り替え。度数モードではルート音を選択できます</li>
@@ -15,8 +15,8 @@ export function HelpPage() {
       </section>
 
       {/* クイズ */}
-      <section className="bg-white rounded-lg p-4 border border-gray-200 space-y-2">
-        <h3 className="text-base font-bold text-gray-800">クイズ</h3>
+      <section className="bg-surface rounded-lg p-4 border border-hair space-y-2">
+        <h3 className="text-base font-bold text-ink">クイズ</h3>
         <p>3つのモードで指板の音を暗記できます。</p>
         <ul className="list-disc ml-5 space-y-1">
           <li><strong>ポジション → ノート</strong> — 指板上のハイライト位置の音名を12個のボタンから回答</li>
@@ -24,7 +24,7 @@ export function HelpPage() {
           <li><strong>度数</strong> — ルート音に対するハイライト位置のインターバルを回答</li>
         </ul>
         <div className="mt-2 space-y-1">
-          <p className="font-medium text-gray-800">学習サポート:</p>
+          <p className="font-medium text-ink">学習サポート:</p>
           <ul className="list-disc ml-5 space-y-1">
             <li><strong>練習範囲</strong> — 弦・フレット・音名で出題範囲を絞り込めます</li>
             <li><strong>ヒント</strong> — クイズ中に「ヒントを見る」で目印（開放弦からの半音数、5F=隣弦の開放音など）を表示</li>
@@ -34,12 +34,12 @@ export function HelpPage() {
       </section>
 
       {/* スケール */}
-      <section className="bg-white rounded-lg p-4 border border-gray-200 space-y-2">
-        <h3 className="text-base font-bold text-gray-800">スケール</h3>
+      <section className="bg-surface rounded-lg p-4 border border-hair space-y-2">
+        <h3 className="text-base font-bold text-ink">スケール</h3>
         <p>4種類のスケールを指板上で視覚的に学べます。5つのボックスポジションで段階的に覚えましょう。</p>
 
         <div className="mt-2 space-y-1">
-          <p className="font-medium text-gray-800">対応スケール:</p>
+          <p className="font-medium text-ink">対応スケール:</p>
           <ul className="list-disc ml-5 space-y-1">
             <li><strong>メジャーペンタ</strong> — R, 2, 3, 5, 6</li>
             <li><strong>マイナーペンタ</strong> — R, m3, 4, 5, m7</li>
@@ -53,7 +53,7 @@ export function HelpPage() {
         </div>
 
         <div className="mt-2 space-y-1">
-          <p className="font-medium text-gray-800">表示モード:</p>
+          <p className="font-medium text-ink">表示モード:</p>
           <ul className="list-disc ml-5 space-y-1">
             <li>「全体」で指板全体のスケール音を表示、5つのボックスポジションを点線で区分け</li>
             <li>ポジション1〜5を選ぶと、そのボックスだけをハイライト表示</li>
@@ -62,7 +62,7 @@ export function HelpPage() {
         </div>
 
         <div className="mt-2 space-y-1">
-          <p className="font-medium text-gray-800">クイズモード (2種):</p>
+          <p className="font-medium text-ink">クイズモード (2種):</p>
           <ul className="list-disc ml-5 space-y-1">
             <li><strong>スケール内/外</strong> — ハイライト位置がスケールに含まれるかどうかを回答</li>
             <li><strong>度数当て</strong> — スケール内の音の度数(R, 2, 3, 4, 5, 6, 7等)を回答</li>
@@ -71,12 +71,12 @@ export function HelpPage() {
       </section>
 
       {/* CAGED */}
-      <section className="bg-white rounded-lg p-4 border border-gray-200 space-y-2">
-        <h3 className="text-base font-bold text-gray-800">CAGED</h3>
+      <section className="bg-surface rounded-lg p-4 border border-hair space-y-2">
+        <h3 className="text-base font-bold text-ink">CAGED</h3>
         <p>CAGEDシステムで指板全体のコードフォームとペンタトニックスケールの位置関係を学べます。</p>
 
         <div className="mt-2 space-y-1">
-          <p className="font-medium text-gray-800">表示モード:</p>
+          <p className="font-medium text-ink">表示モード:</p>
           <ul className="list-disc ml-5 space-y-1">
             <li><strong>ルート音選択</strong> — 任意のキーに転調して表示</li>
             <li><strong>フォーム選択</strong> — C/A/G/E/D を個別ON/OFF、または全表示</li>
@@ -86,7 +86,7 @@ export function HelpPage() {
         </div>
 
         <div className="mt-2 space-y-1">
-          <p className="font-medium text-gray-800">クイズモード (3種):</p>
+          <p className="font-medium text-ink">クイズモード (3種):</p>
           <ul className="list-disc ml-5 space-y-1">
             <li><strong>フォーム当て</strong> — ポジション群を見て「何フォーム？」を回答</li>
             <li><strong>ポジション当て</strong> — フォーム名とルートが提示され、正しい位置をタップ</li>
@@ -96,8 +96,8 @@ export function HelpPage() {
       </section>
 
       {/* ボイシング */}
-      <section className="bg-white rounded-lg p-4 border border-gray-200 space-y-2">
-        <h3 className="text-base font-bold text-gray-800">ボイシング</h3>
+      <section className="bg-surface rounded-lg p-4 border border-hair space-y-2">
+        <h3 className="text-base font-bold text-ink">ボイシング</h3>
         <p>バレーコードのフォームをコードダイアグラムで確認できます。</p>
         <ul className="list-disc ml-5 space-y-1">
           <li><strong>6弦ルート</strong> — Eフォーム系。ジャズ教本ベースの5弦・1弦省略ボイシング</li>
@@ -109,8 +109,8 @@ export function HelpPage() {
       </section>
 
       {/* オープンコード */}
-      <section className="bg-white rounded-lg p-4 border border-gray-200 space-y-2">
-        <h3 className="text-base font-bold text-gray-800">オープン</h3>
+      <section className="bg-surface rounded-lg p-4 border border-hair space-y-2">
+        <h3 className="text-base font-bold text-ink">オープン</h3>
         <p>開放弦を使ったオープンコード32種をカテゴリ別に表示します。</p>
         <ul className="list-disc ml-5 space-y-1">
           <li>カテゴリ: メジャー / マイナー / 7th / maj7 / m7 / sus / add9</li>
@@ -119,8 +119,8 @@ export function HelpPage() {
       </section>
 
       {/* ダイアトニック */}
-      <section className="bg-white rounded-lg p-4 border border-gray-200 space-y-2">
-        <h3 className="text-base font-bold text-gray-800">ダイアトニック</h3>
+      <section className="bg-surface rounded-lg p-4 border border-hair space-y-2">
+        <h3 className="text-base font-bold text-ink">ダイアトニック</h3>
         <p>キーのダイアトニックコード一覧と、定番コード進行の練習ができます。</p>
         <ul className="list-disc ml-5 space-y-1">
           <li><strong>コード一覧</strong> — メジャー/マイナーキーの I〜VII コードをダイアグラムで表示</li>
@@ -130,8 +130,8 @@ export function HelpPage() {
       </section>
 
       {/* アルペジオ */}
-      <section className="bg-white rounded-lg p-4 border border-gray-200 space-y-2">
-        <h3 className="text-base font-bold text-gray-800">アルペジオ</h3>
+      <section className="bg-surface rounded-lg p-4 border border-hair space-y-2">
+        <h3 className="text-base font-bold text-ink">アルペジオ</h3>
         <p>コードトーンを低音から高音へ順番に弾くアルペジオの練習をサポートします。</p>
         <ul className="list-disc ml-5 space-y-1">
           <li>コードタイプ: maj7 / 7th / m7 / m7(♭5) の4種</li>
@@ -142,8 +142,8 @@ export function HelpPage() {
       </section>
 
       {/* 設定 */}
-      <section className="bg-white rounded-lg p-4 border border-gray-200 space-y-2">
-        <h3 className="text-base font-bold text-gray-800">設定</h3>
+      <section className="bg-surface rounded-lg p-4 border border-hair space-y-2">
+        <h3 className="text-base font-bold text-ink">設定</h3>
         <ul className="list-disc ml-5 space-y-1">
           <li><strong>表記</strong> — # (シャープ) / ♭ (フラット) / #/♭ (併記) を切替</li>
           <li><strong>フレット数</strong> — 12 / 15 / 17 / 19 / 22 フレットに対応</li>
@@ -152,9 +152,9 @@ export function HelpPage() {
       </section>
 
       {/* おすすめの学習手順 */}
-      <section className="bg-blue-50 rounded-lg p-4 border border-blue-200 space-y-2">
-        <h3 className="text-base font-bold text-blue-800">おすすめの学習ステップ</h3>
-        <ol className="list-decimal ml-5 space-y-1 text-blue-900">
+      <section className="bg-accent-soft rounded-lg p-4 border border-hair space-y-2">
+        <h3 className="text-base font-bold text-accent">おすすめの学習ステップ</h3>
+        <ol className="list-decimal ml-5 space-y-1 text-ink">
           <li>「指板マップ」で全体像を眺める</li>
           <li>範囲を「6弦のみ・0〜4F」に絞ってクイズで覚える</li>
           <li>5弦→4弦と弦を増やしていく</li>

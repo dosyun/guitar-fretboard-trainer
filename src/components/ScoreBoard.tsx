@@ -12,26 +12,26 @@ export function ScoreBoard({ score }: ScoreBoardProps) {
   return (
     <div className="flex justify-center gap-6 text-sm">
       <div className="text-center">
-        <div className="text-gray-400">正解率</div>
-        <div className="text-lg font-bold text-gray-800">
+        <div className="text-dim text-xs">正解率</div>
+        <div className="text-lg font-bold font-mono tabular-nums text-ink">
           {score.total > 0 ? `${accuracy}%` : '-'}
         </div>
       </div>
       <div className="text-center">
-        <div className="text-gray-400">正解数</div>
-        <div className="text-lg font-bold text-gray-800">
+        <div className="text-dim text-xs">正解数</div>
+        <div className="text-lg font-bold font-mono tabular-nums text-ink">
           {score.correct}/{score.total}
         </div>
       </div>
       <div className="text-center">
-        <div className="text-gray-400">連続</div>
-        <div className="text-lg font-bold text-orange-500">
+        <div className="text-dim text-xs">連続</div>
+        <div className="text-lg font-bold font-mono tabular-nums text-accent">
           {score.streak}
         </div>
       </div>
       <div className="text-center">
-        <div className="text-gray-400">最高</div>
-        <div className="text-lg font-bold text-purple-600">
+        <div className="text-dim text-xs">最高</div>
+        <div className="text-lg font-bold font-mono tabular-nums text-ink">
           {score.bestStreak}
         </div>
       </div>

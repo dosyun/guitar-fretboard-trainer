@@ -1,5 +1,6 @@
 import { getOpenStringName, getNoteAt } from '../data/fretboard';
 import { getScalePositions, getScaleBoxPositions, SCALE_COLORS } from '../data/scales';
+import { BOARD } from '../data/boardPalette';
 import type { Accidental, NoteName } from '../types';
 import type { ScaleName } from '../data/scales';
 
@@ -58,7 +59,7 @@ export function ScaleMap({ maxFret, rootNote, scaleName, selectedBox, displayMod
         width={NUT_WIDTH + FRET_WIDTH * maxFret}
         height={STRING_SPACING * 5 + STRING_SPACING}
         rx={2}
-        fill="#fef3c7"
+        fill={BOARD.board}
       />
 
       {/* ボックスポジションの背景ハイライト */}
@@ -110,39 +111,39 @@ export function ScaleMap({ maxFret, rootNote, scaleName, selectedBox, displayMod
         y={PADDING_TOP - STRING_SPACING / 2}
         width={NUT_WIDTH}
         height={STRING_SPACING * 5 + STRING_SPACING}
-        fill="#78716c"
+        fill={BOARD.nut}
         rx={1}
       />
 
       {/* フレット線 */}
       {Array.from({ length: maxFret }, (_, i) => i + 1).map((f) => (
-        <line key={`fret-${f}`} x1={fretX(f)} y1={PADDING_TOP - STRING_SPACING / 2} x2={fretX(f)} y2={PADDING_TOP + STRING_SPACING * 5 + STRING_SPACING / 2} stroke="#a8a29e" strokeWidth={1.5} />
+        <line key={`fret-${f}`} x1={fretX(f)} y1={PADDING_TOP - STRING_SPACING / 2} x2={fretX(f)} y2={PADDING_TOP + STRING_SPACING * 5 + STRING_SPACING / 2} stroke={BOARD.fretwire} strokeWidth={1.5} />
       ))}
 
       {/* ポジションマーク */}
       {SINGLE_DOTS.filter((f) => f <= maxFret).map((f) => (
-        <circle key={`dot-${f}`} cx={fretX(f) - FRET_WIDTH / 2} cy={PADDING_TOP + STRING_SPACING * 2.5} r={5} fill="#d6d3d1" />
+        <circle key={`dot-${f}`} cx={fretX(f) - FRET_WIDTH / 2} cy={PADDING_TOP + STRING_SPACING * 2.5} r={5} fill={BOARD.inlay} />
       ))}
       {DOUBLE_DOT <= maxFret && (
         <>
-          <circle cx={fretX(DOUBLE_DOT) - FRET_WIDTH / 2} cy={PADDING_TOP + STRING_SPACING * 1.5} r={5} fill="#d6d3d1" />
-          <circle cx={fretX(DOUBLE_DOT) - FRET_WIDTH / 2} cy={PADDING_TOP + STRING_SPACING * 3.5} r={5} fill="#d6d3d1" />
+          <circle cx={fretX(DOUBLE_DOT) - FRET_WIDTH / 2} cy={PADDING_TOP + STRING_SPACING * 1.5} r={5} fill={BOARD.inlay} />
+          <circle cx={fretX(DOUBLE_DOT) - FRET_WIDTH / 2} cy={PADDING_TOP + STRING_SPACING * 3.5} r={5} fill={BOARD.inlay} />
         </>
       )}
 
       {/* フレット番号 */}
       {Array.from({ length: maxFret }, (_, i) => i + 1).map((f) => (
-        <text key={`fn-${f}`} x={fretX(f) - FRET_WIDTH / 2} y={PADDING_TOP - STRING_SPACING / 2 - 6} textAnchor="middle" fontSize={9} fill="#9ca3af">{f}</text>
+        <text key={`fn-${f}`} x={fretX(f) - FRET_WIDTH / 2} y={PADDING_TOP - STRING_SPACING / 2 - 6} textAnchor="middle" fontSize={9} fill={BOARD.fretNumber}>{f}</text>
       ))}
 
       {/* 弦 */}
       {Array.from({ length: 6 }, (_, s) => (
-        <line key={`s-${s}`} x1={PADDING_LEFT} y1={stringY(s)} x2={PADDING_LEFT + NUT_WIDTH + FRET_WIDTH * maxFret} y2={stringY(s)} stroke="#78716c" strokeWidth={1 + s * 0.3} />
+        <line key={`s-${s}`} x1={PADDING_LEFT} y1={stringY(s)} x2={PADDING_LEFT + NUT_WIDTH + FRET_WIDTH * maxFret} y2={stringY(s)} stroke={BOARD.string} strokeWidth={1 + s * 0.3} />
       ))}
 
       {/* 弦名 */}
       {Array.from({ length: 6 }, (_, s) => (
-        <text key={`sn-${s}`} x={PADDING_LEFT - 28} y={stringY(s)} textAnchor="middle" dominantBaseline="central" fontSize={10} fill="#6b7280" fontWeight={500}>{getOpenStringName(s)}</text>
+        <text key={`sn-${s}`} x={PADDING_LEFT - 28} y={stringY(s)} textAnchor="middle" dominantBaseline="central" fontSize={10} fill={BOARD.stringLabel} fontWeight={500}>{getOpenStringName(s)}</text>
       ))}
 
       {/* スケール音 (全表示時は範囲外を薄く) */}

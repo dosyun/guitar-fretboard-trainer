@@ -1,5 +1,6 @@
 import { getNoteAt, getNoteLabel, getIntervalAt, NOTE_COLORS } from '../data/fretboard';
 import { getOpenStringName } from '../data/fretboard';
+import { BOARD } from '../data/boardPalette';
 import type { Accidental, NoteName } from '../types';
 
 interface FretboardMapProps {
@@ -87,7 +88,7 @@ export function FretboardMap({
         width={NUT_WIDTH + FRET_WIDTH * maxFret}
         height={STRING_SPACING * 5 + STRING_SPACING}
         rx={2}
-        fill="#fef3c7"
+        fill={BOARD.board}
       />
 
       {/* ナット */}
@@ -96,7 +97,7 @@ export function FretboardMap({
         y={PADDING_TOP - STRING_SPACING / 2}
         width={NUT_WIDTH}
         height={STRING_SPACING * 5 + STRING_SPACING}
-        fill="#78716c"
+        fill={BOARD.nut}
         rx={1}
       />
 
@@ -108,7 +109,7 @@ export function FretboardMap({
           y1={PADDING_TOP - STRING_SPACING / 2}
           x2={fretX(f)}
           y2={PADDING_TOP + STRING_SPACING * 5 + STRING_SPACING / 2}
-          stroke="#a8a29e"
+          stroke={BOARD.fretwire}
           strokeWidth={1.5}
         />
       ))}
@@ -120,13 +121,13 @@ export function FretboardMap({
           cx={fretX(f) - FRET_WIDTH / 2}
           cy={PADDING_TOP + STRING_SPACING * 2.5}
           r={5}
-          fill="#d6d3d1"
+          fill={BOARD.inlay}
         />
       ))}
       {DOUBLE_DOT <= maxFret && (
         <>
-          <circle cx={fretX(DOUBLE_DOT) - FRET_WIDTH / 2} cy={PADDING_TOP + STRING_SPACING * 1.5} r={5} fill="#d6d3d1" />
-          <circle cx={fretX(DOUBLE_DOT) - FRET_WIDTH / 2} cy={PADDING_TOP + STRING_SPACING * 3.5} r={5} fill="#d6d3d1" />
+          <circle cx={fretX(DOUBLE_DOT) - FRET_WIDTH / 2} cy={PADDING_TOP + STRING_SPACING * 1.5} r={5} fill={BOARD.inlay} />
+          <circle cx={fretX(DOUBLE_DOT) - FRET_WIDTH / 2} cy={PADDING_TOP + STRING_SPACING * 3.5} r={5} fill={BOARD.inlay} />
         </>
       )}
 
@@ -138,7 +139,7 @@ export function FretboardMap({
           y={PADDING_TOP - STRING_SPACING / 2 - 6}
           textAnchor="middle"
           fontSize={9}
-          fill="#9ca3af"
+          fill={BOARD.fretNumber}
         >
           {f}
         </text>
@@ -152,7 +153,7 @@ export function FretboardMap({
           y1={stringY(s)}
           x2={PADDING_LEFT + NUT_WIDTH + FRET_WIDTH * maxFret}
           y2={stringY(s)}
-          stroke="#78716c"
+          stroke={BOARD.string}
           strokeWidth={1 + s * 0.3}
         />
       ))}
@@ -166,7 +167,7 @@ export function FretboardMap({
           textAnchor="middle"
           dominantBaseline="central"
           fontSize={10}
-          fill="#6b7280"
+          fill={BOARD.stringLabel}
           fontWeight={500}
         >
           {getOpenStringName(s)}

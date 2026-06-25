@@ -18,10 +18,10 @@ export function IntervalSelector({ feedback, correctAnswer, onSelect }: Interval
             onClick={() => onSelect(interval)}
             disabled={feedback !== null}
             className={`
-              py-3 px-2 rounded-lg text-base font-semibold transition-colors
+              py-3 px-2 rounded-lg text-base font-semibold font-mono transition-colors
               ${isCorrectHighlight
-                ? 'bg-green-500 text-white'
-                : 'bg-gray-100 hover:bg-purple-100 active:bg-purple-200 text-gray-800'
+                ? 'bg-correct text-bg'
+                : 'bg-panel hover:bg-accent-soft active:opacity-80 text-ink border border-hair'
               }
               disabled:opacity-60 disabled:cursor-not-allowed
             `}

@@ -19,7 +19,7 @@ export function CagedFormSelector({ selectedForms, onChange }: CagedFormSelector
 
   return (
     <div className="flex items-center gap-2 justify-center">
-      <span className="text-sm text-gray-500">フォーム:</span>
+      <span className="text-sm text-dim">フォーム:</span>
       {CAGED_ORDER.map((form) => {
         const color = CAGED_COLORS[form];
         const selected = selectedForms.includes(form);
@@ -30,7 +30,7 @@ export function CagedFormSelector({ selectedForms, onChange }: CagedFormSelector
             style={selected ? { background: color.bg, color: '#fff', borderColor: color.border } : {}}
             className={`
               w-10 h-10 rounded-lg text-base font-bold transition-opacity border-2
-              ${selected ? '' : 'bg-gray-100 text-gray-400 border-gray-200 opacity-50'}
+              ${selected ? '' : 'bg-panel text-dim border-hair opacity-50'}
             `}
           >
             {form}
@@ -39,7 +39,7 @@ export function CagedFormSelector({ selectedForms, onChange }: CagedFormSelector
       })}
       <button
         onClick={() => onChange([...CAGED_ORDER])}
-        className="px-3 py-2 rounded text-xs text-gray-500 hover:bg-gray-100"
+        className="px-3 py-2 rounded text-xs text-dim hover:bg-accent-soft"
       >
         全表示
       </button>

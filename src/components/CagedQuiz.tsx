@@ -74,15 +74,15 @@ export function CagedQuiz({
   return (
     <div className="flex flex-col gap-3">
       {/* モード選択 */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+      <div className="flex gap-1 bg-panel p-1 rounded-lg">
         {QUIZ_MODES.map(({ value, label }) => (
           <button
             key={value}
             onClick={() => onSetMode(value)}
             className={`flex-1 py-2 px-2 rounded-md text-sm font-medium transition-colors ${
               quiz.mode === value
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-surface text-ink shadow-sm'
+                : 'text-dim hover:text-ink'
             }`}
           >
             {label}
@@ -96,10 +96,10 @@ export function CagedQuiz({
       {/* 問題文 */}
       {started && (
         <div className="text-center">
-          <p className="text-gray-700 font-medium">{getPrompt()}</p>
+          <p className="text-ink font-medium">{getPrompt()}</p>
           {quiz.feedback && (
             <p className={`text-lg font-bold mt-1 ${
-              quiz.feedback === 'correct' ? 'text-green-600' : 'text-red-500'
+              quiz.feedback === 'correct' ? 'text-correct' : 'text-wrong'
             }`}>
               {getFeedbackMsg()}
             </p>
@@ -136,7 +136,7 @@ export function CagedQuiz({
                 onClick={() => onAnswerForm(form)}
                 disabled={quiz.feedback !== null}
                 style={isCorrectHighlight
-                  ? { background: '#22c55e', color: '#fff' }
+                  ? { background: 'var(--correct)', color: '#0e0f12' }
                   : { background: color.bg, color: '#fff', borderColor: color.border }
                 }
                 className="w-14 h-14 rounded-lg text-xl font-bold border-2 transition-opacity
@@ -160,8 +160,8 @@ export function CagedQuiz({
                 disabled={quiz.feedback !== null}
                 className={`w-16 h-14 rounded-lg text-xl font-bold border-2 transition-colors
                   ${isCorrectHighlight
-                    ? 'bg-green-500 text-white border-green-600'
-                    : 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200'
+                    ? 'bg-correct text-bg border-correct'
+                    : 'bg-panel text-ink border-hair hover:bg-accent-soft'
                   }
                   disabled:opacity-50 disabled:cursor-not-allowed
                 `}
@@ -177,8 +177,8 @@ export function CagedQuiz({
       {!started && (
         <button
           onClick={() => onStart(quiz.mode)}
-          className="mx-auto px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg
-                     hover:bg-blue-700 active:bg-blue-800 transition-colors"
+          className="mx-auto px-8 py-3 bg-accent text-bg font-semibold rounded-lg
+                     hover:opacity-90 active:opacity-80 transition-opacity"
         >
           スタート
         </button>

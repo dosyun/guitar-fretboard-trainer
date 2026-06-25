@@ -55,7 +55,7 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="bg-white rounded-xl shadow-sm p-4">
+      <div className="bg-surface rounded-xl shadow-sm p-4">
         {/* キー選択 */}
         <RootSelector current={key} accidental={accidental} onChange={setKey} />
 
@@ -92,7 +92,7 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
                 const voicing = voicings.find(v => v.type === degree.type)!;
                 return (
                   <div key={degree.roman} className="flex flex-col items-center w-[22%] sm:w-auto">
-                    <div className="text-xs font-bold text-indigo-600 mb-0.5">{degree.roman}</div>
+                    <div className="text-xs font-bold text-accent mb-0.5">{degree.roman}</div>
                     <VoicingDiagram
                       voicing={{ ...voicing, label: chordName }}
                       rootNote={rootNote}
@@ -116,8 +116,8 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
                   onClick={() => setSelectedProgIdx(i)}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium border-2 transition-all ${
                     selectedProgIdx === i
-                      ? 'bg-indigo-600 text-white border-indigo-600'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                      ? 'bg-accent text-bg border-accent'
+                      : 'bg-panel text-dim border-hair hover:border-accent'
                   }`}
                 >
                   {prog.name}
@@ -125,10 +125,10 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
               ))}
             </div>
 
-            <p className="text-center text-xs text-gray-500 mt-1">{selectedProg.description}</p>
+            <p className="text-center text-xs text-dim mt-1">{selectedProg.description}</p>
 
             {/* スケール表示（マイナー/メジャー） */}
-            <p className="text-center text-xs text-gray-400">
+            <p className="text-center text-xs text-dim">
               ({selectedProg.scale === 'major' ? 'メジャースケール' : 'マイナースケール'})
             </p>
 
@@ -143,7 +143,7 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
                 const voicing = voicings.find(v => v.type === degree.type)!;
                 return (
                   <div key={i} className="flex flex-col items-center w-[22%] sm:w-auto">
-                    <div className="text-xs font-bold text-indigo-600 mb-0.5">{degree.roman}</div>
+                    <div className="text-xs font-bold text-accent mb-0.5">{degree.roman}</div>
                     <VoicingDiagram
                       voicing={{ ...voicing, label: chordName }}
                       rootNote={rootNote}
