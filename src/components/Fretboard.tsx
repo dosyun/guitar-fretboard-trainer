@@ -188,7 +188,8 @@ export function Fretboard({
               highlighted={highlighted || isCorrect}
               feedback={markerFeedback}
               showLabel={label}
-              noteColor={(highlighted || label) ? note : undefined}
+              // 出題位置のハイライトは中立色(琥珀)。音高カラーは答え/正解表示(label)のときだけ。
+              noteColor={label ? note : undefined}
               onClick={onPositionClick ? () => onPositionClick({ string: s, fret: f }) : undefined}
             />
           );
