@@ -1,5 +1,7 @@
 import { getAllSessions, getNoteRecognitionMetrics, getStreak } from '../data/practiceStore';
 import { getNoteLabel } from '../data/fretboard';
+import { PhaseMap } from './PhaseMap';
+import type { Phase } from '../data/phases';
 import type { Accidental } from '../types';
 import type { CellMetrics } from '../types/practice';
 
@@ -7,6 +9,7 @@ interface HomePageProps {
   accidental: Accidental;
   onStartDaily: () => void;
   onStartPractice: () => void;
+  onStartPhase: (p: Phase) => void;
   onOpenStats: () => void;
   onShowHelp: () => void;
 }
@@ -18,7 +21,7 @@ const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const weakness = (m: CellMetrics) =>
   0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
 
-export function HomePage({ accidental, onStartDaily, onStartPractice, onOpenStats, onShowHelp }: HomePageProps) {
+export function HomePage({ accidental, onStartDaily, onStartPractice, onStartPhase, onOpenStats, onShowHelp }: HomePageProps) {
   const sessions = getAllSessions();
   const metrics = getNoteRecognitionMetrics();
   const streak = getStreak();
@@ -100,6 +103,9 @@ export function HomePage({ accidental, onStartDaily, onStartPractice, onOpenStat
           はじめての方は <span className="text-accent">使い方ガイド</span> から
         </button>
       )}
+
+      {/* 学習マップ（フェーズ） */}
+      <PhaseMap onStartPhase={onStartPhase} />
     </div>
   );
 }

@@ -27,6 +27,7 @@ import { useScore } from './hooks/useScore';
 import { useSession } from './hooks/useSession';
 import { getLastSession, getNoteRecognitionMetrics, getDegreeMetrics, recordPracticeDay } from './data/practiceStore';
 import type { SessionSummary } from './types/practice';
+import type { Phase } from './data/phases';
 import { useCagedQuiz } from './hooks/useCagedQuiz';
 import { useScaleQuiz } from './hooks/useScaleQuiz';
 import { getNoteAt, getIntervalAt, getAllPositionsForNote } from './data/fretboard';
@@ -235,6 +236,19 @@ function App() {
     start(quiz.mode, quiz.rootNote);
   };
 
+  // フェーズ起動: 範囲をフェーズのスコープに設定して練習開始（範囲内は弱点優先）。
+  const handleStartPhase = (p: Phase) => {
+    setSelectedStrings(p.strings);
+    setFretRange(p.fretRange);
+    setSelectedNotes(p.notes);
+    setResult(null);
+    resetScore();
+    setDailyTarget(null);
+    session.startSession('free');
+    setView('practice');
+    start(p.mode, quiz.rootNote, { strings: p.strings, fretRange: p.fretRange, noteFilter: p.notes });
+  };
+
   // 今日の練習: 固定35問・位置→音名・弱点優先。Homeから起動。
   const handleStartDaily = () => {
     setResult(null);
@@ -302,6 +316,7 @@ function App() {
             accidental={accidental}
             onStartDaily={handleStartDaily}
             onStartPractice={() => setView('practice')}
+            onStartPhase={handleStartPhase}
             onOpenStats={() => setView('stats')}
             onShowHelp={() => { setSettingsShowHelp(true); setView('settings'); }}
           />

@@ -91,10 +91,18 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
   );
 
   const start = useCallback(
-    (mode: QuizMode, rootNote: NoteName = 'C') => {
+    (
+      mode: QuizMode,
+      rootNote: NoteName = 'C',
+      scope?: { strings: number[]; fretRange: [number, number]; noteFilter: string[] | null },
+    ) => {
       setStarted(true);
       setShowHint(false);
-      setQuiz(generateQuestion(mode, rootNote, maxFret, accidental, strings, fretRange, noteFilter));
+      // scope を渡すと初回出題はその範囲で生成（state更新前のstale回避）。
+      const ss = scope ? scope.strings : strings;
+      const fr = scope ? scope.fretRange : fretRange;
+      const nf = scope ? scope.noteFilter : noteFilter;
+      setQuiz(generateQuestion(mode, rootNote, maxFret, accidental, ss, fr, nf));
       questionShownAt.current = Date.now();
     },
     [maxFret, accidental, strings, fretRange, noteFilter]

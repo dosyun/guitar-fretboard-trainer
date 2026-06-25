@@ -93,6 +93,12 @@ HomePageの「今日の練習をはじめる」→ 固定35問(`DAILY_COUNT`)・
 完了(handleEnd)で `recordPracticeDay()` が連続練習日数を更新、Homeに「連続N日」(`getStreak`)表示。
 モード/範囲を手動変更すると `dailyTarget` 解除＝自由練習に戻る。
 
+### フェーズ到達マップ (M2)
+HomePageの「学習マップ」。`phases.ts` の `PHASES`(5フェーズ)を `computePhaseStatus` で進捗・クリア判定
+（CellStat/度数の記録から導出、**非永続**）。フェーズ=練習範囲のプリセット＋到達目標(正答率/平均反応)。
+タップで範囲(弦/フレット/音名/モード)をセットし練習開始、範囲内は弱点エンジンが駆動。**ロックなし**(ADR0002)、
+クリアでバッジ。`useQuiz.start()` に scope override 引数を追加し、起動初回の stale 範囲を回避。
+
 ### permanenceとリセット
 - 永続化は `practiceStore` に閉じ込め（キー `gft-attempts-v1 / gft-cellstats-v1 / gft-sessions-v1`）。
   量が増えたら IndexedDB へ差し替え可能。`useScore` の連続/最高は別キー。
