@@ -80,6 +80,11 @@ src/
 - 度数(interval)はルート依存なのでセルに混ぜない（ログは取る）。詳細は [CONTEXT.md] の「出題対象」。
 - 色: 弱点(=誤答率0.6＋遅さ0.4)を 緑(習得)→琥珀(要練習)→赤(苦手)、未出題=無色。
 
+### 弱点自動出題 (M2)
+`practiceStore.pickWeightedPosition()` が弱点スコア順で出題対象を選ぶ。配分 **弱点60% / 復習30% / 新規10%**。
+`useQuiz` の出題生成で音名認識(position-to-note / note-to-position)に適用。度数(interval)は一様のまま。
+記録ゼロの範囲では `null` を返し一様ランダムにフォールバック。練習画面に「弱点を優先して出題中」を表示。
+
 ### permanenceとリセット
 - 永続化は `practiceStore` に閉じ込め（キー `gft-attempts-v1 / gft-cellstats-v1 / gft-sessions-v1`）。
   量が増えたら IndexedDB へ差し替え可能。`useScore` の連続/最高は別キー。

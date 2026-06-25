@@ -25,7 +25,7 @@ import { ScaleQuiz } from './components/ScaleQuiz';
 import { useQuiz } from './hooks/useQuiz';
 import { useScore } from './hooks/useScore';
 import { useSession } from './hooks/useSession';
-import { getLastSession } from './data/practiceStore';
+import { getLastSession, getNoteRecognitionMetrics } from './data/practiceStore';
 import type { SessionSummary } from './types/practice';
 import { useCagedQuiz } from './hooks/useCagedQuiz';
 import { useScaleQuiz } from './hooks/useScaleQuiz';
@@ -371,6 +371,15 @@ function App() {
             )}
 
             {started && <ScoreBoard score={score} />}
+
+            {started && quiz.mode !== 'interval' && getNoteRecognitionMetrics().length > 0 && (
+              <div className="flex justify-center">
+                <span className="inline-flex items-center gap-1.5 text-[11px] text-dim bg-panel border border-hair rounded-full px-2.5 py-0.5">
+                  <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true" />
+                  弱点を優先して出題中
+                </span>
+              </div>
+            )}
 
             {started && (
               <div className="text-center">

@@ -8,6 +8,7 @@ import {
   getRandomPosition,
   getRandomNote,
 } from '../data/fretboard';
+import { pickWeightedPosition } from '../data/practiceStore';
 
 const FEEDBACK_DELAY = 800;
 
@@ -32,7 +33,11 @@ function generateQuestion(
   noteFilter: string[] | null,
 ): QuizState {
   if (mode === 'position-to-note' || mode === 'interval') {
-    const pos = getRandomPosition(maxFret, strings, fretRange, noteFilter, accidental);
+    // 音名認識は弱点優先で出題。度数はルート依存のため一様（M2で別途）。
+    const pos =
+      (mode === 'position-to-note'
+        ? pickWeightedPosition('position-to-note', strings, fretRange, noteFilter, accidental)
+        : null) ?? getRandomPosition(maxFret, strings, fretRange, noteFilter, accidental);
     return {
       mode,
       currentPosition: pos,
@@ -42,8 +47,11 @@ function generateQuestion(
       correctAnswer: null,
     };
   }
-  // note-to-position
-  const note = getRandomNote(accidental, strings, fretRange, maxFret, noteFilter);
+  // note-to-position: 弱点セルを選び、その音名を出題（回答は任意の正解位置でOK）
+  const weakPos = pickWeightedPosition('note-to-position', strings, fretRange, noteFilter, accidental);
+  const note = weakPos
+    ? getNoteAt(weakPos.string, weakPos.fret, accidental)
+    : getRandomNote(accidental, strings, fretRange, maxFret, noteFilter);
   return {
     mode,
     currentPosition: null,

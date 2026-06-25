@@ -18,6 +18,8 @@ import type {
   CellMetrics,
 } from '../types/practice';
 import { cellKey, isNoteRecognition } from '../types/practice';
+import { getNoteAt } from './fretboard';
+import type { FretPosition, Accidental } from '../types';
 
 const ATTEMPTS_KEY = 'gft-attempts-v1';
 const CELLS_KEY = 'gft-cellstats-v1';
@@ -139,6 +141,77 @@ export function clearPracticeData(): void {
       /* ignore */
     }
   });
+}
+
+// ===== 弱点自動出題 (docs/adr/0002, ChatGPT提案3位) =====
+
+const SEL_FAST_MS = 1200;
+const SEL_SLOW_MS = 4000;
+const DAY_MS = 86_400_000;
+const clampU = (x: number) => Math.min(1, Math.max(0, x));
+
+/**
+ * 弱点スコア = 誤答率0.45 + 反応の遅さ0.35 + 経過(staleness)0.15。
+ * (importance 0.05 は将来。現状は重要度重みなし)
+ */
+function statWeakness(stat: CellStat, now: number): number {
+  const errorRate = 1 - stat.correct / stat.n;
+  const norm = clampU((stat.sumMs / stat.n - SEL_FAST_MS) / (SEL_SLOW_MS - SEL_FAST_MS));
+  const staleness = clampU((now - stat.lastAt) / (14 * DAY_MS));
+  return errorRate * 0.45 + norm * 0.35 + staleness * 0.15;
+}
+
+/**
+ * 弱点重み付きで出題対象セルを選ぶ。配分: 弱点60% / 通常復習30% / 新規10%。
+ * 範囲内に記録が無ければ null（呼び出し側で一様ランダムにフォールバック）。
+ */
+export function pickWeightedPosition(
+  quizType: QuizType,
+  strings: number[],
+  fretRange: [number, number],
+  noteFilter: string[] | null,
+  accidental: Accidental,
+): FretPosition | null {
+  const ss = strings.length ? strings : [0, 1, 2, 3, 4, 5];
+  const [lo, hi] = fretRange;
+  const candidates: FretPosition[] = [];
+  for (const s of ss) {
+    for (let f = lo; f <= hi; f++) {
+      if (noteFilter && noteFilter.length && !noteFilter.includes(getNoteAt(s, f, accidental))) continue;
+      candidates.push({ string: s, fret: f });
+    }
+  }
+  if (candidates.length === 0) return null;
+
+  const cells = getCellStats();
+  const now = Date.now();
+  const tested: { pos: FretPosition; w: number }[] = [];
+  const untested: FretPosition[] = [];
+  for (const c of candidates) {
+    const stat = cells[cellKey(quizType, c.string, c.fret)];
+    if (stat && stat.n > 0) tested.push({ pos: c, w: statWeakness(stat, now) });
+    else untested.push(c);
+  }
+  // 記録ゼロなら適応しない（呼び出し側で一様 random）
+  if (tested.length === 0) return null;
+
+  const uniform = (arr: FretPosition[]) => arr[Math.floor(Math.random() * arr.length)];
+  const roll = Math.random();
+
+  // 弱点 60%: 弱点スコアで重み付き抽選（弱いほど出やすい）
+  if (roll < 0.6) {
+    const total = tested.reduce((a, t) => a + (t.w + 0.05), 0);
+    let r = Math.random() * total;
+    for (const t of tested) {
+      r -= t.w + 0.05;
+      if (r <= 0) return t.pos;
+    }
+    return tested[tested.length - 1].pos;
+  }
+  // 通常復習 30%: 既習から一様
+  if (roll < 0.9) return uniform(tested.map((t) => t.pos));
+  // 新規 10%: 未出題から一様（無ければ既習）
+  return untested.length ? uniform(untested) : uniform(tested.map((t) => t.pos));
 }
 
 /** 配列の中央値 (セッション結果用)。 */
