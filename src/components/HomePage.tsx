@@ -2,6 +2,7 @@ import { Segmented } from 'antd';
 import { getAllSessions, getNoteRecognitionMetrics, getStreak } from '../data/practiceStore';
 import { getNoteLabel } from '../data/fretboard';
 import { PhaseMap } from './PhaseMap';
+import { InstallPrompt } from './InstallPrompt';
 import type { Phase } from '../data/phases';
 import type { Accidental } from '../types';
 import type { CellMetrics } from '../types/practice';
@@ -40,6 +41,8 @@ export function HomePage({ accidental, dailyLength, onDailyLengthChange, onStart
 
   return (
     <div className="max-w-md mx-auto w-full space-y-5">
+      <InstallPrompt />
+
       <div className="flex items-center justify-between">
         <div className="font-mono text-xs tracking-widest text-accent flex items-center gap-2">
           <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true" />
