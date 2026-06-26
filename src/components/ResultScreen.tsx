@@ -1,23 +1,47 @@
-import type { SessionSummary } from '../types/practice';
+import { getNoteRecognitionMetrics } from '../data/practiceStore';
+import { getNoteAt } from '../data/fretboard';
+import type { Accidental } from '../types';
+import type { SessionSummary, CellMetrics } from '../types/practice';
 
 interface ResultScreenProps {
   summary: SessionSummary;
   prev: SessionSummary | null;
   challenge?: boolean;
+  accidental: Accidental;
+  onDrill: (note: string) => void;
   onRestart: () => void;
   onClose: () => void;
 }
 
 const sec = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
 const acc = (s: SessionSummary) => (s.count > 0 ? Math.round((s.correct / s.count) * 100) : 0);
+const FAST_MS = 1200;
+const SLOW_MS = 4000;
+const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
+const weakness = (m: CellMetrics) =>
+  0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
 
-export function ResultScreen({ summary, prev, challenge = false, onRestart, onClose }: ResultScreenProps) {
+export function ResultScreen({
+  summary,
+  prev,
+  challenge = false,
+  accidental,
+  onDrill,
+  onRestart,
+  onClose,
+}: ResultScreenProps) {
   const accuracy = acc(summary);
   const cleared = challenge && summary.count > 0 && summary.correct === summary.count;
 
   // 前回比 (改善=correct色 / 悪化=wrong色)
   const accDelta = prev ? accuracy - acc(prev) : null;
   const avgDelta = prev ? summary.avgMs - prev.avgMs : null; // 負=速くなった
+
+  // 一番弱い場所(n>=2) → その音だけ練習する導線（ループを閉じる）
+  const weakest = [...getNoteRecognitionMetrics()]
+    .filter((m) => m.n >= 2)
+    .sort((a, b) => weakness(b) - weakness(a))[0];
+  const weakNote = weakest ? getNoteAt(weakest.pos.string, weakest.pos.fret, accidental) : null;
 
   return (
     <div className="max-w-md mx-auto w-full bg-surface border border-hair rounded-2xl p-6 space-y-6">
@@ -77,11 +101,32 @@ export function ResultScreen({ summary, prev, challenge = false, onRestart, onCl
         </Row>
       </div>
 
+      {/* 次の一手: 一番弱い場所をその場で潰す（主導線） */}
+      {weakest && weakNote && (
+        <div className="space-y-2 pt-1">
+          <Row label="一番弱い">
+            <span className="font-mono text-ink">
+              {6 - weakest.pos.string}弦 {weakest.pos.fret}F（{weakNote}）
+            </span>
+          </Row>
+          <button
+            onClick={() => onDrill(weakNote)}
+            className="w-full px-4 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
+          >
+            「{weakNote}」を10問だけ練習
+          </button>
+        </div>
+      )}
+
       {/* アクション */}
-      <div className="flex gap-2 pt-1">
+      <div className="flex gap-2">
         <button
           onClick={onRestart}
-          className="flex-1 px-4 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
+          className={`flex-1 px-4 py-3 rounded-lg transition-colors ${
+            weakest
+              ? 'bg-panel text-ink border border-hair hover:bg-accent-soft'
+              : 'bg-accent text-bg font-semibold hover:opacity-90 active:opacity-80'
+          }`}
         >
           もう一回
         </button>

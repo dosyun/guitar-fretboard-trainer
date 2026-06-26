@@ -103,6 +103,13 @@ HomePageの「今日の練習をはじめる」→ 固定35問(`DAILY_COUNT`)・
 完了(handleEnd)で `recordPracticeDay()` が連続練習日数を更新、Homeに「連続N日」(`getStreak`)表示。
 モード/範囲を手動変更すると `dailyTarget` 解除＝自由練習に戻る。
 
+### 弱点ドリル導線 — ループを閉じる (M2)
+結果画面(`ResultScreen`)とStatsPageの「苦手ポジション」から、弱点の音を **その場で1タップ練習**できる。
+- `ResultScreen` は `getNoteRecognitionMetrics()` から最弱セル(n>=2, 弱点スコア最大)を算出し「一番弱い: ◯弦◯F（音）」＋主CTA「『音』を10問だけ練習」を表示。
+- StatsPageの苦手TOP5は各行がボタン（タップでその音を練習）。
+- `App.handleStartDrill(note, count=10)`: `noteFilter:[note]`・全盤・**note-to-position**・challengeで起動（「その音を探す」ドリル）。
+- 狙い: 練習→結果→弱点→その場で潰す→改善、のループを閉じる。
+
 ### フェーズ到達マップ (M2)
 HomePageの「学習マップ」。`phases.ts` の `PHASES`(5フェーズ)を `computePhaseStatus` で進捗・クリア判定
 （CellStat/度数の記録から導出、**非永続**）。フェーズ=練習範囲のプリセット＋到達目標(正答率/平均反応)。

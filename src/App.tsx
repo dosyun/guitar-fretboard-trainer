@@ -254,6 +254,21 @@ function App() {
     start(p.mode, quiz.rootNote, { strings: p.strings, fretRange: p.fretRange, noteFilter: p.notes }, true);
   };
 
+  // 弱点ドリル: 指定した音だけを N問(既定10)・ノート→位置で集中練習（ループを閉じる導線）。
+  const handleStartDrill = (note: string, count = 10) => {
+    const scope = { strings: [0, 1, 2, 3, 4, 5], fretRange: [0, maxFret] as [number, number], noteFilter: [note] };
+    setSelectedStrings(scope.strings);
+    setFretRange(scope.fretRange);
+    setSelectedNotes([note]);
+    setResult(null);
+    resetScore();
+    setSessionKind('challenge');
+    setSessionTarget(count);
+    session.startSession('free');
+    setView('practice');
+    start('note-to-position', quiz.rootNote, scope, true);
+  };
+
   // 今日の練習: 選んだ問題数(既定15)・位置→音名・弱点優先。Homeから起動。
   const handleStartDaily = () => {
     setResult(null);
@@ -405,6 +420,8 @@ function App() {
             summary={result.summary}
             prev={result.prev}
             challenge={result.kind === 'challenge'}
+            accidental={accidental}
+            onDrill={handleStartDrill}
             onRestart={() => (result.kind === 'daily' ? handleStartDaily() : handleStart())}
             onClose={() => setResult(null)}
           />
@@ -524,7 +541,7 @@ function App() {
         )}
 
         {/* ===== 成績ビュー ===== */}
-        {view === 'stats' && <StatsPage maxFret={maxFret} accidental={accidental} />}
+        {view === 'stats' && <StatsPage maxFret={maxFret} accidental={accidental} onDrill={handleStartDrill} />}
 
         {/* ===== スケールビュー ===== */}
         {view === 'theory' && theoryTab === 'scale' && (

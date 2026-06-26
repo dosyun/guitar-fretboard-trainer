@@ -1,13 +1,14 @@
 import { FretboardHeatmap } from './FretboardHeatmap';
 import { ProgressChart } from './ProgressChart';
 import { getAllSessions, getNoteRecognitionMetrics, getDegreeMetrics } from '../data/practiceStore';
-import { getNoteLabel } from '../data/fretboard';
+import { getNoteLabel, getNoteAt } from '../data/fretboard';
 import type { Accidental } from '../types';
 import type { CellMetrics, DegreeMetrics } from '../types/practice';
 
 interface StatsPageProps {
   maxFret: number;
   accidental: Accidental;
+  onDrill: (note: string) => void;
 }
 
 const sec = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
@@ -20,7 +21,7 @@ const degreeWeak = (m: DegreeMetrics) =>
   0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
 const heatColor = (w: number) => (w < 0.25 ? 'var(--correct)' : w < 0.55 ? 'var(--accent)' : 'var(--wrong)');
 
-export function StatsPage({ maxFret, accidental }: StatsPageProps) {
+export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
   const sessions = getAllSessions();
   const metrics = getNoteRecognitionMetrics();
   const degreeWorst = [...getDegreeMetrics()].sort((a, b) => degreeWeak(b) - degreeWeak(a));
@@ -77,23 +78,27 @@ export function StatsPage({ maxFret, accidental }: StatsPageProps) {
             </div>
           </div>
 
-          {/* 苦手ポジション */}
+          {/* 苦手ポジション（タップでその音だけ練習） */}
           {worst.length > 0 && (
             <div className="space-y-2">
               <h2 className="text-sm font-medium text-ink">苦手なポジション</h2>
+              <p className="text-xs text-dim">タップでその音だけ集中練習</p>
               <ul className="space-y-1">
                 {worst.map((m) => (
-                  <li
-                    key={`${m.pos.string}-${m.pos.fret}`}
-                    className="flex items-center justify-between bg-surface border border-hair rounded-lg px-3 py-2 text-sm"
-                  >
-                    <span className="font-mono text-ink">
-                      {6 - m.pos.string}弦 {m.pos.fret}F
-                      <span className="text-dim ml-2">{getNoteLabel(m.pos.string, m.pos.fret, accidental)}</span>
-                    </span>
-                    <span className="font-mono tabular-nums text-dim">
-                      誤答 {Math.round(m.errorRate * 100)}% / {sec(m.avgMs)}
-                    </span>
+                  <li key={`${m.pos.string}-${m.pos.fret}`}>
+                    <button
+                      onClick={() => onDrill(getNoteAt(m.pos.string, m.pos.fret, accidental))}
+                      className="w-full flex items-center justify-between bg-surface border border-hair rounded-lg px-3 py-2 text-sm hover:bg-panel transition-colors"
+                    >
+                      <span className="font-mono text-ink">
+                        {6 - m.pos.string}弦 {m.pos.fret}F
+                        <span className="text-dim ml-2">{getNoteLabel(m.pos.string, m.pos.fret, accidental)}</span>
+                      </span>
+                      <span className="font-mono tabular-nums text-dim flex items-center gap-2">
+                        誤答 {Math.round(m.errorRate * 100)}% / {sec(m.avgMs)}
+                        <span className="text-accent">練習 →</span>
+                      </span>
+                    </button>
                   </li>
                 ))}
               </ul>
