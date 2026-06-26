@@ -3,12 +3,14 @@ import { getAllSessions, getNoteRecognitionMetrics, getStreak } from '../data/pr
 import { getNoteLabel } from '../data/fretboard';
 import { PhaseMap } from './PhaseMap';
 import { InstallPrompt } from './InstallPrompt';
+import { MasteryBar } from './MasteryBar';
 import type { Phase } from '../data/phases';
 import type { Accidental } from '../types';
 import type { CellMetrics } from '../types/practice';
 
 interface HomePageProps {
   accidental: Accidental;
+  maxFret: number;
   dailyLength: number;
   onDailyLengthChange: (n: number) => void;
   onStartDaily: () => void;
@@ -25,7 +27,7 @@ const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const weakness = (m: CellMetrics) =>
   0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
 
-export function HomePage({ accidental, dailyLength, onDailyLengthChange, onStartDaily, onStartPractice, onStartPhase, onOpenStats, onShowHelp }: HomePageProps) {
+export function HomePage({ accidental, maxFret, dailyLength, onDailyLengthChange, onStartDaily, onStartPractice, onStartPhase, onOpenStats, onShowHelp }: HomePageProps) {
   const sessions = getAllSessions();
   const metrics = getNoteRecognitionMetrics();
   const streak = getStreak();
@@ -93,6 +95,7 @@ export function HomePage({ accidental, dailyLength, onDailyLengthChange, onStart
       {/* 進捗 */}
       {hasData ? (
         <div className="space-y-3">
+          <MasteryBar maxFret={maxFret} accidental={accidental} compact />
           <div className="grid grid-cols-3 gap-2 text-center">
             <Stat label="累計問題数" value={`${totalAttempts}`} />
             <Stat label="総合正答率" value={`${accuracy}%`} />

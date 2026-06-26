@@ -338,6 +338,7 @@ function App() {
         {view === 'home' && (
           <HomePage
             accidental={accidental}
+            maxFret={maxFret}
             dailyLength={dailyLength}
             onDailyLengthChange={setDailyLength}
             onStartDaily={handleStartDaily}

@@ -1,5 +1,6 @@
 import { FretboardHeatmap } from './FretboardHeatmap';
 import { ProgressChart } from './ProgressChart';
+import { MasteryBar } from './MasteryBar';
 import { getAllSessions, getNoteRecognitionMetrics, getDegreeMetrics } from '../data/practiceStore';
 import { getNoteLabel, getNoteAt } from '../data/fretboard';
 import type { Accidental } from '../types';
@@ -63,6 +64,9 @@ export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
             <Stat label="総合正答率" value={`${accuracy}%`} />
             <Stat label="平均反応" value={sec(avgMs)} />
           </div>
+
+          {/* 指板習熟度 */}
+          <MasteryBar maxFret={maxFret} accidental={accidental} />
 
           {/* 推移グラフ */}
           <ProgressChart sessions={sessions} />

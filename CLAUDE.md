@@ -103,6 +103,12 @@ HomePageの「今日の練習をはじめる」→ 固定35問(`DAILY_COUNT`)・
 完了(handleEnd)で `recordPracticeDay()` が連続練習日数を更新、Homeに「連続N日」(`getStreak`)表示。
 モード/範囲を手動変更すると `dailyTarget` 解除＝自由練習に戻る。
 
+### Mastery Score / 指板習熟度 (M2)
+`src/data/mastery.ts`: `cellMastery(0-100)=accuracy*0.5+speed*0.35+recency*0.05+confidence*0.1`
+（提案のconsistencyは分散データ無しのため回数confidenceで代替）。`getMasterySummary(maxFret, accidental)` が
+盤面全セル平均(未出題=0)の `overall%` と、音ごとの `top`(得意)/`weak`(次に練習) を返す。
+`MasteryBar` をホーム(compact)と成績(得意/次つき)に表示。成長が見える単一指標＋「次はこれ」断定。
+
 ### 弱点ドリル導線 — ループを閉じる (M2)
 結果画面(`ResultScreen`)とStatsPageの「苦手ポジション」から、弱点の音を **その場で1タップ練習**できる。
 - `ResultScreen` は `getNoteRecognitionMetrics()` から最弱セル(n>=2, 弱点スコア最大)を算出し「一番弱い: ◯弦◯F（音）」＋主CTA「『音』を10問だけ練習」を表示。
