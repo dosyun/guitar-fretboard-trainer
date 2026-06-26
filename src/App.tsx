@@ -21,6 +21,7 @@ import { HomePage } from './components/HomePage';
 import { ResultScreen } from './components/ResultScreen';
 import { ChordToneQuiz } from './components/ChordToneQuiz';
 import { ChordProgressionQuiz } from './components/ChordProgressionQuiz';
+import { LessonsPage } from './components/LessonsPage';
 import { StatsPage } from './components/StatsPage';
 import { ScaleMap } from './components/ScaleMap';
 import { ScaleQuiz } from './components/ScaleQuiz';
@@ -41,9 +42,10 @@ import type { Accidental, FretPosition, NoteName, CagedFormName } from './types'
 import './index.css';
 
 type AppView = 'home' | 'practice' | 'theory' | 'stats' | 'settings';
-type TheoryTab = 'map' | 'scale' | 'caged' | 'voicing' | 'open' | 'diatonic' | 'arpeggio';
+type TheoryTab = 'learn' | 'map' | 'scale' | 'caged' | 'voicing' | 'open' | 'diatonic' | 'arpeggio';
 
 const THEORY_TABS: { key: TheoryTab; label: string }[] = [
+  { key: 'learn', label: '学ぶ' },
   { key: 'map', label: '指板マップ' },
   { key: 'scale', label: 'スケール' },
   { key: 'caged', label: 'CAGED' },
@@ -56,7 +58,7 @@ const THEORY_TABS: { key: TheoryTab; label: string }[] = [
 function App() {
   const [accidental, setAccidental] = useState<Accidental>('flat');
   const [view, setView] = useState<AppView>('home');
-  const [theoryTab, setTheoryTab] = useState<TheoryTab>('map');
+  const [theoryTab, setTheoryTab] = useState<TheoryTab>('learn');
   const [settingsShowHelp, setSettingsShowHelp] = useState(false);
   const [mapDisplay, setMapDisplay] = useState<'notes' | 'intervals'>('notes');
   const [mapRoot, setMapRoot] = useState<NoteName>('C');
@@ -243,6 +245,13 @@ function App() {
     start(quiz.mode, quiz.rootNote, undefined, false);
   };
 
+  // レッスンの「見る/練習する」導線: 理論サブタブ or 練習モードへ。
+  const handleLessonGoto = (target: string) => {
+    if (target === 'practice-chord') { setPracticeMode('chord-tone'); setResult(null); setView('practice'); }
+    else if (target === 'practice-prog') { setPracticeMode('progression'); setResult(null); setView('practice'); }
+    else setTheoryTab(target as TheoryTab);
+  };
+
   // フェーズ起動: 範囲をフェーズのスコープに設定（範囲内は弱点優先）。
   const handleStartPhase = (p: Phase) => {
     setSelectedStrings(p.strings);
@@ -369,6 +378,11 @@ function App() {
               </button>
             ))}
           </div>
+        )}
+
+        {/* ===== 学ぶ（レッスン） ===== */}
+        {view === 'theory' && theoryTab === 'learn' && (
+          <LessonsPage onGoto={handleLessonGoto} />
         )}
 
         {/* ===== マップビュー ===== */}
