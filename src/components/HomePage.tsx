@@ -1,3 +1,4 @@
+import { Segmented } from 'antd';
 import { getAllSessions, getNoteRecognitionMetrics, getStreak } from '../data/practiceStore';
 import { getNoteLabel } from '../data/fretboard';
 import { PhaseMap } from './PhaseMap';
@@ -7,6 +8,8 @@ import type { CellMetrics } from '../types/practice';
 
 interface HomePageProps {
   accidental: Accidental;
+  dailyLength: number;
+  onDailyLengthChange: (n: number) => void;
   onStartDaily: () => void;
   onStartPractice: () => void;
   onStartPhase: (p: Phase) => void;
@@ -21,7 +24,7 @@ const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const weakness = (m: CellMetrics) =>
   0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
 
-export function HomePage({ accidental, onStartDaily, onStartPractice, onStartPhase, onOpenStats, onShowHelp }: HomePageProps) {
+export function HomePage({ accidental, dailyLength, onDailyLengthChange, onStartDaily, onStartPractice, onStartPhase, onOpenStats, onShowHelp }: HomePageProps) {
   const sessions = getAllSessions();
   const metrics = getNoteRecognitionMetrics();
   const streak = getStreak();
@@ -54,8 +57,21 @@ export function HomePage({ accidental, onStartDaily, onStartPractice, onStartPha
         <div>
           <h2 className="text-lg font-bold text-ink text-balance">今日の練習</h2>
           <p className="text-dim text-sm mt-1 text-pretty">
-            35問・約2分。あなたの弱点を優先して出題します。指板の音名を反射で言えるように。
+            あなたの弱点を優先して{dailyLength}問。指板の音名を反射で言えるように。
           </p>
+        </div>
+        <div className="flex items-center justify-center gap-2">
+          <span className="text-xs text-dim">問題数</span>
+          <Segmented
+            size="small"
+            value={dailyLength}
+            onChange={(v) => onDailyLengthChange(v as number)}
+            options={[
+              { label: '10', value: 10 },
+              { label: '15', value: 15 },
+              { label: '20', value: 20 },
+            ]}
+          />
         </div>
         <button
           onClick={onStartDaily}

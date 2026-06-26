@@ -86,6 +86,7 @@ function App() {
   const [sessionTarget, setSessionTarget] = useState<number | null>(null);
   const [sessionKind, setSessionKind] = useState<'daily' | 'challenge'>('challenge');
   const [challengeLength, setChallengeLength] = useState<number | null>(10);
+  const [dailyLength, setDailyLength] = useState(15);
 
   const {
     quiz,
@@ -228,7 +229,6 @@ function App() {
   };
 
   // ===== 練習セッション制御 =====
-  const DAILY_COUNT = 35;
 
   // チャレンジ（自由練習）: ランダム・選んだ問題数・100%でクリア。
   const handleStart = () => {
@@ -254,12 +254,12 @@ function App() {
     start(p.mode, quiz.rootNote, { strings: p.strings, fretRange: p.fretRange, noteFilter: p.notes }, true);
   };
 
-  // 今日の練習: 固定35問・位置→音名・弱点優先。Homeから起動。
+  // 今日の練習: 選んだ問題数(既定15)・位置→音名・弱点優先。Homeから起動。
   const handleStartDaily = () => {
     setResult(null);
     resetScore();
     setSessionKind('daily');
-    setSessionTarget(DAILY_COUNT);
+    setSessionTarget(dailyLength);
     session.startSession('daily');
     setView('practice');
     start('position-to-note', quiz.rootNote, undefined, true);
@@ -323,6 +323,8 @@ function App() {
         {view === 'home' && (
           <HomePage
             accidental={accidental}
+            dailyLength={dailyLength}
+            onDailyLengthChange={setDailyLength}
             onStartDaily={handleStartDaily}
             onStartPractice={() => setView('practice')}
             onStartPhase={handleStartPhase}
