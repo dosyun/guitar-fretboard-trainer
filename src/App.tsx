@@ -19,6 +19,7 @@ import { OpenChordPage } from './components/OpenChordPage';
 import { HelpPage } from './components/HelpPage';
 import { HomePage } from './components/HomePage';
 import { ResultScreen } from './components/ResultScreen';
+import { ChordToneQuiz } from './components/ChordToneQuiz';
 import { StatsPage } from './components/StatsPage';
 import { ScaleMap } from './components/ScaleMap';
 import { ScaleQuiz } from './components/ScaleQuiz';
@@ -87,6 +88,7 @@ function App() {
   const [sessionKind, setSessionKind] = useState<'daily' | 'challenge'>('challenge');
   const [challengeLength, setChallengeLength] = useState<number | null>(10);
   const [dailyLength, setDailyLength] = useState(15);
+  const [practiceMode, setPracticeMode] = useState<'basic' | 'chord-tone'>('basic');
 
   const {
     quiz,
@@ -415,8 +417,25 @@ function App() {
           </>
         )}
 
-        {/* ===== クイズビュー ===== */}
-        {view === 'practice' && result && (
+        {/* ===== 練習ビュー ===== */}
+        {view === 'practice' && !result && (
+          <div className="flex justify-center">
+            <Segmented
+              value={practiceMode}
+              onChange={(v) => { setPracticeMode(v as 'basic' | 'chord-tone'); setResult(null); }}
+              options={[
+                { label: '基本', value: 'basic' },
+                { label: 'コードトーン', value: 'chord-tone' },
+              ]}
+            />
+          </div>
+        )}
+
+        {view === 'practice' && practiceMode === 'chord-tone' && (
+          <ChordToneQuiz accidental={accidental} maxFret={maxFret} />
+        )}
+
+        {view === 'practice' && practiceMode === 'basic' && result && (
           <ResultScreen
             summary={result.summary}
             prev={result.prev}
@@ -427,7 +446,7 @@ function App() {
             onClose={() => setResult(null)}
           />
         )}
-        {view === 'practice' && !result && (
+        {view === 'practice' && practiceMode === 'basic' && !result && (
           <>
             <ModeSelector
               current={quiz.mode}
