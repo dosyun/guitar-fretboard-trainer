@@ -4,9 +4,8 @@ import { Fretboard } from './Fretboard';
 import { RootSelector } from './RootSelector';
 import { getNoteAt, getNoteNames, getNoteIndex, getAllPositionsForNote } from '../data/fretboard';
 import { PROGRESSIONS, chordById } from '../data/chords';
+import { toneWhy } from '../data/theory';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
-
-const FEEDBACK_DELAY = 1100;
 
 interface ChordProgressionQuizProps {
   accidental: Accidental;
@@ -18,7 +17,7 @@ export function ChordProgressionQuiz({ accidental, maxFret }: ChordProgressionQu
   const [progId, setProgId] = useState('ii-v-i');
   const [started, setStarted] = useState(false);
   const [step, setStep] = useState(0);
-  const [target, setTarget] = useState<{ deg: string; note: string } | null>(null);
+  const [target, setTarget] = useState<{ deg: string; note: string; st: number; root: string } | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -40,7 +39,7 @@ export function ChordProgressionQuiz({ accidental, maxFret }: ChordProgressionQu
     const idx = (getNoteIndex(kr) + p.chords[s].degree) % 12;
     const ct = chordById(p.chords[s].type);
     const t = ct.tones[Math.floor(Math.random() * ct.tones.length)];
-    setTarget({ deg: t.deg, note: noteNames[(idx + t.st) % 12] });
+    setTarget({ deg: t.deg, note: noteNames[(idx + t.st) % 12], st: t.st, root: noteNames[idx] });
     setFeedback(null);
   };
 
@@ -83,7 +82,7 @@ export function ChordProgressionQuiz({ accidental, maxFret }: ChordProgressionQu
       const next = (step + 1) % chords.length;
       setStep(next);
       askWith(keyRoot, progId, next);
-    }, FEEDBACK_DELAY);
+    }, ok ? 1300 : 2800);
   };
 
   const correctPositions =
@@ -146,6 +145,9 @@ export function ChordProgressionQuiz({ accidental, maxFret }: ChordProgressionQu
               <p className={`text-lg font-bold mt-1 ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
                 {feedback === 'correct' ? '正解!' : `不正解... 正解の音: ${target?.note}`}
               </p>
+            )}
+            {feedback && target && (
+              <p className="text-xs text-dim mt-1 text-pretty font-mono">{toneWhy(target.deg, target.st, target.root, target.note)}</p>
             )}
           </div>
         </>

@@ -213,10 +213,11 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
         correctAnswer: isCorrect ? null : correct,
       }));
 
+      // 度数モードは「なぜ?」を読む時間を確保（不正解は長め）
       clearTimeout(feedbackTimer.current);
       feedbackTimer.current = setTimeout(() => {
         nextQuestion();
-      }, FEEDBACK_DELAY);
+      }, isCorrect ? 1300 : 2800);
     },
     [quiz.feedback, quiz.currentPosition, quiz.rootNote, accidental, onCorrect, onWrong, onAttempt, nextQuestion]
   );

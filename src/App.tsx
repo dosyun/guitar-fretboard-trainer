@@ -33,7 +33,8 @@ import type { SessionSummary } from './types/practice';
 import type { Phase } from './data/phases';
 import { useCagedQuiz } from './hooks/useCagedQuiz';
 import { useScaleQuiz } from './hooks/useScaleQuiz';
-import { getNoteAt, getIntervalAt, getAllPositionsForNote } from './data/fretboard';
+import { getNoteAt, getIntervalAt, getAllPositionsForNote, INTERVAL_NAMES } from './data/fretboard';
+import { toneWhy } from './data/theory';
 import { CAGED_ORDER } from './data/caged';
 import { SCALES, SCALE_LIST, SCALE_COLORS } from './data/scales';
 import type { ScaleName } from './data/scales';
@@ -231,6 +232,14 @@ function App() {
     if (quiz.feedback === 'correct') return '正解!';
     if (quiz.correctAnswer) return `不正解... 正解: ${quiz.correctAnswer}`;
     return '不正解...';
+  };
+
+  // 度数モードの「なぜ?」（その場で理解：半音数と役割）
+  const getIntervalWhy = (): string | null => {
+    if (quiz.mode !== 'interval' || !quiz.feedback || !quiz.currentPosition) return null;
+    const deg = getIntervalAt(quiz.currentPosition.string, quiz.currentPosition.fret, quiz.rootNote);
+    const note = getNoteAt(quiz.currentPosition.string, quiz.currentPosition.fret, accidental);
+    return toneWhy(deg, INTERVAL_NAMES.indexOf(deg), quiz.rootNote, note);
   };
 
   // ===== 練習セッション制御 =====
@@ -497,10 +506,13 @@ function App() {
                 <p className="text-ink font-medium">{getPrompt()}</p>
                 {quiz.feedback && (
                   <p className={`text-lg font-bold mt-1 ${
-                    quiz.feedback === 'correct' ? 'text-green-600' : 'text-red-500'
+                    quiz.feedback === 'correct' ? 'text-correct' : 'text-wrong'
                   }`}>
                     {getFeedbackMsg()}
                   </p>
+                )}
+                {quiz.mode === 'interval' && quiz.feedback && (
+                  <p className="text-xs text-dim mt-1 font-mono text-pretty">{getIntervalWhy()}</p>
                 )}
               </div>
             )}

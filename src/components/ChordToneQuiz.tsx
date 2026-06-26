@@ -4,9 +4,8 @@ import { Fretboard } from './Fretboard';
 import { RootSelector } from './RootSelector';
 import { getNoteAt, getNoteNames, getNoteIndex, getAllPositionsForNote } from '../data/fretboard';
 import { CHORD_TYPES } from '../data/chords';
+import { toneWhy } from '../data/theory';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
-
-const FEEDBACK_DELAY = 1000;
 
 interface ChordToneQuizProps {
   accidental: Accidental;
@@ -17,7 +16,7 @@ export function ChordToneQuiz({ accidental, maxFret }: ChordToneQuizProps) {
   const [root, setRoot] = useState<NoteName>('D');
   const [typeId, setTypeId] = useState('m7');
   const [started, setStarted] = useState(false);
-  const [target, setTarget] = useState<{ deg: string; note: string } | null>(null);
+  const [target, setTarget] = useState<{ deg: string; note: string; st: number; root: string } | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -32,7 +31,7 @@ export function ChordToneQuiz({ accidental, maxFret }: ChordToneQuizProps) {
     const c = CHORD_TYPES.find((x) => x.id === tid)!;
     const ri = getNoteIndex(r);
     const t = c.tones[Math.floor(Math.random() * c.tones.length)];
-    setTarget({ deg: t.deg, note: noteNames[(ri + t.st) % 12] });
+    setTarget({ deg: t.deg, note: noteNames[(ri + t.st) % 12], st: t.st, root: r });
     setFeedback(null);
   };
 
@@ -64,7 +63,7 @@ export function ChordToneQuiz({ accidental, maxFret }: ChordToneQuizProps) {
     setScore((s) => ({ correct: s.correct + (ok ? 1 : 0), total: s.total + 1 }));
     setFeedback(ok ? 'correct' : 'wrong');
     clearTimeout(timer.current);
-    timer.current = setTimeout(() => regen(root, typeId), FEEDBACK_DELAY);
+    timer.current = setTimeout(() => regen(root, typeId), ok ? 1300 : 2800);
   };
 
   // 不正解時に正解音の位置を緑で表示
@@ -111,6 +110,9 @@ export function ChordToneQuiz({ accidental, maxFret }: ChordToneQuizProps) {
               <p className={`text-lg font-bold mt-1 ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
                 {feedback === 'correct' ? '正解!' : `不正解... 正解の音: ${target?.note}`}
               </p>
+            )}
+            {feedback && target && (
+              <p className="text-xs text-dim mt-1 text-pretty font-mono">{toneWhy(target.deg, target.st, target.root, target.note)}</p>
             )}
           </div>
         </>
