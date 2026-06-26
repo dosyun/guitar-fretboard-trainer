@@ -45,6 +45,18 @@ import './index.css';
 type AppView = 'home' | 'practice' | 'theory' | 'stats' | 'settings';
 type TheoryTab = 'learn' | 'map' | 'scale' | 'caged' | 'voicing' | 'open' | 'diatonic' | 'arpeggio';
 
+// 理論ビューの1行解説（“調べる”を“分かる”に）
+const THEORY_INTRO: Record<TheoryTab, string> = {
+  learn: '',
+  map: '指板の全ポジションの音名・度数を一覧。まず全体像を掴むのに。',
+  scale: 'スケール＝ソロやメロディで使う音の集合。ボックスごとに段階的に。',
+  caged: 'CAGED＝C/A/G/E/D の5フォームで指板全体を1つに繋ぐ考え方。',
+  voicing: 'バレーコードの押さえ方を度数で。ルートのある弦でフォームが決まる。',
+  open: '開放弦を使うコード。最初に覚える定番フォーム集。',
+  diatonic: 'キーで使えるコードの基本セット＋定番進行。曲はこの中で動く。',
+  arpeggio: 'コードの構成音を1音ずつ並べる。アドリブやメロディの土台。',
+};
+
 const THEORY_TABS: { key: TheoryTab; label: string }[] = [
   { key: 'learn', label: '学ぶ' },
   { key: 'map', label: '指板マップ' },
@@ -392,6 +404,11 @@ function App() {
         {/* ===== 学ぶ（レッスン） ===== */}
         {view === 'theory' && theoryTab === 'learn' && (
           <LessonsPage onGoto={handleLessonGoto} />
+        )}
+
+        {/* 理論ビューの1行解説 */}
+        {view === 'theory' && theoryTab !== 'learn' && THEORY_INTRO[theoryTab] && (
+          <p className="text-xs text-dim text-center text-pretty">{THEORY_INTRO[theoryTab]}</p>
         )}
 
         {/* ===== マップビュー ===== */}

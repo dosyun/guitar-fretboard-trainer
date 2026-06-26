@@ -15,6 +15,8 @@ export interface Lesson {
   body: string[];
   example?: string;
   link?: LessonLink;
+  /** 指板で「見て分かる」実演（root からの度数を光らせる） */
+  demo?: { root: string; tones: { st: number; label: string }[]; maxFret?: number };
 }
 
 export const LESSONS: Lesson[] = [
@@ -38,6 +40,7 @@ export const LESSONS: Lesson[] = [
       'R=ルート、M3=長3度(半音4つ)、P5=完全5度(半音7つ) など。',
     ],
     example: 'Cをルートにすると E=M3(半音4) / G=P5(半音7)',
+    demo: { root: 'C', tones: [{ st: 0, label: 'R' }, { st: 4, label: 'M3' }, { st: 7, label: 'P5' }] },
     link: { label: '指板マップの「度数」モードで見る', target: 'map' },
   },
   {
@@ -48,6 +51,13 @@ export const LESSONS: Lesson[] = [
       'この7音がキーの“地図”になり、コードもメロディもここから生まれる。',
     ],
     example: 'Cメジャー: C D E F G A B（ピアノの白鍵だけ）',
+    demo: {
+      root: 'C',
+      tones: [
+        { st: 0, label: 'R' }, { st: 2, label: '2' }, { st: 4, label: '3' }, { st: 5, label: '4' },
+        { st: 7, label: '5' }, { st: 9, label: '6' }, { st: 11, label: '7' },
+      ],
+    },
     link: { label: 'スケールを指板で見る', target: 'scale' },
   },
   {
@@ -58,6 +68,7 @@ export const LESSONS: Lesson[] = [
       '3度が長い(明るい=メジャー)か短い(暗い=マイナー)かで色が決まる。',
     ],
     example: 'C = C(R) E(3) G(5) / Cm = C E♭ G',
+    demo: { root: 'C', tones: [{ st: 0, label: 'R' }, { st: 4, label: '3' }, { st: 7, label: '5' }] },
     link: { label: 'オープンコードで押さえ方を見る', target: 'open' },
   },
   {
@@ -68,6 +79,10 @@ export const LESSONS: Lesson[] = [
       'ジャズ/ポップスの土台。7の種類で maj7 / 7 / m7 などの色が変わる。',
     ],
     example: 'Cmaj7=C E G B / C7=C E G B♭ / Dm7=D F A C',
+    demo: {
+      root: 'C',
+      tones: [{ st: 0, label: 'R' }, { st: 4, label: '3' }, { st: 7, label: '5' }, { st: 11, label: '7' }],
+    },
     link: { label: 'コードトーンを指板で探す練習へ', target: 'practice-chord' },
   },
   {

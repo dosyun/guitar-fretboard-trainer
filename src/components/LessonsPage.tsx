@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { LESSONS } from '../data/lessons';
+import { LessonFretboard } from './LessonFretboard';
 
 interface LessonsPageProps {
   onGoto: (target: string) => void;
@@ -62,6 +63,12 @@ export function LessonsPage({ onGoto }: LessonsPageProps) {
         {l.example && (
           <div className="bg-panel border border-hair rounded-lg px-3 py-2 font-mono text-sm text-ink overflow-x-auto">
             {l.example}
+          </div>
+        )}
+
+        {l.demo && (
+          <div className="bg-bg border border-hair rounded-lg p-2 overflow-x-auto">
+            <LessonFretboard root={l.demo.root} tones={l.demo.tones} maxFret={l.demo.maxFret} />
           </div>
         )}
 
