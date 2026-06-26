@@ -4,9 +4,12 @@ import { BOARD } from '../data/boardPalette';
 import type { Accidental } from '../types';
 import type { CellMetrics } from '../types/practice';
 
+export type HeatMetric = 'weakness' | 'error' | 'speed';
+
 interface FretboardHeatmapProps {
   maxFret: number;
   accidental: Accidental;
+  metric?: HeatMetric;
 }
 
 // レイアウト (FretboardMap の非both設定に揃える)
@@ -25,15 +28,21 @@ const FAST_MS = 1200;
 const SLOW_MS = 4000;
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
-/** 弱点 = 誤答率(0.6) + 反応の遅さ(0.4)。色: 緑(習得)→琥珀→赤(苦手)。 */
-function heat(m: CellMetrics): { fill: string; opacity: number } {
+/** 指標値 0-1（総合=誤答0.6+遅さ0.4 / 誤答=誤答率 / 遅さ=反応の遅さ） */
+function metricValue(m: CellMetrics, metric: HeatMetric): number {
   const slowness = clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
-  const w = 0.6 * m.errorRate + 0.4 * slowness;
-  const fill = w < 0.25 ? 'var(--correct)' : w < 0.55 ? 'var(--accent)' : 'var(--wrong)';
-  return { fill, opacity: 0.35 + 0.55 * clamp01(Math.max(w, 0.18)) };
+  if (metric === 'error') return m.errorRate;
+  if (metric === 'speed') return slowness;
+  return 0.6 * m.errorRate + 0.4 * slowness;
 }
 
-export function FretboardHeatmap({ maxFret, accidental }: FretboardHeatmapProps) {
+/** 色: 緑(良)→琥珀→赤(要対策)。濃さ=指標の強さ。 */
+function heat(v: number): { fill: string; opacity: number } {
+  const fill = v < 0.25 ? 'var(--correct)' : v < 0.55 ? 'var(--accent)' : 'var(--wrong)';
+  return { fill, opacity: 0.35 + 0.55 * clamp01(Math.max(v, 0.18)) };
+}
+
+export function FretboardHeatmap({ maxFret, accidental, metric = 'weakness' }: FretboardHeatmapProps) {
   const metrics = getNoteRecognitionMetrics();
   const byCell = new Map<string, CellMetrics>();
   metrics.forEach((m) => byCell.set(`${m.pos.string}:${m.pos.fret}`, m));
@@ -112,7 +121,7 @@ export function FretboardHeatmap({ maxFret, accidental }: FretboardHeatmapProps)
         Array.from({ length: maxFret + 1 }, (_, f) => {
           const m = byCell.get(`${s}:${f}`);
           if (!m || m.n === 0) return null;
-          const { fill, opacity } = heat(m);
+          const { fill, opacity } = heat(metricValue(m, metric));
           return (
             <g key={`h-${s}-${f}`}>
               <circle cx={posX(f)} cy={stringY(s)} r={MARKER_R} fill={fill} opacity={opacity} />

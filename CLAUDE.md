@@ -87,6 +87,7 @@ src/
 - **指板ヒートマップは音名認識(position-to-note / note-to-position)のみ**。target=`(string,fret)`。
 - 度数(interval)はルート依存なのでセルに混ぜない（ログは取る）。詳細は [CONTEXT.md] の「出題対象」。
 - 色: 弱点(=誤答率0.6＋遅さ0.4)を 緑(習得)→琥珀(要練習)→赤(苦手)、未出題=無色。
+- 成績で **総合/誤答/遅さ** を切替（`FretboardHeatmap` の `metric` prop）。「間違える場所」と「知ってるが遅い場所」は練習法が違うため区別できる。
 
 ### 弱点自動出題 (M2)
 `practiceStore.pickWeightedPosition()` が弱点スコア順で出題対象を選ぶ。配分 **弱点60% / 復習30% / 新規10%**。

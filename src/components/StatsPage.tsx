@@ -1,10 +1,19 @@
+import { useState } from 'react';
+import { Segmented } from 'antd';
 import { FretboardHeatmap } from './FretboardHeatmap';
+import type { HeatMetric } from './FretboardHeatmap';
 import { ProgressChart } from './ProgressChart';
 import { MasteryBar } from './MasteryBar';
 import { getAllSessions, getNoteRecognitionMetrics, getDegreeMetrics } from '../data/practiceStore';
 import { getNoteLabel, getNoteAt } from '../data/fretboard';
 import type { Accidental } from '../types';
 import type { CellMetrics, DegreeMetrics } from '../types/practice';
+
+const HEAT_HINT: Record<HeatMetric, string> = {
+  weakness: '音名認識の弱点（誤答＋遅さ）',
+  error: '間違える場所 — 答えを確認して復習',
+  speed: '正解だが遅い場所 — 素早い反応を反復',
+};
 
 interface StatsPageProps {
   maxFret: number;
@@ -23,6 +32,7 @@ const degreeWeak = (m: DegreeMetrics) =>
 const heatColor = (w: number) => (w < 0.25 ? 'var(--correct)' : w < 0.55 ? 'var(--accent)' : 'var(--wrong)');
 
 export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
+  const [heatMetric, setHeatMetric] = useState<HeatMetric>('weakness');
   const sessions = getAllSessions();
   const metrics = getNoteRecognitionMetrics();
   const degreeWorst = [...getDegreeMetrics()].sort((a, b) => degreeWeak(b) - degreeWeak(a));
@@ -71,14 +81,27 @@ export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
           {/* 推移グラフ */}
           <ProgressChart sessions={sessions} />
 
-          {/* ヒートマップ */}
+          {/* ヒートマップ（総合/誤答/遅さ 切替） */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-medium text-ink">指板ヒートマップ（音名認識）</h2>
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-sm font-medium text-ink">指板ヒートマップ</h2>
+              <Segmented
+                size="small"
+                value={heatMetric}
+                onChange={(v) => setHeatMetric(v as HeatMetric)}
+                options={[
+                  { label: '総合', value: 'weakness' },
+                  { label: '誤答', value: 'error' },
+                  { label: '遅さ', value: 'speed' },
+                ]}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-2 text-xs text-dim">
+              <span className="text-pretty">{HEAT_HINT[heatMetric]}</span>
               <Legend />
             </div>
             <div className="bg-surface rounded-xl border border-hair p-2 overflow-x-auto">
-              <FretboardHeatmap maxFret={maxFret} accidental={accidental} />
+              <FretboardHeatmap maxFret={maxFret} accidental={accidental} metric={heatMetric} />
             </div>
           </div>
 
