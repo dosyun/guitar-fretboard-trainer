@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- 全面背景（maskableで角が切られても成立するよう full-bleed） -->
+  <rect width="512" height="512" fill="#14110c"/>
+  <!-- 指板パネル（エボニー） -->
+  <rect x="86" y="86" width="340" height="340" rx="40" fill="#241d14"/>
+
+  <!-- ナット（牛骨） -->
+  <rect x="116" y="120" width="12" height="272" rx="5" fill="#cdbf9e"/>
+
+  <!-- フレット（ニッケル・縦） -->
+  <g stroke="#5f636b" stroke-width="6" stroke-linecap="round">
+    <line x1="196" y1="120" x2="196" y2="392"/>
+    <line x1="268" y1="120" x2="268" y2="392"/>
+    <line x1="340" y1="120" x2="340" y2="392"/>
+    <line x1="392" y1="120" x2="392" y2="392"/>
+  </g>
+
+  <!-- 弦（ニッケル・横、低音弦ほど太く） -->
+  <g stroke="#8b8f98" stroke-linecap="round">
+    <line x1="116" y1="148" x2="396" y2="148" stroke-width="2.6"/>
+    <line x1="116" y1="186" x2="396" y2="186" stroke-width="3.2"/>
+    <line x1="116" y1="224" x2="396" y2="224" stroke-width="4"/>
+    <line x1="116" y1="262" x2="396" y2="262" stroke-width="4.8"/>
+    <line x1="116" y1="300" x2="396" y2="300" stroke-width="5.6"/>
+    <line x1="116" y1="338" x2="396" y2="338" stroke-width="6.4"/>
+  </g>
+
+  <!-- 白蝶貝のポジションインレイ -->
+  <circle cx="304" cy="357" r="7" fill="#b8ad93"/>
+
+  <!-- 琥珀の音（フォーカル） -->
+  <circle cx="304" cy="224" r="34" fill="#f5a623" stroke="#c9821a" stroke-width="3"/>
+</svg>

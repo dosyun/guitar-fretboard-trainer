@@ -291,7 +291,10 @@ function App() {
 
   return (
     <div className="min-h-dvh flex flex-col bg-bg">
-      <header className="bg-surface border-b border-hair py-3 px-4">
+      <header
+        className="bg-surface border-b border-hair py-3 px-4"
+        style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top))' }}
+      >
         <h1 className="font-mono text-base font-medium text-ink text-center flex items-center justify-center gap-2">
           <span className="inline-block size-2 rounded-sm bg-accent" aria-hidden="true" />
           Guitar Fretboard Trainer

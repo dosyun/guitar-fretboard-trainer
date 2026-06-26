@@ -15,6 +15,14 @@ Cloudflare Pages で自動デプロイ（GitHub master push → 即反映）。
 - `npm run lint` — ESLint実行
 - `npm run preview` — ビルド結果のプレビュー
 
+## PWA（インストール/オフライン）
+
+- `vite-plugin-pwa`(workbox) で `manifest.webmanifest` ＋ Service Worker を生成（`registerType: 'autoUpdate'`、`registerSW.js` 自動登録）。`npm run build` 時に precache 一式を生成。
+- アイコンは `public/app-icon.svg`（指板＋琥珀の音）から `@vite-pwa/assets-generator`(minimal-2023) で全サイズ生成（pwa-192/512・maskable-512・apple-touch-icon-180・favicon）。
+- Googleフォントは workbox の runtimeCaching(CacheFirst) でオフライン対応。
+- iOS は Safari の共有 →「ホーム画面に追加」でスタンドアロン起動。`status-bar-style: black-translucent` ＋ セーフエリア(`env(safe-area-inset-*)`)対応。`main.tsx` で `navigator.storage.persist()` を要求（iOSの記録消失対策）。
+- 設定は `vite.config.ts` の `VitePWA({...})`。将来 Capacitor で同コードをストア配信可能（WebViewなので書き換え不要）。
+
 ## アーキテクチャ
 
 ```

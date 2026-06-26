@@ -4,6 +4,11 @@ import { ConfigProvider, theme } from 'antd'
 import './index.css'
 import App from './App.tsx'
 
+// 練習記録(localStorage)を消えにくくする（特にiOS）。Service Workerは vite-plugin-pwa が自動登録。
+if (navigator.storage?.persist) {
+  navigator.storage.persist().catch(() => { /* noop */ })
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ConfigProvider

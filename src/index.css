@@ -28,6 +28,10 @@
   border-color: var(--hair);
 }
 
+html {
+  background: var(--bg);
+}
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, 'Segoe UI', 'Hiragino Kaku Gothic ProN',
@@ -40,6 +44,19 @@ body {
 
 #root {
   min-height: 100dvh;
+  /* セーフエリア（ホームインジケータ/横向きノッチ） */
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* タップの即応（ダブルタップ拡大・300ms遅延の抑止） */
+button,
+[role='button'],
+a,
+.ant-tabs-tab,
+.ant-segmented-item {
+  touch-action: manipulation;
 }
 
 /* データ readout の数字を揃える (回答時間・正答率など) */
