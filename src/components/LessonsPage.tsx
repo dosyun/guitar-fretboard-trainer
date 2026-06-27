@@ -1,9 +1,51 @@
 import { useState } from 'react';
 import { LESSONS } from '../data/lessons';
+import type { LessonCheckQ } from '../data/lessons';
 import { LessonFretboard } from './LessonFretboard';
 
 interface LessonsPageProps {
   onGoto: (target: string) => void;
+}
+
+/** 理解度チェック（学んだ直後にその場で確かめる）。多肢選択。 */
+function LessonCheck({ check }: { check: LessonCheckQ[] }) {
+  const [answers, setAnswers] = useState<Record<number, number>>({});
+
+  return (
+    <div className="space-y-3 border-t border-hair pt-4">
+      <h3 className="text-sm font-medium text-ink">理解度チェック</h3>
+      {check.map((q, qi) => {
+        const sel = answers[qi];
+        const answered = sel !== undefined;
+        return (
+          <div key={qi} className="space-y-1.5">
+            <p className="text-sm text-ink text-pretty">{q.q}</p>
+            <div className="flex flex-wrap gap-2">
+              {q.choices.map((c, ci) => {
+                let cls = 'bg-panel text-ink border-hair hover:bg-accent-soft';
+                if (answered) {
+                  if (ci === q.answer) cls = 'bg-correct text-bg border-correct';
+                  else if (ci === sel) cls = 'bg-wrong text-white border-wrong';
+                  else cls = 'bg-panel text-dim border-hair opacity-60';
+                }
+                return (
+                  <button
+                    key={ci}
+                    disabled={answered}
+                    onClick={() => setAnswers((a) => ({ ...a, [qi]: ci }))}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-mono border transition-colors ${cls}`}
+                  >
+                    {c}
+                  </button>
+                );
+              })}
+            </div>
+            {answered && q.why && <p className="text-xs text-dim text-pretty">{q.why}</p>}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export function LessonsPage({ onGoto }: LessonsPageProps) {
@@ -71,6 +113,8 @@ export function LessonsPage({ onGoto }: LessonsPageProps) {
             <LessonFretboard root={l.demo.root} tones={l.demo.tones} maxFret={l.demo.maxFret} />
           </div>
         )}
+
+        {l.check && <LessonCheck key={idx} check={l.check} />}
 
         {l.link && (
           <button
