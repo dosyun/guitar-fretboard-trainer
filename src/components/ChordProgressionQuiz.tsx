@@ -10,9 +10,10 @@ import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
 interface ChordProgressionQuizProps {
   accidental: Accidental;
   maxFret: number;
+  onLearn?: () => void;
 }
 
-export function ChordProgressionQuiz({ accidental, maxFret }: ChordProgressionQuizProps) {
+export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProgressionQuizProps) {
   const [keyRoot, setKeyRoot] = useState<NoteName>('C');
   const [progId, setProgId] = useState('ii-v-i');
   const [started, setStarted] = useState(false);
@@ -166,12 +167,19 @@ export function ChordProgressionQuiz({ accidental, maxFret }: ChordProgressionQu
       </div>
 
       {!started ? (
-        <button
-          onClick={start}
-          className="mx-auto px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
-        >
-          スタート
-        </button>
+        <div className="flex flex-col items-center gap-2">
+          <button
+            onClick={start}
+            className="px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
+          >
+            スタート
+          </button>
+          {onLearn && (
+            <button onClick={onLearn} className="text-xs text-accent hover:opacity-80 underline">
+              はじめて？ まず学ぶ →
+            </button>
+          )}
+        </div>
       ) : (
         <button
           onClick={stop}

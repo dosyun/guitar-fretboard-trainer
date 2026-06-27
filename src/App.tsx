@@ -266,6 +266,12 @@ function App() {
     start(quiz.mode, quiz.rootNote, undefined, false);
   };
 
+  // 練習からの「まず学ぶ」導線: 理論>学ぶ へ。
+  const goToLearn = () => {
+    setTheoryTab('learn');
+    setView('theory');
+  };
+
   // レッスンの「見る/練習する」導線: 理論サブタブ or 練習モードへ。
   const handleLessonGoto = (target: string) => {
     if (target === 'practice-chord') { setPracticeMode('chord-tone'); setResult(null); setView('practice'); }
@@ -379,6 +385,7 @@ function App() {
             onStartPhase={handleStartPhase}
             onOpenStats={() => setView('stats')}
             onShowHelp={() => { setSettingsShowHelp(true); setView('settings'); }}
+            onLearn={goToLearn}
           />
         )}
 
@@ -474,11 +481,11 @@ function App() {
         )}
 
         {view === 'practice' && practiceMode === 'chord-tone' && (
-          <ChordToneQuiz accidental={accidental} maxFret={maxFret} />
+          <ChordToneQuiz accidental={accidental} maxFret={maxFret} onLearn={goToLearn} />
         )}
 
         {view === 'practice' && practiceMode === 'progression' && (
-          <ChordProgressionQuiz accidental={accidental} maxFret={maxFret} />
+          <ChordProgressionQuiz accidental={accidental} maxFret={maxFret} onLearn={goToLearn} />
         )}
 
         {view === 'practice' && practiceMode === 'basic' && result && (
@@ -593,6 +600,11 @@ function App() {
                 >
                   チャレンジ開始
                 </button>
+                {quiz.mode === 'interval' && (
+                  <button onClick={goToLearn} className="text-xs text-accent hover:opacity-80 underline">
+                    度数がわからない？ まず学ぶ →
+                  </button>
+                )}
               </div>
             )}
 

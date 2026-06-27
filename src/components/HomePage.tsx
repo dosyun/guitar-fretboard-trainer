@@ -18,6 +18,7 @@ interface HomePageProps {
   onStartPhase: (p: Phase) => void;
   onOpenStats: () => void;
   onShowHelp: () => void;
+  onLearn: () => void;
 }
 
 const sec = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
@@ -27,7 +28,7 @@ const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const weakness = (m: CellMetrics) =>
   0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
 
-export function HomePage({ accidental, maxFret, dailyLength, onDailyLengthChange, onStartDaily, onStartPractice, onStartPhase, onOpenStats, onShowHelp }: HomePageProps) {
+export function HomePage({ accidental, maxFret, dailyLength, onDailyLengthChange, onStartDaily, onStartPractice, onStartPhase, onOpenStats, onShowHelp, onLearn }: HomePageProps) {
   const sessions = getAllSessions();
   const metrics = getNoteRecognitionMetrics();
   const streak = getStreak();
@@ -89,6 +90,9 @@ export function HomePage({ accidental, maxFret, dailyLength, onDailyLengthChange
           className="w-full text-sm text-dim hover:text-ink transition-colors"
         >
           チャレンジ（問題数を選んで挑戦）
+        </button>
+        <button onClick={onLearn} className="w-full text-sm text-accent hover:opacity-80 transition-opacity">
+          音楽理論を学ぶ（ゼロから）→
         </button>
       </div>
 
