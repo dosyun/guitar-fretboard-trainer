@@ -2,9 +2,10 @@ import { useState, useRef } from 'react';
 import { Segmented } from 'antd';
 import { Fretboard } from './Fretboard';
 import { RootSelector } from './RootSelector';
-import { getNoteAt, getNoteNames, getNoteIndex, getAllPositionsForNote } from '../data/fretboard';
+import { getNoteAt, getNoteNames, getNoteIndex, getAllPositionsForNote, INTERVAL_NAMES } from '../data/fretboard';
 import { PROGRESSIONS, chordById } from '../data/chords';
 import { toneWhy } from '../data/theory';
+import { useSession } from '../hooks/useSession';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
 
 interface ChordProgressionQuizProps {
@@ -22,6 +23,8 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const session = useSession();
+  const shownAt = useRef<number>(0);
 
   const noteNames = getNoteNames(accidental);
   const prog = PROGRESSIONS.find((p) => p.id === progId) ?? PROGRESSIONS[0];
@@ -42,16 +45,19 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
     const t = ct.tones[Math.floor(Math.random() * ct.tones.length)];
     setTarget({ deg: t.deg, note: noteNames[(idx + t.st) % 12], st: t.st, root: noteNames[idx] });
     setFeedback(null);
+    shownAt.current = Date.now();
   };
 
   const start = () => {
     setScore({ correct: 0, total: 0 });
     setStarted(true);
     setStep(0);
+    session.startSession('free');
     askWith(keyRoot, progId, 0);
   };
   const stop = () => {
     clearTimeout(timer.current);
+    session.finalize();
     setStarted(false);
     setStep(0);
     setTarget(null);
@@ -76,6 +82,14 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
   const onTap = (pos: FretPosition) => {
     if (!target || feedback) return;
     const ok = getNoteAt(pos.string, pos.fret, accidental) === target.note;
+    session.record({
+      quizType: 'interval',
+      isCorrect: ok,
+      responseTimeMs: Date.now() - shownAt.current,
+      string: pos.string,
+      fret: pos.fret,
+      degree: INTERVAL_NAMES[target.st % 12],
+    });
     setScore((s) => ({ correct: s.correct + (ok ? 1 : 0), total: s.total + 1 }));
     setFeedback(ok ? 'correct' : 'wrong');
     clearTimeout(timer.current);

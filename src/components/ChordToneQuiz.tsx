@@ -2,9 +2,10 @@ import { useState, useRef } from 'react';
 import { Segmented } from 'antd';
 import { Fretboard } from './Fretboard';
 import { RootSelector } from './RootSelector';
-import { getNoteAt, getNoteNames, getNoteIndex, getAllPositionsForNote } from '../data/fretboard';
+import { getNoteAt, getNoteNames, getNoteIndex, getAllPositionsForNote, INTERVAL_NAMES } from '../data/fretboard';
 import { CHORD_TYPES } from '../data/chords';
 import { toneWhy } from '../data/theory';
+import { useSession } from '../hooks/useSession';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
 
 interface ChordToneQuizProps {
@@ -21,6 +22,8 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const session = useSession();
+  const shownAt = useRef<number>(0);
 
   const noteNames = getNoteNames(accidental);
   const chord = CHORD_TYPES.find((c) => c.id === typeId)!;
@@ -34,16 +37,19 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
     const t = c.tones[Math.floor(Math.random() * c.tones.length)];
     setTarget({ deg: t.deg, note: noteNames[(ri + t.st) % 12], st: t.st, root: r });
     setFeedback(null);
+    shownAt.current = Date.now();
   };
 
   const start = () => {
     setScore({ correct: 0, total: 0 });
     setStarted(true);
+    session.startSession('free');
     regen(root, typeId);
   };
 
   const stop = () => {
     clearTimeout(timer.current);
+    session.finalize();
     setStarted(false);
     setTarget(null);
     setFeedback(null);
@@ -61,6 +67,15 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
   const onTap = (pos: FretPosition) => {
     if (!target || feedback) return;
     const ok = getNoteAt(pos.string, pos.fret, accidental) === target.note;
+    session.record({
+      quizType: 'interval',
+      isCorrect: ok,
+      responseTimeMs: Date.now() - shownAt.current,
+      string: pos.string,
+      fret: pos.fret,
+      rootNote: root,
+      degree: INTERVAL_NAMES[target.st % 12],
+    });
     setScore((s) => ({ correct: s.correct + (ok ? 1 : 0), total: s.total + 1 }));
     setFeedback(ok ? 'correct' : 'wrong');
     clearTimeout(timer.current);
