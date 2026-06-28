@@ -67,7 +67,7 @@ src/
   - **基本**: 音名・位置・度数の3モード。**チャレンジ**=問題数(10/20/50/∞)・純ランダム・規定数で自動終了→**100%でクリア判定**。直近6問は重複回避。
   - **コードトーン**: `ChordToneQuiz`。ルート＋コードタイプ(major/m/7/maj7/m7/m7♭5、`data/chords.ts`)を選び「◯◯コードの△度を選べ」を指板でタップ。構成音をヒント表示。
   - **進行**: `ChordProgressionQuiz`。キー＋進行(ii-V-I/I-vi-ii-V/i-iv-V/ブルース、`PROGRESSIONS`)を選び、進行を巡回して各コードのターゲット音を押さえる。現在コードを進行ストリップで強調。
-  - ※コードトーン/進行は回答ごとに `useSession` で **quizType='interval'** として記録（度数=`INTERVAL_NAMES[st%12]`）。度数の弱点(`getDegreeMetrics`)＋累計セッション統計(Home 累計/正答率)に連動。指板ヒートマップ/cell Mastery（音名認識）はルート依存のため非汚染（設計通り）。「終了」で `finalize()`。
+  - ※コードトーン/進行は回答ごとに `useSession` で **quizType='interval'** として記録（度数=`INTERVAL_NAMES[st%12]`）。度数の弱点(`getDegreeMetrics`)＋累計セッション統計(Home 累計/正答率)に連動。指板ヒートマップ/cell Mastery（音名認識）はルート依存のため非汚染（設計通り）。「終了」で `finalize()`＋`getLastSession('interval')`前回比つき `ResultScreen`(`showDrill={false}`=音名ドリルCTA非表示)を自前表示、「もう一回」で再開。
 - **理論 (theory)**: `TheoryTab` サブナビ（横スクロールのピル）。
   - **学ぶ**: `LessonsPage`＋`data/lessons.ts`。全19レッスンを7章に段階化(初級: 1.音と度数 / 2.スケール / 3.コード / 4.キーと進行、中級: 5.コード機能と発展(機能T-SD-D/セカンダリードミナント/代理コード) / 6.響きの拡張(モード/テンション)、上級: 7.上級テクニック(モード使い分け/リハーモナイズ/転調))。章→レベルは `CHAPTER_LEVEL`(初級/中級/上級)で一覧・レッスンに色付きバッジ表示。各レッスン=**説明＋例＋`LessonFretboard`の盤面実演（入力）→ 理解度チェック多肢選択＋解説（確認）→ 練習への導線(`onGoto`)**。進捗は `lessonProgress`(localStorage `gft-lessons-v1`)で保存し一覧に✓/「N/19完了」バー、「学んだ→次へ」で完了マーク。**章クリアで「✓ クリア」、全完走で🎉バナー**。「ちゃんと学んでからクイズ」でゼロベースでも“なんじゃこれ”にしない。理論は“読ませず”見て・確かめて練習に繋ぐ(docs/adr/0001)。
     **学び→実践の循環**: Home「音楽理論を学ぶ」＋練習(度数/コードトーン/進行)の「まず学ぶ→」(`goToLearn`)で本コースへ誘導、各レッスンの導線で練習へ戻る。Homeは未完了の続きを「次のレッスン: ◯◯ →」で表示し `goToLearn(lessonId)`→`LessonsPage` の `openLessonId` でそのレッスンを直接開く。

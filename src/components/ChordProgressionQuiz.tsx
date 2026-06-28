@@ -6,7 +6,10 @@ import { getNoteAt, getNoteNames, getNoteIndex, getAllPositionsForNote, INTERVAL
 import { PROGRESSIONS, chordById } from '../data/chords';
 import { toneWhy } from '../data/theory';
 import { useSession } from '../hooks/useSession';
+import { getLastSession } from '../data/practiceStore';
+import { ResultScreen } from './ResultScreen';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
+import type { SessionSummary } from '../types/practice';
 
 interface ChordProgressionQuizProps {
   accidental: Accidental;
@@ -25,6 +28,7 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const session = useSession();
   const shownAt = useRef<number>(0);
+  const [result, setResult] = useState<{ summary: SessionSummary; prev: SessionSummary | null } | null>(null);
 
   const noteNames = getNoteNames(accidental);
   const prog = PROGRESSIONS.find((p) => p.id === progId) ?? PROGRESSIONS[0];
@@ -49,6 +53,7 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
   };
 
   const start = () => {
+    setResult(null);
     setScore({ correct: 0, total: 0 });
     setStarted(true);
     setStep(0);
@@ -57,11 +62,13 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
   };
   const stop = () => {
     clearTimeout(timer.current);
-    session.finalize();
+    const prev = getLastSession('interval');
+    const summary = session.finalize();
     setStarted(false);
     setStep(0);
     setTarget(null);
     setFeedback(null);
+    setResult(summary ? { summary, prev } : null);
   };
 
   const handleKey = (r: NoteName) => {
@@ -106,6 +113,19 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
     if (feedback && target && getNoteAt(s, f, accidental) === target.note) return target.note;
     return undefined;
   };
+
+  if (result) {
+    return (
+      <ResultScreen
+        summary={result.summary}
+        prev={result.prev}
+        accidental={accidental}
+        showDrill={false}
+        onRestart={() => start()}
+        onClose={() => setResult(null)}
+      />
+    );
+  }
 
   return (
     <>

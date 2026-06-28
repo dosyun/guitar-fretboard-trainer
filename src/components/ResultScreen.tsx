@@ -8,7 +8,9 @@ interface ResultScreenProps {
   prev: SessionSummary | null;
   challenge?: boolean;
   accidental: Accidental;
-  onDrill: (note: string) => void;
+  onDrill?: (note: string) => void;
+  /** 音名認識の弱点ドリルCTAを出すか（度数系=コードトーン/進行ではfalse）。 */
+  showDrill?: boolean;
   onRestart: () => void;
   onClose: () => void;
 }
@@ -27,6 +29,7 @@ export function ResultScreen({
   challenge = false,
   accidental,
   onDrill,
+  showDrill = true,
   onRestart,
   onClose,
 }: ResultScreenProps) {
@@ -101,8 +104,8 @@ export function ResultScreen({
         </Row>
       </div>
 
-      {/* 次の一手: 一番弱い場所をその場で潰す（主導線） */}
-      {weakest && weakNote && (
+      {/* 次の一手: 一番弱い場所をその場で潰す（主導線・音名認識のみ） */}
+      {showDrill && weakest && weakNote && (
         <div className="space-y-2 pt-1">
           <Row label="一番弱い">
             <span className="font-mono text-ink">
@@ -110,7 +113,7 @@ export function ResultScreen({
             </span>
           </Row>
           <button
-            onClick={() => onDrill(weakNote)}
+            onClick={() => onDrill?.(weakNote)}
             className="w-full px-4 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
           >
             「{weakNote}」を10問だけ練習
@@ -123,7 +126,7 @@ export function ResultScreen({
         <button
           onClick={onRestart}
           className={`flex-1 px-4 py-3 rounded-lg transition-colors ${
-            weakest
+            showDrill && weakest
               ? 'bg-panel text-ink border border-hair hover:bg-accent-soft'
               : 'bg-accent text-bg font-semibold hover:opacity-90 active:opacity-80'
           }`}
