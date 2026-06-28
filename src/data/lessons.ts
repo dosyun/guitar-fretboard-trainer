@@ -33,8 +33,17 @@ const CH1 = '1. 音と度数';
 const CH2 = '2. スケール';
 const CH3 = '3. コード';
 const CH4 = '4. キーと進行';
-const CH5 = '5. コード機能と発展（中級）';
-const CH6 = '6. 響きの拡張（中級）';
+const CH5 = '5. コード機能と発展';
+const CH6 = '6. 響きの拡張';
+const CH7 = '7. 上級テクニック';
+
+export type LessonLevel = '初級' | '中級' | '上級';
+/** 章 → レベル（一覧/レッスンのバッジ用）。 */
+export const CHAPTER_LEVEL: Record<string, LessonLevel> = {
+  [CH1]: '初級', [CH2]: '初級', [CH3]: '初級', [CH4]: '初級',
+  [CH5]: '中級', [CH6]: '中級',
+  [CH7]: '上級',
+};
 
 export const LESSONS: Lesson[] = [
   {
@@ -333,7 +342,63 @@ export const LESSONS: Lesson[] = [
     ],
     link: { label: 'ボイシングでコード形を見る', target: 'voicing' },
   },
+
+  {
+    id: 'modes-usage',
+    chapter: CH7,
+    title: 'モードを使い分ける',
+    body: [
+      'メジャースケールから7つのモードができる（前章の続き）。明るい順〜暗い順で性格が並ぶ。',
+      '明るい: リディアン(#4) ＞ アイオニアン(普通の長調) ＞ ミクソリディアン(♭7)。暗い: ドリアン(6が長い) ＞ エオリアン(自然短) ＞ フリジアン(♭2) ＞ ロクリアン(♭2♭5)。',
+      'コードに合うモードを当てるとソロが“ハマる”。例: メジャー7thにはリディアンが映える。',
+    ],
+    example: 'C リディアン: C D E F# G A B（#4=F# が浮遊感）',
+    demo: {
+      root: 'C',
+      tones: [
+        { st: 0, label: 'R' }, { st: 2, label: '2' }, { st: 4, label: '3' }, { st: 6, label: '#4' },
+        { st: 7, label: '5' }, { st: 9, label: '6' }, { st: 11, label: '7' },
+      ],
+    },
+    check: [
+      { q: 'リディアンの特徴音は？', choices: ['#4', '♭7', '♭2'], answer: 0, why: '第4音が半音上がる(#4)＝浮遊感。' },
+      { q: '一番暗い（♭2♭5を持つ）モードは？', choices: ['ロクリアン', 'フリジアン', 'ドリアン'], answer: 0, why: 'ロクリアンは♭2と♭5を持つ最も不安定なモード。' },
+    ],
+    link: { label: 'スケールを指板で見る', target: 'scale' },
+  },
+  {
+    id: 'reharmonize',
+    chapter: CH7,
+    title: 'リハーモナイズ',
+    body: [
+      '同じメロディに別のコードを当て直して響きを豊かにする技。',
+      '道具はこれまでの応用: セカンダリードミナント・裏コード・代理コード・モーダルインターチェンジ(同主調から借用)。',
+      '例: C → Am を、C → A7(V7/ii) → Dm7 → G7 のように厚くできる。',
+    ],
+    example: 'C → F → G → C  ⇒  C → A7 → Dm7 → D♭7 → C（裏コード入り）',
+    check: [
+      { q: 'リハーモナイズの道具でないのは？', choices: ['ピッキング強化', '裏コード', 'セカンダリードミナント'], answer: 0 },
+      { q: '同主調から和音を借りる技は？', choices: ['モーダルインターチェンジ', 'トランスポーズ'], answer: 0, why: 'Cメジャーに Cマイナーの和音(例 Fm)を借用＝モーダルインターチェンジ。' },
+    ],
+    link: { label: 'ダイアトニックで素材を確認', target: 'diatonic' },
+  },
+  {
+    id: 'modulation',
+    chapter: CH7,
+    title: '転調（モジュレーション）',
+    body: [
+      '曲の途中でキーを変える技。場面転換やサビの高揚に効く。',
+      '定番: ①ピボットコード(両キー共通の和音)で橋渡し ②転調先の V7 で着地 ③半音上げてサビを持ち上げる(ダイレクト)。',
+      '転調先のキーで ii-V-I を差し込むと自然に移れる。',
+    ],
+    example: 'Key C →(Dm7-G7-C のあと)→ Gm7-C7-F で Key F へ',
+    check: [
+      { q: '両キー共通の和音で橋渡しする方法は？', choices: ['ピボットコード', 'ダイレクト転調'], answer: 0 },
+      { q: 'サビを半音上げて高揚させるのは？', choices: ['ダイレクト転調', 'ピボット'], answer: 0, why: 'キーをそのまま半音上げる定番の盛り上げ。' },
+    ],
+    link: { label: '進行モードで弾いてみる', target: 'practice-prog' },
+  },
 ];
 
 /** 章の順序（出現順） */
-export const LESSON_CHAPTERS: string[] = [CH1, CH2, CH3, CH4, CH5, CH6];
+export const LESSON_CHAPTERS: string[] = [CH1, CH2, CH3, CH4, CH5, CH6, CH7];

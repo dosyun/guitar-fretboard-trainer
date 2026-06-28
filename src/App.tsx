@@ -72,6 +72,7 @@ function App() {
   const [accidental, setAccidental] = useState<Accidental>('flat');
   const [view, setView] = useState<AppView>('home');
   const [theoryTab, setTheoryTab] = useState<TheoryTab>('learn');
+  const [learnOpenId, setLearnOpenId] = useState<string | undefined>(undefined);
   const [settingsShowHelp, setSettingsShowHelp] = useState(false);
   const [mapDisplay, setMapDisplay] = useState<'notes' | 'intervals'>('notes');
   const [mapRoot, setMapRoot] = useState<NoteName>('C');
@@ -266,8 +267,9 @@ function App() {
     start(quiz.mode, quiz.rootNote, undefined, false);
   };
 
-  // 練習からの「まず学ぶ」導線: 理論>学ぶ へ。
-  const goToLearn = () => {
+  // 練習/Homeからの「学ぶ」導線: 理論>学ぶ へ。lessonId 指定でそのレッスンを直接開く。
+  const goToLearn = (lessonId?: string) => {
+    setLearnOpenId(lessonId);
     setTheoryTab('learn');
     setView('theory');
   };
@@ -410,7 +412,11 @@ function App() {
 
         {/* ===== 学ぶ（レッスン） ===== */}
         {view === 'theory' && theoryTab === 'learn' && (
-          <LessonsPage onGoto={handleLessonGoto} />
+          <LessonsPage
+            onGoto={handleLessonGoto}
+            openLessonId={learnOpenId}
+            onConsumeOpen={() => setLearnOpenId(undefined)}
+          />
         )}
 
         {/* 理論ビューの1行解説 */}
@@ -601,7 +607,7 @@ function App() {
                   チャレンジ開始
                 </button>
                 {quiz.mode === 'interval' && (
-                  <button onClick={goToLearn} className="text-xs text-accent hover:opacity-80 underline">
+                  <button onClick={() => goToLearn()} className="text-xs text-accent hover:opacity-80 underline">
                     度数がわからない？ まず学ぶ →
                   </button>
                 )}

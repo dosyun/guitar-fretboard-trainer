@@ -1,5 +1,7 @@
 import { Segmented } from 'antd';
 import { getAllSessions, getNoteRecognitionMetrics, getStreak } from '../data/practiceStore';
+import { getCompletedLessons } from '../data/lessonProgress';
+import { LESSONS } from '../data/lessons';
 import { getNoteLabel } from '../data/fretboard';
 import { PhaseMap } from './PhaseMap';
 import { InstallPrompt } from './InstallPrompt';
@@ -18,7 +20,7 @@ interface HomePageProps {
   onStartPhase: (p: Phase) => void;
   onOpenStats: () => void;
   onShowHelp: () => void;
-  onLearn: () => void;
+  onLearn: (lessonId?: string) => void;
 }
 
 const sec = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
@@ -41,6 +43,12 @@ export function HomePage({ accidental, maxFret, dailyLength, onDailyLengthChange
       : 0;
   const worst = [...metrics].filter((m) => m.n >= 2).sort((a, b) => weakness(b) - weakness(a))[0];
   const hasData = totalAttempts > 0;
+
+  // 学ぶコースの続き（未完了の最初のレッスン）
+  const doneLessons = getCompletedLessons();
+  const lessonsTotal = LESSONS.length;
+  const lessonsDone = doneLessons.size;
+  const nextLesson = LESSONS.find((l) => !doneLessons.has(l.id)) ?? null;
 
   return (
     <div className="max-w-md mx-auto w-full space-y-5">
@@ -91,9 +99,21 @@ export function HomePage({ accidental, maxFret, dailyLength, onDailyLengthChange
         >
           チャレンジ（問題数を選んで挑戦）
         </button>
-        <button onClick={onLearn} className="w-full text-sm text-accent hover:opacity-80 transition-opacity">
-          音楽理論を学ぶ（ゼロから）→
-        </button>
+        {nextLesson ? (
+          <button
+            onClick={() => onLearn(nextLesson.id)}
+            className="w-full flex items-center justify-between gap-2 text-sm text-accent hover:opacity-80 transition-opacity"
+          >
+            <span className="truncate">
+              {lessonsDone === 0 ? '音楽理論を学ぶ（ゼロから）' : `次のレッスン: ${nextLesson.title}`} →
+            </span>
+            <span className="font-mono text-dim shrink-0">{lessonsDone}/{lessonsTotal}</span>
+          </button>
+        ) : (
+          <button onClick={() => onLearn()} className="w-full text-sm text-accent hover:opacity-80 transition-opacity">
+            🎉 理論コース制覇 ・ 復習する →
+          </button>
+        )}
       </div>
 
       {/* 進捗 */}

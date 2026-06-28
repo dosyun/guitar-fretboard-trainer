@@ -175,7 +175,7 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
             スタート
           </button>
           {onLearn && (
-            <button onClick={onLearn} className="text-xs text-accent hover:opacity-80 underline">
+            <button onClick={() => onLearn()} className="text-xs text-accent hover:opacity-80 underline">
               はじめて？ まず学ぶ →
             </button>
           )}

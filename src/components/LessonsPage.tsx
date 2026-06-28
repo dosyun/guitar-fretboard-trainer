@@ -1,11 +1,28 @@
-import { useState } from 'react';
-import { LESSONS, LESSON_CHAPTERS } from '../data/lessons';
-import type { LessonCheckQ } from '../data/lessons';
+import { useEffect, useState } from 'react';
+import { LESSONS, LESSON_CHAPTERS, CHAPTER_LEVEL } from '../data/lessons';
+import type { LessonCheckQ, LessonLevel } from '../data/lessons';
 import { getCompletedLessons, markLessonComplete } from '../data/lessonProgress';
 import { LessonFretboard } from './LessonFretboard';
 
 interface LessonsPageProps {
   onGoto: (target: string) => void;
+  /** Home などから特定レッスンを直接開く（適用後 onConsumeOpen で消費）。 */
+  openLessonId?: string;
+  onConsumeOpen?: () => void;
+}
+
+const LEVEL_STYLE: Record<LessonLevel, string> = {
+  初級: 'text-correct',
+  中級: 'text-accent',
+  上級: 'text-wrong',
+};
+
+function LevelBadge({ level }: { level: LessonLevel }) {
+  return (
+    <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono border border-hair bg-panel ${LEVEL_STYLE[level]}`}>
+      {level}
+    </span>
+  );
 }
 
 /** 理解度チェック（学んだ直後にその場で確かめる）。多肢選択。 */
@@ -49,13 +66,25 @@ function LessonCheck({ check }: { check: LessonCheckQ[] }) {
   );
 }
 
-export function LessonsPage({ onGoto }: LessonsPageProps) {
+export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPageProps) {
   const [idx, setIdx] = useState<number | null>(null);
   const completed = getCompletedLessons();
+
+  // Home の「次のレッスン →」等から特定レッスンを開く
+  useEffect(() => {
+    if (openLessonId) {
+      const i = LESSONS.findIndex((l) => l.id === openLessonId);
+      if (i >= 0) setIdx(i);
+      onConsumeOpen?.();
+    }
+    // openLessonId の変化時のみ反応（onConsumeOpen は安定でない可能性があるため除外）
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openLessonId]);
 
   // ===== 一覧（章ごと・進捗付き） =====
   if (idx === null) {
     const done = completed.size;
+    const allDone = done === LESSONS.length;
     return (
       <div className="max-w-2xl mx-auto w-full space-y-4">
         <div className="flex items-center justify-between">
@@ -73,17 +102,30 @@ export function LessonsPage({ onGoto }: LessonsPageProps) {
             style={{ width: `${Math.round((done / LESSONS.length) * 100)}%`, background: 'var(--correct)' }}
           />
         </div>
-        <p className="text-sm text-dim text-pretty">
-          ゼロから順に。各レッスンは1分ほど。読んで・指板で見て・確かめてから練習へ。
-        </p>
 
-        {LESSON_CHAPTERS.map((ch) => (
-          <div key={ch} className="space-y-2">
-            <h3 className="text-xs font-mono text-dim tracking-wide">{ch}</h3>
-            <ul className="space-y-2">
-              {LESSONS.map((l, i) => ({ l, i }))
-                .filter((x) => x.l.chapter === ch)
-                .map(({ l, i }) => (
+        {allDone ? (
+          <div className="bg-accent-soft border border-accent rounded-xl px-4 py-3 text-center">
+            <p className="text-accent font-semibold">🎉 全{LESSONS.length}レッスン制覇！</p>
+            <p className="text-xs text-dim mt-1">理論コースを完走しました。練習で実戦に活かそう。</p>
+          </div>
+        ) : (
+          <p className="text-sm text-dim text-pretty">
+            ゼロから順に。各レッスンは1分ほど。読んで・指板で見て・確かめてから練習へ。
+          </p>
+        )}
+
+        {LESSON_CHAPTERS.map((ch) => {
+          const chLessons = LESSONS.map((l, i) => ({ l, i })).filter((x) => x.l.chapter === ch);
+          const cleared = chLessons.every((x) => completed.has(x.l.id));
+          return (
+            <div key={ch} className="space-y-2">
+              <h3 className="text-xs font-mono text-dim tracking-wide flex items-center gap-2">
+                <span>{ch}</span>
+                <LevelBadge level={CHAPTER_LEVEL[ch]} />
+                {cleared && <span className="text-correct">✓ クリア</span>}
+              </h3>
+              <ul className="space-y-2">
+                {chLessons.map(({ l, i }) => (
                   <li key={l.id}>
                     <button
                       onClick={() => setIdx(i)}
@@ -101,9 +143,10 @@ export function LessonsPage({ onGoto }: LessonsPageProps) {
                     </button>
                   </li>
                 ))}
-            </ul>
-          </div>
-        ))}
+              </ul>
+            </div>
+          );
+        })}
       </div>
     );
   }
@@ -121,6 +164,7 @@ export function LessonsPage({ onGoto }: LessonsPageProps) {
         <div>
           <div className="font-mono text-xs text-dim flex items-center gap-2">
             <span>LESSON {idx + 1} / {LESSONS.length}</span>
+            <LevelBadge level={CHAPTER_LEVEL[l.chapter]} />
             {isDone && <span className="text-correct">✓ 学習済み</span>}
           </div>
           <h2 className="text-xl font-bold text-ink text-balance mt-1">{l.title}</h2>

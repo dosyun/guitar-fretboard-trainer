@@ -140,7 +140,7 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
             スタート
           </button>
           {onLearn && (
-            <button onClick={onLearn} className="text-xs text-accent hover:opacity-80 underline">
+            <button onClick={() => onLearn()} className="text-xs text-accent hover:opacity-80 underline">
               はじめて？ まず学ぶ →
             </button>
           )}
