@@ -33,6 +33,8 @@ const CH1 = '1. 音と度数';
 const CH2 = '2. スケール';
 const CH3 = '3. コード';
 const CH4 = '4. キーと進行';
+const CH5 = '5. コード機能と発展（中級）';
+const CH6 = '6. 響きの拡張（中級）';
 
 export const LESSONS: Lesson[] = [
   {
@@ -238,7 +240,100 @@ export const LESSONS: Lesson[] = [
     ],
     link: { label: '進行モードで弾いてみる', target: 'practice-prog' },
   },
+
+  {
+    id: 'function',
+    chapter: CH5,
+    title: 'コードの機能（T・SD・D）',
+    body: [
+      'ダイアトニックの7つのコードは、役割で3グループに分かれる。',
+      'トニック(T)=安定・家（I, vi, iii）。サブドミナント(SD)=動き出す（IV, ii）。ドミナント(D)=緊張・解決したい（V, vii°）。',
+      '基本の流れは T→SD→D→T。ii-V-I はまさに SD→D→T。コードの“気持ち”が分かると進行が読める。',
+    ],
+    example: 'Key C: T=C/Am/Em  SD=F/Dm  D=G/Bm♭5',
+    check: [
+      { q: '緊張（ドミナント）のコードは？', choices: ['F', 'G', 'C'], answer: 1, why: 'V=G(G7)が緊張→I(C)へ解決したくなる。' },
+      { q: 'ii-V-I の機能の流れは？', choices: ['T→SD→D', 'SD→D→T', 'D→T→SD'], answer: 1, why: 'ii(SD)→V(D)→I(T)。' },
+    ],
+    link: { label: 'ダイアトニックで役割を確認', target: 'diatonic' },
+  },
+  {
+    id: 'secondary-dominant',
+    chapter: CH5,
+    title: 'セカンダリードミナント',
+    body: [
+      'あるコードを“仮のトニック”に見立て、その直前に専用の V7 を借りる技。',
+      '例: Key C で Dm(ii)の前に A7 を置く＝「V7 of ii」。A7→Dm に一時的な解決感が出る。',
+      '記号は V7/X（Xへ向かうドミナント）。進行に推進力と彩りを足せる。',
+    ],
+    example: 'Key C: C → A7 → Dm → G7 → C （A7 = V7/ii）',
+    check: [
+      { q: 'Dm に向かうセカンダリードミナントは？', choices: ['A7', 'D7', 'E7'], answer: 0, why: 'DmをIに見立てるとV7はA7。' },
+      { q: 'セカンダリードミナントの役割は？', choices: ['一時的な解決感と彩り', 'テンポを上げる'], answer: 0 },
+    ],
+    link: { label: 'ダイアトニックで確認', target: 'diatonic' },
+  },
+  {
+    id: 'tritone-sub',
+    chapter: CH5,
+    title: '代理コード（裏コード）',
+    body: [
+      'コードを、似た響きの別コードで置き換える技。',
+      '定番は「裏コード(トライトーン代理)」: V7 を、半音上にルートを持つ7th(♭II7)で代理。G7 → D♭7。',
+      'G7 と D♭7 は 3度と♭7（トライトーン）を共有。ルートが半音で滑らかに下りる。',
+    ],
+    example: 'Dm7 → D♭7 → Cmaj7 （D♭7 = G7 の裏コード）',
+    check: [
+      { q: 'G7 の裏コード（トライトーン代理）は？', choices: ['D♭7', 'C7', 'A7'], answer: 0, why: '半音上にルートを持つ7th。トライトーンを共有。' },
+      { q: '裏コードで滑らかになる動きは？', choices: ['ルートが半音で下降', 'テンポが上がる'], answer: 0 },
+    ],
+  },
+  {
+    id: 'modes',
+    chapter: CH6,
+    title: 'モード（ドリアンなど）',
+    body: [
+      'メジャースケールを「どの音から始めるか」で7つのモードができる。音は同じでも、起点(ルート)が変わると性格が変わる。',
+      '人気はドリアン（マイナーっぽいが6度が長い＝おしゃれ）とミクソリディアン（メジャーっぽいが7度が短い＝ブルージー）。',
+      '例: Cメジャーの音を D から弾くと D ドリアン。',
+    ],
+    example: 'D ドリアン: D E F G A B C（Cメジャーと同じ音、起点がD）',
+    demo: {
+      root: 'D',
+      tones: [
+        { st: 0, label: 'R' }, { st: 2, label: '2' }, { st: 3, label: '♭3' }, { st: 5, label: '4' },
+        { st: 7, label: '5' }, { st: 9, label: '6' }, { st: 10, label: '♭7' },
+      ],
+    },
+    check: [
+      { q: 'ドリアンの特徴は？', choices: ['マイナーだが6度が長い', 'メジャーだが7度が短い'], answer: 0, why: 'm3だが長6度(M6)を持つのが個性。' },
+      { q: 'Cメジャーの音をDから始めたモードは？', choices: ['Dドリアン', 'Dミクソリディアン'], answer: 0 },
+    ],
+    link: { label: 'スケールを指板で見る', target: 'scale' },
+  },
+  {
+    id: 'tensions',
+    chapter: CH6,
+    title: 'テンション（9th・11th・13th）',
+    body: [
+      '7thコードのさらに上に積む音＝テンション。9th・11th・13th で色気やおしゃれさを足す。',
+      '9th=2度、11th=4度、13th=6度（いずれもオクターブ上）。例: Cmaj9 = Cmaj7 + 9(D)。',
+      '全部足すのではなく、コードに合うテンションを選んで使う。',
+    ],
+    example: 'Cmaj9 = C E G B D（7thに9thのDを追加）',
+    demo: {
+      root: 'C',
+      tones: [
+        { st: 0, label: 'R' }, { st: 4, label: '3' }, { st: 7, label: '5' }, { st: 11, label: '7' }, { st: 2, label: '9' },
+      ],
+    },
+    check: [
+      { q: '9th は何度の音（オクターブ上）？', choices: ['2度', '4度', '6度'], answer: 0, why: '9th=2度の1オクターブ上。11th=4度、13th=6度。' },
+      { q: 'テンションの役割は？', choices: ['色気・おしゃれさを足す', '音量を上げる'], answer: 0 },
+    ],
+    link: { label: 'ボイシングでコード形を見る', target: 'voicing' },
+  },
 ];
 
 /** 章の順序（出現順） */
-export const LESSON_CHAPTERS: string[] = [CH1, CH2, CH3, CH4];
+export const LESSON_CHAPTERS: string[] = [CH1, CH2, CH3, CH4, CH5, CH6];
