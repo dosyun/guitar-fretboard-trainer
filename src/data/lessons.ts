@@ -1,7 +1,7 @@
 /**
- * 「学ぶ」: ゼロから分かる土台コース（インプット → 確認 → 次へ）。
- * 各レッスン = 入力コンテンツ(説明+例+指板実演) + 理解度チェック(数問) + 関連練習への導線。
- * 理論を“読ませて終わり”にせず、見て・確かめて・練習に繋ぐ。
+ * 「学ぶ」: ゼロから分かる音楽理論コース（インプット → 確認 → 練習）。
+ * 各レッスン = 説明+例+指板実演(入力) → 理解度チェック(確認) → 練習への導線。
+ * 章(chapter)で段階化。理論を“読ませて終わり”にせず、見て・確かめて練習に繋ぐ。
  */
 export interface LessonLink {
   label: string;
@@ -18,6 +18,7 @@ export interface LessonCheckQ {
 
 export interface Lesson {
   id: string;
+  chapter: string;
   title: string;
   body: string[];
   example?: string;
@@ -28,9 +29,15 @@ export interface Lesson {
   link?: LessonLink;
 }
 
+const CH1 = '1. 音と度数';
+const CH2 = '2. スケール';
+const CH3 = '3. コード';
+const CH4 = '4. キーと進行';
+
 export const LESSONS: Lesson[] = [
   {
     id: 'notes',
+    chapter: CH1,
     title: '音名と半音・全音',
     body: [
       'ギターは1フレット動くと「半音」上がる。2フレットで「全音」。',
@@ -45,7 +52,30 @@ export const LESSONS: Lesson[] = [
     link: { label: '指板マップで全音名を見る', target: 'map' },
   },
   {
+    id: 'octave',
+    chapter: CH1,
+    title: 'オクターブ（同じ音を探す）',
+    body: [
+      '同じ音は指板の色々な場所にある。覚えるのは1つでも、形で芋づる式に見つかる。',
+      '定番の形: そこから「2本細い弦へ移って、2フレット上」が1オクターブ上の同じ音。',
+      'これを知ると、1つ場所を覚えれば指板全体に展開できる。',
+    ],
+    example: '6弦5F(A) のオクターブ上 = 4弦7F(A)',
+    demo: { root: 'C', tones: [{ st: 0, label: 'R' }], maxFret: 12 },
+    check: [
+      {
+        q: 'オクターブ上の定番の形は？',
+        choices: ['2本細い弦・2フレット上', '1本細い弦・同フレット', '同じ弦・5フレット上'],
+        answer: 0,
+        why: '例: 6弦5F(A)→4弦7F(A)。',
+      },
+      { q: 'オクターブは何度？', choices: ['完全8度', '完全5度'], answer: 0, why: '1オクターブ＝完全8度。' },
+    ],
+    link: { label: '指板マップで同じ音の位置を見る', target: 'map' },
+  },
+  {
     id: 'degree',
+    chapter: CH1,
     title: '度数（インターバル）',
     body: [
       '度数は「基準の音(ルート)から何半音離れているか」のラベル。',
@@ -62,6 +92,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'major-scale',
+    chapter: CH2,
     title: 'メジャースケール',
     body: [
       '明るい「ドレミファソラシド」。全全半全全全半 の間隔で並ぶ7音。',
@@ -82,7 +113,52 @@ export const LESSONS: Lesson[] = [
     link: { label: 'スケールを指板で見る', target: 'scale' },
   },
   {
+    id: 'minor-scale',
+    chapter: CH2,
+    title: 'マイナースケール',
+    body: [
+      '暗い響きのスケール（ナチュラルマイナー）。間隔は 全半全全半全全。',
+      'メジャーの6番目の音から始めた並びと同じ（平行調）。だから使う音はメジャーと共通。',
+    ],
+    example: 'Aマイナー: A B C D E F G（Cメジャーと同じ音）',
+    demo: {
+      root: 'A',
+      tones: [
+        { st: 0, label: 'R' }, { st: 2, label: '2' }, { st: 3, label: '♭3' }, { st: 5, label: '4' },
+        { st: 7, label: '5' }, { st: 8, label: '♭6' }, { st: 10, label: '♭7' },
+      ],
+    },
+    check: [
+      { q: 'ナチュラルマイナーの間隔は？', choices: ['全半全全半全全', '全全半全全全半'], answer: 0, why: '全半全全半全全。' },
+      { q: 'A マイナーと同じ音のメジャーキーは？', choices: ['C', 'G', 'F'], answer: 0, why: 'Aマイナー=Cメジャー（平行調）。' },
+    ],
+    link: { label: 'スケールを指板で見る', target: 'scale' },
+  },
+  {
+    id: 'pentatonic',
+    chapter: CH2,
+    title: 'ペンタトニック',
+    body: [
+      '5音だけのスケール。ロック/ブルースのソロの定番で、外れにくく弾きやすい。',
+      'マイナーペンタ = R ♭3 4 5 ♭7 の5音。最初のアドリブに最適。',
+    ],
+    example: 'Aマイナーペンタ: A C D E G',
+    demo: {
+      root: 'A',
+      tones: [
+        { st: 0, label: 'R' }, { st: 3, label: '♭3' }, { st: 5, label: '4' }, { st: 7, label: '5' }, { st: 10, label: '♭7' },
+      ],
+      maxFret: 12,
+    },
+    check: [
+      { q: 'マイナーペンタは何音？', choices: ['5', '6', '7'], answer: 0, why: 'R ♭3 4 5 ♭7 の5音。' },
+      { q: 'マイナーペンタに含まれないのは？', choices: ['2', '♭3', '4'], answer: 0, why: '2度は含まない。' },
+    ],
+    link: { label: 'スケール（ペンタ）を指板で見る', target: 'scale' },
+  },
+  {
     id: 'triad',
+    chapter: CH3,
     title: 'トライアド（3和音）',
     body: [
       'コードの基本。スケールの音を1個飛ばしで3つ積む＝ R・3・5。',
@@ -97,7 +173,24 @@ export const LESSONS: Lesson[] = [
     link: { label: 'オープンコードで押さえ方を見る', target: 'open' },
   },
   {
+    id: 'power-chord',
+    chapter: CH3,
+    title: 'パワーコード',
+    body: [
+      'ルートと5度だけの2音（3度を抜く）。明暗が無いので歪ませても濁らず、ロックの主役。',
+      '「5」コード(例 C5)と書く。形は1つ覚えれば、どのフレットでも同じ形で使える。',
+    ],
+    example: 'C5 = C(R) G(5) ／ 6弦ルートなら 6弦 + 5弦(2フレット上)',
+    demo: { root: 'C', tones: [{ st: 0, label: 'R' }, { st: 7, label: '5' }] },
+    check: [
+      { q: 'パワーコードの構成は？', choices: ['R 3 5', 'R 5', 'R ♭3 5'], answer: 1, why: '3度を抜いた R と 5 の2音。' },
+      { q: 'パワーコードに明暗(メジャー/マイナー)は？', choices: ['ある', 'ない'], answer: 1, why: '3度が無いので明暗が決まらない。' },
+    ],
+    link: { label: 'ボイシングでコード形を見る', target: 'voicing' },
+  },
+  {
     id: '7th',
+    chapter: CH3,
     title: '7thコード',
     body: [
       'トライアドにもう1つ3度を積んで4音にしたもの＝ R・3・5・7。',
@@ -116,6 +209,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'diatonic',
+    chapter: CH4,
     title: 'ダイアトニックコード',
     body: [
       'キーのメジャースケールの音「だけ」で積んだ7つのコード。',
@@ -130,6 +224,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'ii-v-i',
+    chapter: CH4,
     title: 'ii-V-I（最重要の進行）',
     body: [
       'ダイアトニックの ii → V → I（例: Dm7 → G7 → Cmaj7）。',
@@ -144,3 +239,6 @@ export const LESSONS: Lesson[] = [
     link: { label: '進行モードで弾いてみる', target: 'practice-prog' },
   },
 ];
+
+/** 章の順序（出現順） */
+export const LESSON_CHAPTERS: string[] = [CH1, CH2, CH3, CH4];

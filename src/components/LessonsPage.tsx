@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { LESSONS } from '../data/lessons';
+import { LESSONS, LESSON_CHAPTERS } from '../data/lessons';
 import type { LessonCheckQ } from '../data/lessons';
+import { getCompletedLessons, markLessonComplete } from '../data/lessonProgress';
 import { LessonFretboard } from './LessonFretboard';
 
 interface LessonsPageProps {
@@ -50,38 +51,66 @@ function LessonCheck({ check }: { check: LessonCheckQ[] }) {
 
 export function LessonsPage({ onGoto }: LessonsPageProps) {
   const [idx, setIdx] = useState<number | null>(null);
+  const completed = getCompletedLessons();
 
+  // ===== 一覧（章ごと・進捗付き） =====
   if (idx === null) {
+    const done = completed.size;
     return (
-      <div className="max-w-2xl mx-auto w-full space-y-3">
-        <div className="font-mono text-xs tracking-widest text-accent flex items-center gap-2">
-          <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true" />
-          LEARN
+      <div className="max-w-2xl mx-auto w-full space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="font-mono text-xs tracking-widest text-accent flex items-center gap-2">
+            <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true" />
+            LEARN
+          </div>
+          <span className="text-xs text-dim">
+            <span className="font-mono tabular-nums text-ink">{done}</span>/{LESSONS.length} 完了
+          </span>
+        </div>
+        <div className="h-1.5 rounded-full bg-panel overflow-hidden">
+          <div
+            className="h-full rounded-full"
+            style={{ width: `${Math.round((done / LESSONS.length) * 100)}%`, background: 'var(--correct)' }}
+          />
         </div>
         <p className="text-sm text-dim text-pretty">
-          ゼロから順に。各レッスンは1分ほど。読んだら指板で見て、練習で確かめよう。
+          ゼロから順に。各レッスンは1分ほど。読んで・指板で見て・確かめてから練習へ。
         </p>
-        <ul className="space-y-2">
-          {LESSONS.map((l, i) => (
-            <li key={l.id}>
-              <button
-                onClick={() => setIdx(i)}
-                className="w-full text-left bg-surface border border-hair rounded-xl px-4 py-3 hover:bg-panel transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-dim">{i + 1}</span>
-                  <span className="text-ink font-medium">{l.title}</span>
-                </div>
-                <p className="text-xs text-dim mt-1 line-clamp-1">{l.body[0]}</p>
-              </button>
-            </li>
-          ))}
-        </ul>
+
+        {LESSON_CHAPTERS.map((ch) => (
+          <div key={ch} className="space-y-2">
+            <h3 className="text-xs font-mono text-dim tracking-wide">{ch}</h3>
+            <ul className="space-y-2">
+              {LESSONS.map((l, i) => ({ l, i }))
+                .filter((x) => x.l.chapter === ch)
+                .map(({ l, i }) => (
+                  <li key={l.id}>
+                    <button
+                      onClick={() => setIdx(i)}
+                      className="w-full text-left bg-surface border border-hair rounded-xl px-4 py-3 hover:bg-panel transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        {completed.has(l.id) ? (
+                          <span className="text-correct font-bold">✓</span>
+                        ) : (
+                          <span className="font-mono text-dim">{i + 1}</span>
+                        )}
+                        <span className="text-ink font-medium">{l.title}</span>
+                      </div>
+                      <p className="text-xs text-dim mt-1 line-clamp-1">{l.body[0]}</p>
+                    </button>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        ))}
       </div>
     );
   }
 
+  // ===== レッスン本体 =====
   const l = LESSONS[idx];
+  const isDone = completed.has(l.id);
   return (
     <div className="max-w-2xl mx-auto w-full space-y-4">
       <button onClick={() => setIdx(null)} className="text-sm text-dim hover:text-ink transition-colors">
@@ -90,8 +119,9 @@ export function LessonsPage({ onGoto }: LessonsPageProps) {
 
       <div className="bg-surface border border-hair rounded-2xl p-6 space-y-4">
         <div>
-          <div className="font-mono text-xs text-dim">
-            LESSON {idx + 1} / {LESSONS.length}
+          <div className="font-mono text-xs text-dim flex items-center gap-2">
+            <span>LESSON {idx + 1} / {LESSONS.length}</span>
+            {isDone && <span className="text-correct">✓ 学習済み</span>}
           </div>
           <h2 className="text-xl font-bold text-ink text-balance mt-1">{l.title}</h2>
         </div>
@@ -119,7 +149,7 @@ export function LessonsPage({ onGoto }: LessonsPageProps) {
         {l.link && (
           <button
             onClick={() => onGoto(l.link!.target)}
-            className="w-full px-4 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
+            className="w-full px-4 py-3 bg-panel text-ink border border-hair rounded-lg hover:bg-accent-soft transition-colors"
           >
             {l.link.label} →
           </button>
@@ -130,16 +160,18 @@ export function LessonsPage({ onGoto }: LessonsPageProps) {
         <button
           disabled={idx === 0}
           onClick={() => setIdx(idx - 1)}
-          className="flex-1 px-4 py-2 bg-panel text-dim border border-hair rounded-lg disabled:opacity-40 hover:bg-accent-soft transition-colors"
+          className="px-5 py-2 bg-panel text-dim border border-hair rounded-lg disabled:opacity-40 hover:bg-accent-soft transition-colors"
         >
           ← 前
         </button>
         <button
-          disabled={idx === LESSONS.length - 1}
-          onClick={() => setIdx(idx + 1)}
-          className="flex-1 px-4 py-2 bg-panel text-ink border border-hair rounded-lg disabled:opacity-40 hover:bg-accent-soft transition-colors"
+          onClick={() => {
+            markLessonComplete(l.id);
+            setIdx(idx < LESSONS.length - 1 ? idx + 1 : null);
+          }}
+          className="flex-1 px-4 py-2 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
         >
-          次 →
+          {idx < LESSONS.length - 1 ? '学んだ → 次へ' : '学んだ → 完了'}
         </button>
       </div>
     </div>
