@@ -22,6 +22,9 @@ import { ResultScreen } from './components/ResultScreen';
 import { TriadBuilder } from './components/TriadBuilder';
 import { KeyFunctionQuiz } from './components/KeyFunctionQuiz';
 import { EarTrainingQuiz } from './components/EarTrainingQuiz';
+import { OnboardingScreen } from './components/OnboardingScreen';
+import { getGoal, isOnboarded, resetOnboarding } from './data/goal';
+import type { Goal } from './data/goal';
 import { ChordToneQuiz } from './components/ChordToneQuiz';
 import { ChordProgressionQuiz } from './components/ChordProgressionQuiz';
 import { LessonsPage } from './components/LessonsPage';
@@ -110,6 +113,8 @@ function App() {
   const [challengeLength, setChallengeLength] = useState<number | null>(10);
   const [dailyLength, setDailyLength] = useState(15);
   const [practiceMode, setPracticeMode] = useState<'basic' | 'chord-tone' | 'progression' | 'triad' | 'key-func' | 'ear'>('basic');
+  const [onboarded, setOnboarded] = useState(isOnboarded());
+  const goal = getGoal();
 
   const {
     quiz,
@@ -281,6 +286,14 @@ function App() {
     setView('theory');
   };
 
+  // 目的に合ったおすすめ練習モードへ
+  const handleStartGoal = (g: Goal) => {
+    setResult(null);
+    setPracticeMode(g.practiceMode);
+    if (g.practiceMode === 'basic' && g.basicMode) setMode(g.basicMode);
+    setView('practice');
+  };
+
   // レッスンの「見る/練習する」導線: 理論サブタブ or 練習モードへ。
   const handleLessonGoto = (target: string) => {
     if (target === 'practice-chord') { setPracticeMode('chord-tone'); setResult(null); setView('practice'); }
@@ -383,11 +396,17 @@ function App() {
       <div className="flex-1 flex flex-col gap-3 px-4 pb-4 w-full">
 
         {/* ===== ホームビュー ===== */}
-        {view === 'home' && (
+        {view === 'home' && !onboarded && (
+          <OnboardingScreen onDone={() => setOnboarded(true)} />
+        )}
+
+        {view === 'home' && onboarded && (
           <HomePage
             accidental={accidental}
             maxFret={maxFret}
             dailyLength={dailyLength}
+            goal={goal}
+            onStartGoal={handleStartGoal}
             onDailyLengthChange={setDailyLength}
             onStartDaily={handleStartDaily}
             onStartPractice={() => setView('practice')}
@@ -864,6 +883,8 @@ function App() {
             <SettingsPanel
               accidental={accidental}
               maxFret={maxFret}
+              goalLabel={goal?.label ?? null}
+              onChangeGoal={() => { resetOnboarding(); setOnboarded(false); setView('home'); }}
               onAccidentalChange={setAccidental}
               onMaxFretChange={(f) => { setMaxFret(f); setFretRange([0, f]); }}
               onReset={() => { resetScore(); cagedResetScore(); }}

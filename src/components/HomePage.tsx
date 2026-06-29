@@ -7,6 +7,7 @@ import { PhaseMap } from './PhaseMap';
 import { InstallPrompt } from './InstallPrompt';
 import { MasteryBar } from './MasteryBar';
 import type { Phase } from '../data/phases';
+import type { Goal } from '../data/goal';
 import type { Accidental } from '../types';
 import type { CellMetrics } from '../types/practice';
 
@@ -14,6 +15,8 @@ interface HomePageProps {
   accidental: Accidental;
   maxFret: number;
   dailyLength: number;
+  goal: Goal | null;
+  onStartGoal: (g: Goal) => void;
   onDailyLengthChange: (n: number) => void;
   onStartDaily: () => void;
   onStartPractice: () => void;
@@ -30,7 +33,7 @@ const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const weakness = (m: CellMetrics) =>
   0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
 
-export function HomePage({ accidental, maxFret, dailyLength, onDailyLengthChange, onStartDaily, onStartPractice, onStartPhase, onOpenStats, onShowHelp, onLearn }: HomePageProps) {
+export function HomePage({ accidental, maxFret, dailyLength, goal, onStartGoal, onDailyLengthChange, onStartDaily, onStartPractice, onStartPhase, onOpenStats, onShowHelp, onLearn }: HomePageProps) {
   const sessions = getAllSessions();
   const metrics = getNoteRecognitionMetrics();
   const streak = getStreak();
@@ -66,7 +69,27 @@ export function HomePage({ accidental, maxFret, dailyLength, onDailyLengthChange
         )}
       </div>
 
-      {/* 今日の練習（主導線） */}
+      {/* 目的に合わせたおすすめ（オンボーディングで選択） */}
+      {goal && (
+        <div className="bg-surface border border-accent rounded-2xl p-5 space-y-3">
+          <div>
+            <div className="text-xs text-dim">あなたの目標</div>
+            <h2 className="text-lg font-bold text-ink text-balance">{goal.label}</h2>
+            <p className="text-dim text-sm mt-1 text-pretty">{goal.hint}</p>
+          </div>
+          <button
+            onClick={() => onStartGoal(goal)}
+            className="w-full px-4 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
+          >
+            {goal.cta}
+          </button>
+          <button onClick={() => onLearn(goal.lessonId)} className="w-full text-sm text-accent hover:opacity-80 transition-opacity">
+            この目標を学ぶ →
+          </button>
+        </div>
+      )}
+
+      {/* 今日の練習（習慣化） */}
       <div className="bg-surface border border-hair rounded-2xl p-6 space-y-4">
         <div>
           <h2 className="text-lg font-bold text-ink text-balance">今日の練習</h2>

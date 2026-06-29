@@ -5,6 +5,8 @@ import type { Accidental } from '../types';
 interface SettingsPanelProps {
   accidental: Accidental;
   maxFret: number;
+  goalLabel: string | null;
+  onChangeGoal: () => void;
   onAccidentalChange: (a: Accidental) => void;
   onMaxFretChange: (f: number) => void;
   onReset: () => void;
@@ -12,10 +14,19 @@ interface SettingsPanelProps {
 
 const FRET_OPTIONS = [12, 15, 17, 19, 22];
 
-export function SettingsPanel({ accidental, maxFret, onAccidentalChange, onMaxFretChange, onReset }: SettingsPanelProps) {
+export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, onAccidentalChange, onMaxFretChange, onReset }: SettingsPanelProps) {
   const [sound, setSound] = useState(isSoundEnabled());
   return (
     <div className="flex items-center justify-center gap-4 text-sm flex-wrap">
+      <div className="flex items-center gap-2">
+        <span className="text-dim">目標:</span>
+        <button
+          onClick={onChangeGoal}
+          className="px-3 py-1 rounded text-sm font-medium bg-panel text-ink border border-hair hover:bg-accent-soft transition-colors"
+        >
+          {goalLabel ?? '未設定'} <span className="text-accent">変更</span>
+        </button>
+      </div>
       <div className="flex items-center gap-2">
         <span className="text-dim">音:</span>
         <button
