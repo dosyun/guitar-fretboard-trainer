@@ -31,7 +31,8 @@ src/
 │   ├── index.ts                 — 基本型 (NoteName, FretPosition, QuizState等)
 │   └── practice.ts              — 練習エンジンの型 (PracticeAttempt/SessionSummary/CellStat/AttemptInput)
 ├── data/
-│   ├── fretboard.ts             — 音名・度数の算出ロジック (MIDIノート番号ベース)
+│   ├── fretboard.ts             — 音名・度数の算出ロジック (MIDIノート番号ベース。getMidiAt=発音用実音)
+│   ├── audio.ts                 — ★発音 (Web Audioプラックシンセ。playMidi/Chord/Arpeggio、on/off=gft-sound-v1)
 │   ├── boardPalette.ts          — ★指板SVGのダーク共通パレット (BOARD / MARKER)
 │   ├── practiceStore.ts         — ★練習ログ永続化 (localStorage, セル集計, セッション)
 │   ├── caged.ts / scales.ts / voicings.ts — CAGED/スケール/ボイシングデータ

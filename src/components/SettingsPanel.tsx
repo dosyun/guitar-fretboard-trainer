@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { isSoundEnabled, setSoundEnabled } from '../data/audio';
 import type { Accidental } from '../types';
 
 interface SettingsPanelProps {
@@ -11,8 +13,20 @@ interface SettingsPanelProps {
 const FRET_OPTIONS = [12, 15, 17, 19, 22];
 
 export function SettingsPanel({ accidental, maxFret, onAccidentalChange, onMaxFretChange, onReset }: SettingsPanelProps) {
+  const [sound, setSound] = useState(isSoundEnabled());
   return (
     <div className="flex items-center justify-center gap-4 text-sm flex-wrap">
+      <div className="flex items-center gap-2">
+        <span className="text-dim">音:</span>
+        <button
+          onClick={() => { const next = !sound; setSoundEnabled(next); setSound(next); }}
+          className={`px-3 py-1 rounded text-sm font-medium font-mono transition-colors border ${
+            sound ? 'bg-accent-soft text-accent border-accent' : 'bg-panel text-dim border-hair hover:bg-accent-soft'
+          }`}
+        >
+          {sound ? '♪ ON' : 'OFF'}
+        </button>
+      </div>
       <div className="flex items-center gap-1">
         <span className="text-dim">表記:</span>
         {([['sharp', '#'], ['flat', '♭'], ['both', '#/♭']] as const).map(([val, label]) => (

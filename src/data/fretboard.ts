@@ -52,6 +52,11 @@ export function getNoteLabel(
   return accidental === 'flat' ? flat : sharp;
 }
 
+/** ポジションの実音MIDIノート番号（発音用）。 */
+export function getMidiAt(stringIndex: number, fret: number): number {
+  return STANDARD_TUNING[stringIndex] + fret;
+}
+
 /** ポジションのノート名を取得（内部ロジック用、sharpキーで返す） */
 export function getNoteAt(
   stringIndex: number,

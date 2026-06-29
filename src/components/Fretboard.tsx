@@ -1,5 +1,6 @@
 import { FretMarker } from './FretMarker';
-import { getOpenStringName, getNoteAt } from '../data/fretboard';
+import { getOpenStringName, getNoteAt, getMidiAt } from '../data/fretboard';
+import { playMidi } from '../data/audio';
 import { BOARD } from '../data/boardPalette';
 import type { FretPosition, Feedback, Accidental } from '../types';
 
@@ -190,7 +191,7 @@ export function Fretboard({
               showLabel={label}
               // 出題位置のハイライトは中立色(琥珀)。音高カラーは答え/正解表示(label)のときだけ。
               noteColor={label ? note : undefined}
-              onClick={onPositionClick ? () => onPositionClick({ string: s, fret: f }) : undefined}
+              onClick={onPositionClick ? () => { playMidi(getMidiAt(s, f)); onPositionClick({ string: s, fret: f }); } : undefined}
             />
           );
         })

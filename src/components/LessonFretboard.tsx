@@ -1,4 +1,5 @@
 import { getNoteAt, getNoteIndex } from '../data/fretboard';
+import { playArpeggio, playChord } from '../data/audio';
 import { BOARD } from '../data/boardPalette';
 
 export interface DemoTone {
@@ -28,6 +29,11 @@ export function LessonFretboard({ root, tones, maxFret = 7 }: LessonFretboardPro
   const toneByPitch = new Map<number, DemoTone>();
   tones.forEach((t) => toneByPitch.set((rootIdx + t.st) % 12, t));
 
+  // 発音用: ルートを C3(48) 基準のオクターブに置き、度数を積む
+  const rootMidi = 48 + rootIdx;
+  const midis = [...tones].sort((a, b) => a.st - b.st).map((t) => rootMidi + t.st);
+  const isChord = tones.length <= 4; // トライアド/7th等は和音も鳴らせる
+
   const totalWidth = PADDING_LEFT + NUT_WIDTH + FRET_WIDTH * maxFret + PADDING_RIGHT;
   const totalHeight = PADDING_TOP + STRING_SPACING * 5 + MARKER_R + 5;
   const fretX = (f: number) => PADDING_LEFT + NUT_WIDTH + FRET_WIDTH * f;
@@ -35,7 +41,24 @@ export function LessonFretboard({ root, tones, maxFret = 7 }: LessonFretboardPro
   const posX = (f: number) => (f === 0 ? PADDING_LEFT - MARKER_R - 2 : fretX(f) - FRET_WIDTH / 2);
 
   return (
-    <svg viewBox={`0 0 ${totalWidth} ${totalHeight}`} className="w-full" style={{ minWidth: `${maxFret * 46}px` }}>
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => playArpeggio(midis)}
+          className="px-3 py-1.5 rounded-lg text-xs font-mono bg-panel text-accent border border-hair hover:bg-accent-soft transition-colors"
+        >
+          ▶ 聴く（1音ずつ）
+        </button>
+        {isChord && (
+          <button
+            onClick={() => playChord(midis)}
+            className="px-3 py-1.5 rounded-lg text-xs font-mono bg-panel text-accent border border-hair hover:bg-accent-soft transition-colors"
+          >
+            ♪ 同時
+          </button>
+        )}
+      </div>
+      <svg viewBox={`0 0 ${totalWidth} ${totalHeight}`} className="w-full" style={{ minWidth: `${maxFret * 46}px` }}>
       <rect
         x={PADDING_LEFT}
         y={PADDING_TOP - STRING_SPACING / 2}
@@ -100,6 +123,7 @@ export function LessonFretboard({ root, tones, maxFret = 7 }: LessonFretboardPro
           );
         })
       )}
-    </svg>
+      </svg>
+    </div>
   );
 }
