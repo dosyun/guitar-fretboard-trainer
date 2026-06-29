@@ -5,7 +5,7 @@
  */
 const KEY = 'gft-skills-v1';
 
-export type SkillId = 'note' | 'degree' | 'triad' | 'chordtone' | 'progression' | 'keyfunc';
+export type SkillId = 'note' | 'degree' | 'triad' | 'chordtone' | 'progression' | 'keyfunc' | 'ear';
 
 export interface SkillStat {
   n: number;
@@ -20,6 +20,7 @@ export const SKILL_META: { id: SkillId; label: string }[] = [
   { id: 'chordtone', label: 'コードトーン' },
   { id: 'progression', label: '進行' },
   { id: 'keyfunc', label: 'キー機能' },
+  { id: 'ear', label: '耳（聴き分け）' },
 ];
 
 function load(): SkillMap {

@@ -21,6 +21,7 @@ import { HomePage } from './components/HomePage';
 import { ResultScreen } from './components/ResultScreen';
 import { TriadBuilder } from './components/TriadBuilder';
 import { KeyFunctionQuiz } from './components/KeyFunctionQuiz';
+import { EarTrainingQuiz } from './components/EarTrainingQuiz';
 import { ChordToneQuiz } from './components/ChordToneQuiz';
 import { ChordProgressionQuiz } from './components/ChordProgressionQuiz';
 import { LessonsPage } from './components/LessonsPage';
@@ -108,7 +109,7 @@ function App() {
   const [sessionKind, setSessionKind] = useState<'daily' | 'challenge'>('challenge');
   const [challengeLength, setChallengeLength] = useState<number | null>(10);
   const [dailyLength, setDailyLength] = useState(15);
-  const [practiceMode, setPracticeMode] = useState<'basic' | 'chord-tone' | 'progression' | 'triad' | 'key-func'>('basic');
+  const [practiceMode, setPracticeMode] = useState<'basic' | 'chord-tone' | 'progression' | 'triad' | 'key-func' | 'ear'>('basic');
 
   const {
     quiz,
@@ -482,13 +483,14 @@ function App() {
           <div className="flex justify-center overflow-x-auto">
             <Segmented
               value={practiceMode}
-              onChange={(v) => { setPracticeMode(v as 'basic' | 'chord-tone' | 'progression' | 'triad' | 'key-func'); setResult(null); }}
+              onChange={(v) => { setPracticeMode(v as 'basic' | 'chord-tone' | 'progression' | 'triad' | 'key-func' | 'ear'); setResult(null); }}
               options={[
                 { label: '基本', value: 'basic' },
                 { label: 'コードトーン', value: 'chord-tone' },
                 { label: '進行', value: 'progression' },
                 { label: 'トライアド', value: 'triad' },
                 { label: 'キー機能', value: 'key-func' },
+                { label: '耳トレ', value: 'ear' },
               ]}
             />
           </div>
@@ -504,6 +506,10 @@ function App() {
 
         {view === 'practice' && practiceMode === 'key-func' && (
           <KeyFunctionQuiz accidental={accidental} onLearn={goToLearn} />
+        )}
+
+        {view === 'practice' && practiceMode === 'ear' && (
+          <EarTrainingQuiz accidental={accidental} onLearn={goToLearn} />
         )}
 
         {view === 'practice' && practiceMode === 'progression' && (
