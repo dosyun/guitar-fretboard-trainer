@@ -19,6 +19,7 @@ import { OpenChordPage } from './components/OpenChordPage';
 import { HelpPage } from './components/HelpPage';
 import { HomePage } from './components/HomePage';
 import { ResultScreen } from './components/ResultScreen';
+import { TriadBuilder } from './components/TriadBuilder';
 import { ChordToneQuiz } from './components/ChordToneQuiz';
 import { ChordProgressionQuiz } from './components/ChordProgressionQuiz';
 import { LessonsPage } from './components/LessonsPage';
@@ -105,7 +106,7 @@ function App() {
   const [sessionKind, setSessionKind] = useState<'daily' | 'challenge'>('challenge');
   const [challengeLength, setChallengeLength] = useState<number | null>(10);
   const [dailyLength, setDailyLength] = useState(15);
-  const [practiceMode, setPracticeMode] = useState<'basic' | 'chord-tone' | 'progression'>('basic');
+  const [practiceMode, setPracticeMode] = useState<'basic' | 'chord-tone' | 'progression' | 'triad'>('basic');
 
   const {
     quiz,
@@ -476,11 +477,12 @@ function App() {
           <div className="flex justify-center overflow-x-auto">
             <Segmented
               value={practiceMode}
-              onChange={(v) => { setPracticeMode(v as 'basic' | 'chord-tone' | 'progression'); setResult(null); }}
+              onChange={(v) => { setPracticeMode(v as 'basic' | 'chord-tone' | 'progression' | 'triad'); setResult(null); }}
               options={[
                 { label: '基本', value: 'basic' },
                 { label: 'コードトーン', value: 'chord-tone' },
                 { label: '進行', value: 'progression' },
+                { label: 'トライアド', value: 'triad' },
               ]}
             />
           </div>
@@ -488,6 +490,10 @@ function App() {
 
         {view === 'practice' && practiceMode === 'chord-tone' && (
           <ChordToneQuiz accidental={accidental} maxFret={maxFret} onLearn={goToLearn} />
+        )}
+
+        {view === 'practice' && practiceMode === 'triad' && (
+          <TriadBuilder accidental={accidental} maxFret={maxFret} onLearn={goToLearn} />
         )}
 
         {view === 'practice' && practiceMode === 'progression' && (
