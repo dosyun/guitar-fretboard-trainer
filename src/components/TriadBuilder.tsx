@@ -4,6 +4,7 @@ import { Fretboard } from './Fretboard';
 import { RootSelector } from './RootSelector';
 import { getNoteAt, getNoteNames, getNoteIndex, getMidiAt, INTERVAL_NAMES } from '../data/fretboard';
 import { playMidi, playChord } from '../data/audio';
+import { recordSkill } from '../data/skillStore';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
 
 interface TriadBuilderProps {
@@ -85,6 +86,7 @@ export function TriadBuilder({ accidental, maxFret, onLearn }: TriadBuilderProps
     const idx = qual.sts.indexOf(rel);
 
     playMidi(midi);
+    recordSkill('triad', idx !== -1);
 
     if (idx === -1) {
       setWrongPos(pos);

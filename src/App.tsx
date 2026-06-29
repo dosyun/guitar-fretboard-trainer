@@ -31,6 +31,7 @@ import { useQuiz } from './hooks/useQuiz';
 import { useScore } from './hooks/useScore';
 import { useSession } from './hooks/useSession';
 import { getLastSession, recordPracticeDay } from './data/practiceStore';
+import { recordSkill } from './data/skillStore';
 import type { SessionSummary } from './types/practice';
 import type { Phase } from './data/phases';
 import { useCagedQuiz } from './hooks/useCagedQuiz';
@@ -130,7 +131,10 @@ function App() {
     noteFilter: selectedNotes,
     onCorrect: recordCorrect,
     onWrong: recordWrong,
-    onAttempt: session.record,
+    onAttempt: (input) => {
+      session.record(input);
+      recordSkill(input.quizType === 'interval' ? 'degree' : 'note', input.isCorrect);
+    },
   });
 
   // CAGED用の別スコア

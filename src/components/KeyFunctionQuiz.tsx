@@ -4,6 +4,7 @@ import { RootSelector } from './RootSelector';
 import { getNoteNames, getNoteIndex, INTERVAL_NAMES } from '../data/fretboard';
 import { useSession } from '../hooks/useSession';
 import { getLastSession } from '../data/practiceStore';
+import { recordSkill } from '../data/skillStore';
 import { ResultScreen } from './ResultScreen';
 import type { Accidental, NoteName, Feedback } from '../types';
 import type { SessionSummary } from '../types/practice';
@@ -113,6 +114,7 @@ export function KeyFunctionQuiz({ accidental, onLearn }: KeyFunctionQuizProps) {
       rootNote: keyRoot,
       degree: INTERVAL_NAMES[chord.st],
     });
+    recordSkill('keyfunc', ok);
     setPicked(choice);
     setFeedback(ok ? 'correct' : 'wrong');
     setScore((s) => ({ correct: s.correct + (ok ? 1 : 0), total: s.total + 1 }));

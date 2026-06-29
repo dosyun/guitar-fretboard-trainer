@@ -7,6 +7,7 @@ import { CHORD_TYPES } from '../data/chords';
 import { toneWhy } from '../data/theory';
 import { useSession } from '../hooks/useSession';
 import { getLastSession } from '../data/practiceStore';
+import { recordSkill } from '../data/skillStore';
 import { ResultScreen } from './ResultScreen';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
 import type { SessionSummary } from '../types/practice';
@@ -23,6 +24,7 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
   const [started, setStarted] = useState(false);
   const [target, setTarget] = useState<{ deg: string; note: string; st: number; root: string } | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const [wrongPick, setWrongPick] = useState<{ note: string; deg: string } | null>(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const session = useSession();
@@ -41,6 +43,7 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
     const t = c.tones[Math.floor(Math.random() * c.tones.length)];
     setTarget({ deg: t.deg, note: noteNames[(ri + t.st) % 12], st: t.st, root: r });
     setFeedback(null);
+    setWrongPick(null);
     shownAt.current = Date.now();
   };
 
@@ -73,7 +76,8 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
 
   const onTap = (pos: FretPosition) => {
     if (!target || feedback) return;
-    const ok = getNoteAt(pos.string, pos.fret, accidental) === target.note;
+    const tappedNote = getNoteAt(pos.string, pos.fret, accidental);
+    const ok = tappedNote === target.note;
     session.record({
       quizType: 'interval',
       isCorrect: ok,
@@ -83,6 +87,8 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
       rootNote: root,
       degree: INTERVAL_NAMES[target.st % 12],
     });
+    recordSkill('chordtone', ok);
+    setWrongPick(ok ? null : { note: tappedNote, deg: INTERVAL_NAMES[(getNoteIndex(tappedNote) - getNoteIndex(root) + 12) % 12] });
     setScore((s) => ({ correct: s.correct + (ok ? 1 : 0), total: s.total + 1 }));
     setFeedback(ok ? 'correct' : 'wrong');
     clearTimeout(timer.current);
@@ -145,6 +151,11 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
             {feedback && (
               <p className={`text-lg font-bold mt-1 ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
                 {feedback === 'correct' ? '正解!' : `不正解... 正解の音: ${target?.note}`}
+              </p>
+            )}
+            {feedback === 'wrong' && wrongPick && (
+              <p className="text-xs text-wrong mt-0.5 font-mono">
+                選んだ {wrongPick.note} は {wrongPick.deg}（このコードの構成音ではない）
               </p>
             )}
             {feedback && target && (

@@ -4,6 +4,7 @@ import { FretboardHeatmap } from './FretboardHeatmap';
 import type { HeatMetric } from './FretboardHeatmap';
 import { ProgressChart } from './ProgressChart';
 import { MasteryBar } from './MasteryBar';
+import { SkillMap } from './SkillMap';
 import { getAllSessions, getNoteRecognitionMetrics, getDegreeMetrics } from '../data/practiceStore';
 import { getNoteLabel, getNoteAt } from '../data/fretboard';
 import type { Accidental } from '../types';
@@ -77,6 +78,9 @@ export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
 
           {/* 指板習熟度 */}
           <MasteryBar maxFret={maxFret} accidental={accidental} />
+
+          {/* スキルマップ（種類別の正答率） */}
+          <SkillMap />
 
           {/* 推移グラフ */}
           <ProgressChart sessions={sessions} />
