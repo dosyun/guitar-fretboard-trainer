@@ -5,6 +5,7 @@ import type { HeatMetric } from './FretboardHeatmap';
 import { ProgressChart } from './ProgressChart';
 import { MasteryBar } from './MasteryBar';
 import { SkillMap } from './SkillMap';
+import { MistakeClinic } from './MistakeClinic';
 import { getAllSessions, getNoteRecognitionMetrics, getDegreeMetrics } from '../data/practiceStore';
 import { getNoteLabel, getNoteAt } from '../data/fretboard';
 import type { Accidental } from '../types';
@@ -81,6 +82,9 @@ export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
 
           {/* スキルマップ（種類別の正答率） */}
           <SkillMap />
+
+          {/* 弱点診断（言語化） */}
+          <MistakeClinic accidental={accidental} onDrill={onDrill} />
 
           {/* 推移グラフ */}
           <ProgressChart sessions={sessions} />
