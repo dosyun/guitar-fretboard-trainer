@@ -22,6 +22,7 @@ import { ResultScreen } from './components/ResultScreen';
 import { TriadBuilder } from './components/TriadBuilder';
 import { KeyFunctionQuiz } from './components/KeyFunctionQuiz';
 import { EarTrainingQuiz } from './components/EarTrainingQuiz';
+import { GuideToneTrainer } from './components/GuideToneTrainer';
 import { OnboardingScreen } from './components/OnboardingScreen';
 import { getGoal, isOnboarded, resetOnboarding } from './data/goal';
 import type { Goal } from './data/goal';
@@ -112,7 +113,7 @@ function App() {
   const [sessionKind, setSessionKind] = useState<'daily' | 'challenge'>('challenge');
   const [challengeLength, setChallengeLength] = useState<number | null>(10);
   const [dailyLength, setDailyLength] = useState(15);
-  const [practiceMode, setPracticeMode] = useState<'basic' | 'chord-tone' | 'progression' | 'triad' | 'key-func' | 'ear'>('basic');
+  const [practiceMode, setPracticeMode] = useState<'basic' | 'chord-tone' | 'progression' | 'triad' | 'key-func' | 'ear' | 'guide'>('basic');
   const [onboarded, setOnboarded] = useState(isOnboarded());
   const goal = getGoal();
 
@@ -502,7 +503,7 @@ function App() {
           <div className="flex justify-center overflow-x-auto">
             <Segmented
               value={practiceMode}
-              onChange={(v) => { setPracticeMode(v as 'basic' | 'chord-tone' | 'progression' | 'triad' | 'key-func' | 'ear'); setResult(null); }}
+              onChange={(v) => { setPracticeMode(v as 'basic' | 'chord-tone' | 'progression' | 'triad' | 'key-func' | 'ear' | 'guide'); setResult(null); }}
               options={[
                 { label: '基本', value: 'basic' },
                 { label: 'コードトーン', value: 'chord-tone' },
@@ -510,6 +511,7 @@ function App() {
                 { label: 'トライアド', value: 'triad' },
                 { label: 'キー機能', value: 'key-func' },
                 { label: '耳トレ', value: 'ear' },
+                { label: 'ガイド音', value: 'guide' },
               ]}
             />
           </div>
@@ -529,6 +531,10 @@ function App() {
 
         {view === 'practice' && practiceMode === 'ear' && (
           <EarTrainingQuiz accidental={accidental} onLearn={goToLearn} />
+        )}
+
+        {view === 'practice' && practiceMode === 'guide' && (
+          <GuideToneTrainer accidental={accidental} maxFret={maxFret} onLearn={goToLearn} />
         )}
 
         {view === 'practice' && practiceMode === 'progression' && (

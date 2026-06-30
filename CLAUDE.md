@@ -65,12 +65,13 @@ src/
 `'home' | 'practice' | 'theory' | 'stats' | 'settings'`（[docs/adr/0003] のIA）
 
 - **ホーム (home)**: 初回は**オンボーディング**(`OnboardingScreen`/`data/goal.ts`=目的「音名/コード/アドリブ/作曲」を選択、`gft-goal-v1`)。以降は目的に合わせた**おすすめカード**(`goal.cta`→推奨練習モード、`この目標を学ぶ`→推奨レッスン)＋今日の練習CTA＋進捗readout＋弱点ティーザー。設定の「目標 変更」で再オンボード。
-- **練習 (practice)**: 上部に6モードトグル「基本／コードトーン／進行／トライアド／キー機能／耳トレ」。
+- **練習 (practice)**: 上部に7モードトグル「基本／コードトーン／進行／トライアド／キー機能／耳トレ／ガイド音」。
   - **基本**: 音名・位置・度数の3モード。**チャレンジ**=問題数(10/20/50/∞)・純ランダム・規定数で自動終了→**100%でクリア判定**。直近6問は重複回避。
   - **コードトーン**: `ChordToneQuiz`。ルート＋コードタイプ(major/m/7/maj7/m7/m7♭5、`data/chords.ts`)を選び「◯◯コードの△度を選べ」を指板でタップ。構成音をヒント表示。
   - **進行**: `ChordProgressionQuiz`。キー＋進行(ii-V-I/I-vi-ii-V/i-iv-V/ブルース、`PROGRESSIONS`)を選び、進行を巡回して各コードのターゲット音を押さえる。現在コードを進行ストリップで強調。
   - **トライアド**: `TriadBuilder`。ルート＋メジャー/マイナー/ディミニッシュを選び、R・3・5を指板から**集めて構築**。集めた度数はチップに✓、完成で和音が鳴る。maj↔minで3度が変わる体感、誤タップは「それは◯度」と度数名で指摘。スタンドアロン（エンジン未連動）。
   - **キー機能**: `KeyFunctionQuiz`。キー＋「度数(ローマ数字)/機能」を選び「Key Cで Amは？(vi) / 何の機能?(ドミナント)」を多肢選択。音名でなく“キー内の役割”を答える（作曲/耳コピ/アドリブ直結）。`useSession` で記録（degree=ダイアトニック度数の `INTERVAL_NAMES[st]`）＋終了で結果画面。
+  - **ガイド音**: `GuideToneTrainer`（実戦課題）。進行を巡回し、各コードの **3rd・7th（ガイドトーン）だけ**を指板で狙う。出題時にコードを発音(`playChord`)＝バッキング、「▶コードを聴く」で再生。回答後に「3rdが明暗を決める/7th→3rdへ半音で解決」のボイスリーディング示唆。`recordSkill('progression')`＋結果画面。
   - **耳トレ**: `EarTrainingQuiz`（Sound First）。音だけ聴いて「3度の明暗(長/短)／コードの明暗(maj/min)／音程(m3..oct)」を多肢選択。`playQuestion`=旋律→和声で再生＋「▶もう一度聴く」。`recordSkill('ear')`＋useSession＋結果画面。音(`audio.ts`)が入って実現。
   - ※コードトーン/進行は回答ごとに `useSession` で **quizType='interval'** として記録（度数=`INTERVAL_NAMES[st%12]`）。度数の弱点(`getDegreeMetrics`)＋累計セッション統計(Home 累計/正答率)に連動。指板ヒートマップ/cell Mastery（音名認識）はルート依存のため非汚染（設計通り）。「終了」で `finalize()`＋`getLastSession('interval')`前回比つき `ResultScreen`(`showDrill={false}`=音名ドリルCTA非表示)を自前表示、「もう一回」で再開。
 - **理論 (theory)**: `TheoryTab` サブナビ（横スクロールのピル）。
