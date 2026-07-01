@@ -40,12 +40,9 @@ export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
   const metrics = getNoteRecognitionMetrics();
   const degreeWorst = [...getDegreeMetrics()].sort((a, b) => degreeWeak(b) - degreeWeak(a));
 
-  // セッション未終了でも cell/attempt は即時記録されるので、それも見て「記録あり」にする
-  const usingSessions = sessions.length > 0;
-  const totalAttempts = usingSessions ? sessions.reduce((a, s) => a + s.count, 0) : attempts.length;
-  const totalCorrect = usingSessions
-    ? sessions.reduce((a, s) => a + s.correct, 0)
-    : attempts.filter((a) => a.isCorrect).length;
+  // 全体サマリは attempts を正にする（cell/skill/未終了とカウントを揃える）
+  const totalAttempts = attempts.length;
+  const totalCorrect = attempts.filter((a) => a.isCorrect).length;
   const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
   const avgMs =
     metrics.length > 0
@@ -58,7 +55,7 @@ export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
     .slice(0, 5);
 
   const hasData = sessions.length > 0 || attempts.length > 0 || metrics.length > 0;
-  const inProgress = !usingSessions && attempts.length > 0; // 練習中（まだ終了していない）
+  const inProgress = sessions.length === 0 && attempts.length > 0; // 練習中（まだ終了していない）
 
   return (
     <div className="max-w-2xl mx-auto w-full space-y-5">

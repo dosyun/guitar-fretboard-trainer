@@ -24,6 +24,7 @@ import { KeyFunctionQuiz } from './components/KeyFunctionQuiz';
 import { EarTrainingQuiz } from './components/EarTrainingQuiz';
 import { GuideToneTrainer } from './components/GuideToneTrainer';
 import { OnboardingScreen } from './components/OnboardingScreen';
+import { PwaReloadPrompt } from './components/PwaReloadPrompt';
 import { getGoal, isOnboarded, resetOnboarding } from './data/goal';
 import type { Goal } from './data/goal';
 import { ChordToneQuiz } from './components/ChordToneQuiz';
@@ -119,7 +120,7 @@ function App() {
 
   const { score, recordCorrect, recordWrong, resetScore } = useScore();
   const session = useSession();
-  const [result, setResult] = useState<{ summary: SessionSummary; prev: SessionSummary | null; kind: 'daily' | 'challenge' } | null>(null);
+  const [result, setResult] = useState<{ summary: SessionSummary; prev: SessionSummary | null; kind: 'daily' | 'challenge'; target: number | null } | null>(null);
   const [sessionTarget, setSessionTarget] = useState<number | null>(null);
   const [sessionKind, setSessionKind] = useState<'daily' | 'challenge'>('challenge');
   const [challengeLength, setChallengeLength] = useState<number | null>(10);
@@ -362,7 +363,7 @@ function App() {
     setSessionTarget(null);
     if (summary) {
       recordPracticeDay(); // 連続練習日数を更新
-      setResult({ summary, prev, kind: sessionKind });
+      setResult({ summary, prev, kind: sessionKind, target: sessionTarget });
     }
   };
 
@@ -400,6 +401,7 @@ function App() {
 
   return (
     <div className="min-h-dvh flex flex-col bg-bg">
+      <PwaReloadPrompt />
       <header
         className="bg-surface border-b border-hair py-3 px-4"
         style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top))' }}
@@ -585,6 +587,7 @@ function App() {
             summary={result.summary}
             prev={result.prev}
             challenge={result.kind === 'challenge'}
+            target={result.target}
             accidental={accidental}
             onDrill={handleStartDrill}
             onRestart={() => (result.kind === 'daily' ? handleStartDaily() : handleStart())}
@@ -712,7 +715,8 @@ function App() {
             {started ? (
               <details className="group border border-hair rounded-xl bg-surface">
                 <summary className="cursor-pointer list-none px-4 py-2 text-sm text-dim hover:text-ink flex items-center justify-between">
-                  <span>練習範囲を変更</span>
+                  <span className="group-open:hidden">練習範囲を変更</span>
+                  <span className="hidden group-open:inline">練習範囲を閉じる</span>
                   <span className="text-xs transition-transform group-open:rotate-180">▾</span>
                 </summary>
                 <div className="px-2 pb-2">{practiceRangeSelector}</div>

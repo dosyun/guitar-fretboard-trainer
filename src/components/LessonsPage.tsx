@@ -132,7 +132,10 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
           const cleared = chDone === chLessons.length;
           return (
             <details key={ch} open={ch === nextLesson?.chapter} className="group border border-hair rounded-xl bg-surface">
-              <summary className="cursor-pointer list-none px-3 py-2.5 flex items-center gap-2 text-xs font-mono text-dim tracking-wide">
+              <summary
+                aria-label={`${ch}（${cleared ? 'クリア済み' : `${chDone}/${chLessons.length}完了`}）章を開閉`}
+                className="cursor-pointer list-none px-3 py-2.5 flex items-center gap-2 text-xs font-mono text-dim tracking-wide"
+              >
                 <span className="text-ink">{ch}</span>
                 <LevelBadge level={CHAPTER_LEVEL[ch]} />
                 {cleared ? (

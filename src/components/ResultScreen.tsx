@@ -7,6 +7,7 @@ interface ResultScreenProps {
   summary: SessionSummary;
   prev: SessionSummary | null;
   challenge?: boolean;
+  target?: number | null; // チャレンジの規定問題数（クリア判定に使う）
   accidental: Accidental;
   onDrill?: (note: string) => void;
   /** 音名認識の弱点ドリルCTAを出すか（度数系=コードトーン/進行ではfalse）。 */
@@ -27,6 +28,7 @@ export function ResultScreen({
   summary,
   prev,
   challenge = false,
+  target,
   accidental,
   onDrill,
   showDrill = true,
@@ -34,7 +36,9 @@ export function ResultScreen({
   onClose,
 }: ResultScreenProps) {
   const accuracy = acc(summary);
-  const cleared = challenge && summary.count > 0 && summary.correct === summary.count;
+  // クリア=「規定問題数に到達」かつ「全問正解」。∞(target=null)や途中終了はクリアにしない。
+  const cleared =
+    challenge && target != null && summary.count >= target && summary.correct === summary.count;
 
   // 前回比 (改善=correct色 / 悪化=wrong色)
   const accDelta = prev ? accuracy - acc(prev) : null;

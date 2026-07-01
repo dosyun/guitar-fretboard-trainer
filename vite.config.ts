@@ -7,7 +7,8 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // prompt: 新版検知時にトーストで明示更新（autoUpdateの「旧版を掴む」混乱を回避）
+      registerType: 'prompt',
       // app-icon.svg から各サイズ（pwa/maskable/apple-touch/favicon）を生成・head注入
       pwaAssets: {
         image: 'public/app-icon.svg',

@@ -18,9 +18,9 @@ interface FretboardProps {
 // レイアウト定数
 const PADDING_LEFT = 40;
 const PADDING_RIGHT = 15;
-const PADDING_TOP = 25;
-const PADDING_BOTTOM = 15;
-const STRING_SPACING = 24;
+const PADDING_TOP = 22;
+const PADDING_BOTTOM = 12;
+const STRING_SPACING = 22;
 const FRET_WIDTH = 55;
 const NUT_WIDTH = 4;
 
