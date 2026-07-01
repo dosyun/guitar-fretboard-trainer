@@ -85,6 +85,8 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
   if (idx === null) {
     const done = completed.size;
     const allDone = done === LESSONS.length;
+    const nextIdx = LESSONS.findIndex((l) => !completed.has(l.id));
+    const nextLesson = nextIdx >= 0 ? LESSONS[nextIdx] : null;
     return (
       <div className="max-w-2xl mx-auto w-full space-y-4">
         <div className="flex items-center justify-between">
@@ -114,22 +116,38 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
           </p>
         )}
 
+        {nextLesson && (
+          <button
+            onClick={() => setIdx(nextIdx)}
+            className="w-full text-left bg-surface border border-accent rounded-xl px-4 py-3 hover:bg-panel transition-colors"
+          >
+            <div className="text-xs text-dim">続きから</div>
+            <div className="text-ink font-medium mt-0.5">{nextLesson.title} →</div>
+          </button>
+        )}
+
         {LESSON_CHAPTERS.map((ch) => {
           const chLessons = LESSONS.map((l, i) => ({ l, i })).filter((x) => x.l.chapter === ch);
-          const cleared = chLessons.every((x) => completed.has(x.l.id));
+          const chDone = chLessons.filter((x) => completed.has(x.l.id)).length;
+          const cleared = chDone === chLessons.length;
           return (
-            <div key={ch} className="space-y-2">
-              <h3 className="text-xs font-mono text-dim tracking-wide flex items-center gap-2">
-                <span>{ch}</span>
+            <details key={ch} open={ch === nextLesson?.chapter} className="group border border-hair rounded-xl bg-surface">
+              <summary className="cursor-pointer list-none px-3 py-2.5 flex items-center gap-2 text-xs font-mono text-dim tracking-wide">
+                <span className="text-ink">{ch}</span>
                 <LevelBadge level={CHAPTER_LEVEL[ch]} />
-                {cleared && <span className="text-correct">✓ クリア</span>}
-              </h3>
-              <ul className="space-y-2">
+                {cleared ? (
+                  <span className="text-correct">✓ クリア</span>
+                ) : (
+                  <span className="tabular-nums">{chDone}/{chLessons.length}</span>
+                )}
+                <span className="ml-auto transition-transform group-open:rotate-180">▾</span>
+              </summary>
+              <ul className="space-y-2 px-2 pb-2">
                 {chLessons.map(({ l, i }) => (
                   <li key={l.id}>
                     <button
                       onClick={() => setIdx(i)}
-                      className="w-full text-left bg-surface border border-hair rounded-xl px-4 py-3 hover:bg-panel transition-colors"
+                      className="w-full text-left bg-panel border border-hair rounded-xl px-4 py-3 hover:bg-accent-soft transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         {completed.has(l.id) ? (
@@ -144,7 +162,7 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
                   </li>
                 ))}
               </ul>
-            </div>
+            </details>
           );
         })}
       </div>
