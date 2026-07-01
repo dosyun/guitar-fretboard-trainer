@@ -114,7 +114,7 @@ export function HomePage({ accidental, maxFret, dailyLength, goal, onStartGoal, 
           onClick={onStartDaily}
           className="w-full px-4 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
         >
-          今日の練習をはじめる
+          今日の{dailyLength}問をはじめる
         </button>
         <button
           onClick={onStartPractice}

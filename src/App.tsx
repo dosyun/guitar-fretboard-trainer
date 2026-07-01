@@ -35,8 +35,8 @@ import { ScaleQuiz } from './components/ScaleQuiz';
 import { useQuiz } from './hooks/useQuiz';
 import { useScore } from './hooks/useScore';
 import { useSession } from './hooks/useSession';
-import { getLastSession, recordPracticeDay } from './data/practiceStore';
-import { recordSkill } from './data/skillStore';
+import { getLastSession, recordPracticeDay, clearPracticeData } from './data/practiceStore';
+import { recordSkill, clearSkills } from './data/skillStore';
 import type { SessionSummary } from './types/practice';
 import type { Phase } from './data/phases';
 import { useCagedQuiz } from './hooks/useCagedQuiz';
@@ -931,6 +931,14 @@ function App() {
               onAccidentalChange={setAccidental}
               onMaxFretChange={(f) => { setMaxFret(f); setFretRange([0, f]); }}
               onReset={() => { resetScore(); cagedResetScore(); }}
+              onClearHistory={() => {
+                if (window.confirm('練習履歴（成績・弱点・スキルマップ）をすべて削除します。よろしいですか？')) {
+                  clearPracticeData();
+                  clearSkills();
+                  resetScore();
+                  cagedResetScore();
+                }
+              }}
             />
             <div className="flex justify-center">
               <button

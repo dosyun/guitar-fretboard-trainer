@@ -10,11 +10,12 @@ interface SettingsPanelProps {
   onAccidentalChange: (a: Accidental) => void;
   onMaxFretChange: (f: number) => void;
   onReset: () => void;
+  onClearHistory: () => void;
 }
 
 const FRET_OPTIONS = [12, 15, 17, 19, 22];
 
-export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, onAccidentalChange, onMaxFretChange, onReset }: SettingsPanelProps) {
+export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, onAccidentalChange, onMaxFretChange, onReset, onClearHistory }: SettingsPanelProps) {
   const [sound, setSound] = useState(isSoundEnabled());
   return (
     <div className="flex items-center justify-center gap-4 text-sm flex-wrap">
@@ -70,7 +71,13 @@ export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, on
         onClick={onReset}
         className="px-3 py-1 rounded bg-panel hover:bg-accent-soft text-dim border border-hair transition-colors"
       >
-        スコアリセット
+        今回のスコアをリセット
+      </button>
+      <button
+        onClick={onClearHistory}
+        className="px-3 py-1 rounded bg-panel hover:bg-accent-soft text-wrong border border-hair transition-colors"
+      >
+        練習履歴を削除
       </button>
     </div>
   );

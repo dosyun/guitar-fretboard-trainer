@@ -19,9 +19,9 @@ export function HelpPage() {
         <h3 className="text-base font-bold text-ink">クイズ</h3>
         <p>3つのモードで指板の音を暗記できます。</p>
         <ul className="list-disc ml-5 space-y-1">
-          <li><strong>ポジション → ノート</strong> — 指板上のハイライト位置の音名を12個のボタンから回答</li>
-          <li><strong>ノート → ポジション</strong> — 表示された音名の位置を指板上でタップ</li>
-          <li><strong>度数</strong> — ルート音に対するハイライト位置のインターバルを回答</li>
+          <li><strong>位置 → 音名</strong> — 指板上のハイライト位置の音名を12個のボタンから回答</li>
+          <li><strong>音名 → 位置</strong> — 表示された音名の位置を指板上でタップ</li>
+          <li><strong>度数</strong> — ルート音に対するハイライト位置の度数（インターバル）を回答</li>
         </ul>
         <div className="mt-2 space-y-1">
           <p className="font-medium text-ink">学習サポート:</p>
