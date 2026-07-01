@@ -6,7 +6,7 @@ import { ProgressChart } from './ProgressChart';
 import { MasteryBar } from './MasteryBar';
 import { SkillMap } from './SkillMap';
 import { MistakeClinic } from './MistakeClinic';
-import { getAllSessions, getNoteRecognitionMetrics, getDegreeMetrics } from '../data/practiceStore';
+import { getAllSessions, getAllAttempts, getNoteRecognitionMetrics, getDegreeMetrics } from '../data/practiceStore';
 import { getNoteLabel, getNoteAt } from '../data/fretboard';
 import type { Accidental } from '../types';
 import type { CellMetrics, DegreeMetrics } from '../types/practice';
@@ -36,11 +36,16 @@ const heatColor = (w: number) => (w < 0.25 ? 'var(--correct)' : w < 0.55 ? 'var(
 export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
   const [heatMetric, setHeatMetric] = useState<HeatMetric>('weakness');
   const sessions = getAllSessions();
+  const attempts = getAllAttempts();
   const metrics = getNoteRecognitionMetrics();
   const degreeWorst = [...getDegreeMetrics()].sort((a, b) => degreeWeak(b) - degreeWeak(a));
 
-  const totalAttempts = sessions.reduce((a, s) => a + s.count, 0);
-  const totalCorrect = sessions.reduce((a, s) => a + s.correct, 0);
+  // セッション未終了でも cell/attempt は即時記録されるので、それも見て「記録あり」にする
+  const usingSessions = sessions.length > 0;
+  const totalAttempts = usingSessions ? sessions.reduce((a, s) => a + s.count, 0) : attempts.length;
+  const totalCorrect = usingSessions
+    ? sessions.reduce((a, s) => a + s.correct, 0)
+    : attempts.filter((a) => a.isCorrect).length;
   const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
   const avgMs =
     metrics.length > 0
@@ -52,7 +57,8 @@ export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
     .sort((a, b) => weakness(b) - weakness(a))
     .slice(0, 5);
 
-  const hasData = totalAttempts > 0;
+  const hasData = sessions.length > 0 || attempts.length > 0 || metrics.length > 0;
+  const inProgress = !usingSessions && attempts.length > 0; // 練習中（まだ終了していない）
 
   return (
     <div className="max-w-2xl mx-auto w-full space-y-5">
@@ -70,6 +76,13 @@ export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
         </div>
       ) : (
         <>
+          {inProgress && (
+            <div className="bg-accent-soft border border-accent rounded-xl px-4 py-3 text-sm text-pretty">
+              <span className="text-accent font-medium">練習中の記録があります。</span>
+              <span className="text-dim"> 「終了」すると結果画面に記録され、推移グラフにも反映されます。</span>
+            </div>
+          )}
+
           {/* サマリ readout */}
           <div className="grid grid-cols-3 gap-2 text-center">
             <Stat label="累計問題数" value={`${totalAttempts}`} />
@@ -86,8 +99,8 @@ export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
           {/* 弱点診断（言語化） */}
           <MistakeClinic accidental={accidental} onDrill={onDrill} />
 
-          {/* 推移グラフ */}
-          <ProgressChart sessions={sessions} />
+          {/* 推移グラフ（終了済みセッションのみ） */}
+          {sessions.length > 0 && <ProgressChart sessions={sessions} />}
 
           {/* ヒートマップ（総合/誤答/遅さ 切替） */}
           <div className="space-y-2">

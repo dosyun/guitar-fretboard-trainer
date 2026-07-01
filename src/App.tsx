@@ -366,6 +366,25 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session.count, sessionTarget, started, result, view]);
 
+  // 画面遷移時はスクロール位置を先頭へ（途中位置で開いて上部が欠けるのを防ぐ）
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [view, practiceMode, theoryTab, result]);
+
+  // 練習範囲セレクタ（開始後はアコーディオンに畳んで画面を静かにする）
+  const practiceRangeSelector = (
+    <PracticeRangeSelector
+      selectedStrings={selectedStrings}
+      fretRange={fretRange}
+      maxFret={maxFret}
+      accidental={accidental}
+      selectedNotes={selectedNotes}
+      onStringsChange={(s) => { setSelectedStrings(s); if (started) { start(quiz.mode, quiz.rootNote); session.startSession('free'); } resetScore(); }}
+      onFretRangeChange={(r) => { setFretRange(r); if (started) { start(quiz.mode, quiz.rootNote); session.startSession('free'); } resetScore(); }}
+      onNotesChange={(n) => { setSelectedNotes(n); if (started) { start(quiz.mode, quiz.rootNote); session.startSession('free'); } resetScore(); }}
+    />
+  );
+
   return (
     <div className="min-h-dvh flex flex-col bg-bg">
       <header
@@ -661,16 +680,17 @@ function App() {
               </div>
             )}
 
-            <PracticeRangeSelector
-              selectedStrings={selectedStrings}
-              fretRange={fretRange}
-              maxFret={maxFret}
-              accidental={accidental}
-              selectedNotes={selectedNotes}
-              onStringsChange={(s) => { setSelectedStrings(s); if (started) { start(quiz.mode, quiz.rootNote); session.startSession('free'); } resetScore(); }}
-              onFretRangeChange={(r) => { setFretRange(r); if (started) { start(quiz.mode, quiz.rootNote); session.startSession('free'); } resetScore(); }}
-              onNotesChange={(n) => { setSelectedNotes(n); if (started) { start(quiz.mode, quiz.rootNote); session.startSession('free'); } resetScore(); }}
-            />
+            {started ? (
+              <details className="group border border-hair rounded-xl bg-surface">
+                <summary className="cursor-pointer list-none px-4 py-2 text-sm text-dim hover:text-ink flex items-center justify-between">
+                  <span>練習範囲を変更</span>
+                  <span className="text-xs transition-transform group-open:rotate-180">▾</span>
+                </summary>
+                <div className="px-2 pb-2">{practiceRangeSelector}</div>
+              </details>
+            ) : (
+              practiceRangeSelector
+            )}
           </>
         )}
 
