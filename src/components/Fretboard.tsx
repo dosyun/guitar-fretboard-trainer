@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { FretMarker } from './FretMarker';
 import { getOpenStringName, getNoteAt, getMidiAt } from '../data/fretboard';
 import { playMidi } from '../data/audio';
@@ -50,6 +51,21 @@ export function Fretboard({
       ? PADDING_LEFT - 14
       : fretX(fret) - FRET_WIDTH / 2;
 
+  // スマホの横スクロール指板で、出題セルが画面外なら中央へ自動スクロール
+  const svgRef = useRef<SVGSVGElement>(null);
+  const hlString = highlightPosition?.string;
+  const hlFret = highlightPosition?.fret;
+  useEffect(() => {
+    if (hlFret == null || !svgRef.current) return;
+    let el: HTMLElement | null = svgRef.current.parentElement;
+    while (el && el.scrollWidth <= el.clientWidth + 1) el = el.parentElement;
+    if (!el) return;
+    const renderedWidth = svgRef.current.getBoundingClientRect().width;
+    const xPx = (posX(hlFret) / totalWidth) * renderedWidth;
+    el.scrollTo({ left: xPx - el.clientWidth / 2, behavior: 'smooth' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hlString, hlFret]);
+
   const isHighlighted = (s: number, f: number) =>
     highlightPosition?.string === s && highlightPosition?.fret === f;
 
@@ -58,6 +74,7 @@ export function Fretboard({
 
   return (
     <svg
+      ref={svgRef}
       viewBox={`0 0 ${totalWidth} ${totalHeight}`}
       className="w-full"
       style={{ touchAction: 'manipulation', minWidth: `${maxFret * 50}px` }}

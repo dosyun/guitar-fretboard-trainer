@@ -76,6 +76,16 @@ const THEORY_TABS: { key: TheoryTab; label: string }[] = [
   { key: 'arpeggio', label: 'アルペジオ' },
 ];
 
+type PracticeMode = 'basic' | 'chord-tone' | 'progression' | 'triad' | 'key-func' | 'ear' | 'guide';
+
+// 練習モードを見通しよくグループ化（スマホの横スクロール見切れ対策）
+const PRACTICE_MODE_GROUPS: { label: string; modes: { v: PracticeMode; l: string }[] }[] = [
+  { label: '基礎', modes: [{ v: 'basic', l: '基本' }] },
+  { label: 'コード', modes: [{ v: 'triad', l: 'トライアド' }, { v: 'chord-tone', l: 'コードトーン' }] },
+  { label: '進行・実戦', modes: [{ v: 'progression', l: '進行' }, { v: 'guide', l: 'ガイド音' }, { v: 'key-func', l: 'キー機能' }] },
+  { label: '耳', modes: [{ v: 'ear', l: '耳トレ' }] },
+];
+
 function App() {
   const [accidental, setAccidental] = useState<Accidental>('flat');
   const [view, setView] = useState<AppView>('home');
@@ -113,7 +123,7 @@ function App() {
   const [sessionKind, setSessionKind] = useState<'daily' | 'challenge'>('challenge');
   const [challengeLength, setChallengeLength] = useState<number | null>(10);
   const [dailyLength, setDailyLength] = useState(15);
-  const [practiceMode, setPracticeMode] = useState<'basic' | 'chord-tone' | 'progression' | 'triad' | 'key-func' | 'ear' | 'guide'>('basic');
+  const [practiceMode, setPracticeMode] = useState<PracticeMode>('basic');
   const [onboarded, setOnboarded] = useState(isOnboarded());
   const goal = getGoal();
 
@@ -519,20 +529,27 @@ function App() {
 
         {/* ===== 練習ビュー ===== */}
         {view === 'practice' && !result && (
-          <div className="flex justify-center overflow-x-auto">
-            <Segmented
-              value={practiceMode}
-              onChange={(v) => { setPracticeMode(v as 'basic' | 'chord-tone' | 'progression' | 'triad' | 'key-func' | 'ear' | 'guide'); setResult(null); }}
-              options={[
-                { label: '基本', value: 'basic' },
-                { label: 'コードトーン', value: 'chord-tone' },
-                { label: '進行', value: 'progression' },
-                { label: 'トライアド', value: 'triad' },
-                { label: 'キー機能', value: 'key-func' },
-                { label: '耳トレ', value: 'ear' },
-                { label: 'ガイド音', value: 'guide' },
-              ]}
-            />
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
+            {PRACTICE_MODE_GROUPS.map((g) => (
+              <div key={g.label} className="flex flex-col items-center gap-1">
+                <span className="text-[10px] font-mono text-dim tracking-wide">{g.label}</span>
+                <div className="flex gap-1">
+                  {g.modes.map((m) => (
+                    <button
+                      key={m.v}
+                      onClick={() => { setPracticeMode(m.v); setResult(null); }}
+                      className={`px-3 py-1.5 rounded-lg text-sm border transition-colors ${
+                        practiceMode === m.v
+                          ? 'bg-accent text-bg border-accent font-medium'
+                          : 'bg-panel text-dim border-hair hover:bg-accent-soft'
+                      }`}
+                    >
+                      {m.l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
