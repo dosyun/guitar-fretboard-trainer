@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { isSoundEnabled, setSoundEnabled } from '../data/audio';
+import { isManualTempo, setManualTempo } from '../data/tempo';
 import type { Accidental } from '../types';
 
 interface SettingsPanelProps {
@@ -17,8 +18,25 @@ const FRET_OPTIONS = [12, 15, 17, 19, 22];
 
 export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, onAccidentalChange, onMaxFretChange, onReset, onClearHistory }: SettingsPanelProps) {
   const [sound, setSound] = useState(isSoundEnabled());
+  const [manual, setManual] = useState(isManualTempo());
   return (
     <div className="flex items-center justify-center gap-4 text-sm flex-wrap">
+      <div className="flex items-center gap-2">
+        <span className="text-dim">回答:</span>
+        <div className="flex gap-1">
+          {([[false, '反射(自動)'], [true, '学習(手動)']] as const).map(([val, label]) => (
+            <button
+              key={label}
+              onClick={() => { setManualTempo(val); setManual(val); }}
+              className={`px-2.5 py-1 rounded text-sm font-medium transition-colors border ${
+                manual === val ? 'bg-accent-soft text-accent border-accent' : 'bg-panel text-dim border-hair hover:bg-accent-soft'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="flex items-center gap-2">
         <span className="text-dim">目標:</span>
         <button

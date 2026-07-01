@@ -37,6 +37,7 @@ import { useScore } from './hooks/useScore';
 import { useSession } from './hooks/useSession';
 import { getLastSession, recordPracticeDay, clearPracticeData } from './data/practiceStore';
 import { recordSkill, clearSkills } from './data/skillStore';
+import { isManualTempo } from './data/tempo';
 import type { SessionSummary } from './types/practice';
 import type { Phase } from './data/phases';
 import { useCagedQuiz } from './hooks/useCagedQuiz';
@@ -136,6 +137,7 @@ function App() {
     answerNote,
     answerInterval,
     answerPosition,
+    next: nextQuestion,
     setMode,
     setRootNote,
     toggleHint,
@@ -656,6 +658,15 @@ function App() {
             )}
             {started && quiz.mode === 'interval' && (
               <IntervalSelector feedback={quiz.feedback} correctAnswer={quiz.correctAnswer} onSelect={answerInterval} />
+            )}
+
+            {started && quiz.feedback && isManualTempo() && (
+              <button
+                onClick={() => nextQuestion()}
+                className="mx-auto px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
+              >
+                次へ →
+              </button>
             )}
 
             {started && (

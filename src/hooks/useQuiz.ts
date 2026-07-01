@@ -9,6 +9,7 @@ import {
   getRandomNote,
 } from '../data/fretboard';
 import { pickWeightedPosition, pickWeightedIntervalPosition } from '../data/practiceStore';
+import { isManualTempo } from '../data/tempo';
 
 const FEEDBACK_DELAY = 800;
 
@@ -174,6 +175,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       }));
 
       clearTimeout(feedbackTimer.current);
+      if (isManualTempo()) return; // 学習モード: 「次へ」待ち
       feedbackTimer.current = setTimeout(() => {
         nextQuestion();
       }, FEEDBACK_DELAY);
@@ -215,6 +217,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
 
       // 度数モードは「なぜ?」を読む時間を確保（不正解は長め）
       clearTimeout(feedbackTimer.current);
+      if (isManualTempo()) return; // 学習モード: 「次へ」待ち
       feedbackTimer.current = setTimeout(() => {
         nextQuestion();
       }, isCorrect ? 1300 : 2800);
@@ -251,6 +254,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       }));
 
       clearTimeout(feedbackTimer.current);
+      if (isManualTempo()) return; // 学習モード: 「次へ」待ち
       feedbackTimer.current = setTimeout(() => {
         nextQuestion();
       }, FEEDBACK_DELAY);
@@ -297,6 +301,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
     answerNote,
     answerInterval,
     answerPosition,
+    next: nextQuestion,
     setMode,
     setRootNote,
     toggleHint,
