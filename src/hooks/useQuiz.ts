@@ -166,6 +166,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
         string: quiz.currentPosition.string,
         fret: quiz.currentPosition.fret,
         note: correct as NoteName,
+        wrong: isCorrect ? undefined : selectedNote,
       });
 
       setQuiz((prev) => ({
@@ -245,6 +246,8 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
         string: pos.string,
         fret: pos.fret,
         note: quiz.currentNote as NoteName,
+        // 誤答時: 実際に押したセルの音（本来その音を探すべきだった＝混同相手）
+        wrong: isCorrect ? undefined : getNoteAt(pos.string, pos.fret, accidental),
       });
 
       setQuiz((prev) => ({

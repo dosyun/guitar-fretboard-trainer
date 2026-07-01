@@ -3,7 +3,7 @@ import type { Accidental } from '../types';
 
 interface MistakeClinicProps {
   accidental: Accidental;
-  onDrill: (note: string) => void;
+  onDrill: (note: string | string[]) => void;
 }
 
 /** 弱点を言語化して見せる診断カード。データが乏しければ何も出さない。 */
@@ -18,14 +18,21 @@ export function MistakeClinic({ accidental, onDrill }: MistakeClinicProps) {
         {diags.map((d) => (
           <li key={d.id} className="flex items-center justify-between gap-3 text-sm">
             <span className="text-ink text-pretty">{d.text}</span>
-            {d.drillNote && (
+            {d.drillNotes ? (
+              <button
+                onClick={() => onDrill(d.drillNotes!)}
+                className="shrink-0 text-accent text-xs hover:opacity-80 whitespace-nowrap"
+              >
+                両方を練習 →
+              </button>
+            ) : d.drillNote ? (
               <button
                 onClick={() => onDrill(d.drillNote!)}
                 className="shrink-0 text-accent text-xs hover:opacity-80 whitespace-nowrap"
               >
                 練習 →
               </button>
-            )}
+            ) : null}
           </li>
         ))}
       </ul>

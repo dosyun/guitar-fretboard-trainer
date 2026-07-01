@@ -25,6 +25,7 @@ export interface PracticeAttempt {
   string: number; // 0-5
   fret: number; // 0-maxFret
   note?: NoteName; // 音名認識: そのセルの音
+  wrong?: string; // 誤答時にユーザーが選んだ/触れた音名（混同ペア診断用）
   rootNote?: NoteName; // interval: ルート
   degree?: IntervalName; // interval: 度数
   createdAt: number; // epoch ms
@@ -38,6 +39,7 @@ export interface AttemptInput {
   string: number;
   fret: number;
   note?: NoteName;
+  wrong?: string;
   rootNote?: NoteName;
   degree?: IntervalName;
 }

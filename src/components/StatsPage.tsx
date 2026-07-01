@@ -20,7 +20,7 @@ const HEAT_HINT: Record<HeatMetric, string> = {
 interface StatsPageProps {
   maxFret: number;
   accidental: Accidental;
-  onDrill: (note: string) => void;
+  onDrill: (note: string | string[]) => void;
 }
 
 const sec = (ms: number) => `${(ms / 1000).toFixed(1)}s`;

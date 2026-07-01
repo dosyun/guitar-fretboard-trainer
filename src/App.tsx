@@ -329,11 +329,12 @@ function App() {
   };
 
   // 弱点ドリル: 指定した音だけを N問(既定10)・ノート→位置で集中練習（ループを閉じる導線）。
-  const handleStartDrill = (note: string, count = 10) => {
-    const scope = { strings: [0, 1, 2, 3, 4, 5], fretRange: [0, maxFret] as [number, number], noteFilter: [note] };
+  const handleStartDrill = (note: string | string[], count = 10) => {
+    const notes = Array.isArray(note) ? note : [note];
+    const scope = { strings: [0, 1, 2, 3, 4, 5], fretRange: [0, maxFret] as [number, number], noteFilter: notes };
     setSelectedStrings(scope.strings);
     setFretRange(scope.fretRange);
-    setSelectedNotes([note]);
+    setSelectedNotes(notes);
     setResult(null);
     resetScore();
     setSessionKind('challenge');
