@@ -7,11 +7,15 @@ import {
   getAllPositionsForNote,
   getRandomPosition,
   getRandomNote,
+  sameNote,
 } from '../data/fretboard';
 import { pickWeightedPosition, pickWeightedIntervalPosition } from '../data/practiceStore';
 import { isManualTempo } from '../data/tempo';
 
-const FEEDBACK_DELAY = 800;
+// 正解=素早く次へ。誤答=正解や「なぜ」を読む時間を確保して長めに。
+const CORRECT_DELAY = 800;
+const CORRECT_DELAY_INTERVAL = 1300;
+const WRONG_DELAY = 2800;
 
 interface UseQuizOptions {
   maxFret: number;
@@ -87,8 +91,8 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
   const [started, setStarted] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const feedbackTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  // 出題が提示された時刻。回答時間 = answer時刻 - これ。
-  const questionShownAt = useRef<number>(Date.now());
+  // 出題が提示された時刻。回答時間 = answer時刻 - これ。start()/nextQuestion() で必ず設定される。
+  const questionShownAt = useRef<number>(0);
   // 直近に出した問題のキー（近接の重複を避ける）
   const recentKeys = useRef<string[]>([]);
   // セッションが弱点優先(デイリー)かどうか
@@ -154,7 +158,8 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
         accidental
       );
 
-      const isCorrect = selectedNote === correct;
+      // 異名同音を許容（'C#'と'Db'は同一）。表記'both'でも正しく判定される。
+      const isCorrect = sameNote(selectedNote, correct);
 
       if (isCorrect) onCorrect();
       else onWrong();
@@ -179,7 +184,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       if (isManualTempo()) return; // 学習モード: 「次へ」待ち
       feedbackTimer.current = setTimeout(() => {
         nextQuestion();
-      }, FEEDBACK_DELAY);
+      }, isCorrect ? CORRECT_DELAY : WRONG_DELAY);
     },
     [quiz.feedback, quiz.currentPosition, accidental, onCorrect, onWrong, onAttempt, nextQuestion]
   );
@@ -221,7 +226,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       if (isManualTempo()) return; // 学習モード: 「次へ」待ち
       feedbackTimer.current = setTimeout(() => {
         nextQuestion();
-      }, isCorrect ? 1300 : 2800);
+      }, isCorrect ? CORRECT_DELAY_INTERVAL : WRONG_DELAY);
     },
     [quiz.feedback, quiz.currentPosition, quiz.rootNote, accidental, onCorrect, onWrong, onAttempt, nextQuestion]
   );
@@ -260,7 +265,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       if (isManualTempo()) return; // 学習モード: 「次へ」待ち
       feedbackTimer.current = setTimeout(() => {
         nextQuestion();
-      }, FEEDBACK_DELAY);
+      }, isCorrect ? CORRECT_DELAY : WRONG_DELAY);
     },
     [quiz.feedback, quiz.currentNote, maxFret, accidental, onCorrect, onWrong, onAttempt, nextQuestion]
   );

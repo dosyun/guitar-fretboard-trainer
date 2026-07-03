@@ -11,13 +11,41 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Fretboard" />
+
+    <!-- OGP / Twitter Card（SNS共有プレビュー）
+         注意: 本番ドメイン確定後に og:url / canonical を絶対URLにし、
+         専用の 1200x630 画像(og.png)を用意すると最適。現状は正方アイコンで代用。 -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Guitar Fretboard Trainer" />
+    <meta property="og:title" content="Guitar Fretboard Trainer — 指板を反射で覚える練習トレーナー" />
+    <meta property="og:description" content="ギター指板の音名・度数を反射で使えるようにする練習エンジン。1問ごとに回答時間を計測し、弱点をヒートマップで可視化。コード/スケール/耳トレも。" />
+    <meta property="og:image" content="/pwa-512x512.png" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Guitar Fretboard Trainer" />
+    <meta name="twitter:description" content="ギター指板の音名・度数を反射で覚える練習トレーナー。回答時間を計測し弱点をヒートマップで可視化。" />
+    <meta name="twitter:image" content="/pwa-512x512.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Guitar Fretboard Trainer",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web",
+        "description": "ギター指板の音名・度数を反射で使えるようにする練習トレーナー。回答時間を計測し弱点をヒートマップで可視化する。",
+        "inLanguage": "ja",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" }
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <title>Guitar Fretboard Trainer</title>
+    <title>Guitar Fretboard Trainer — 指板を反射で覚える練習トレーナー</title>
   </head>
   <body>
     <div id="root"></div>

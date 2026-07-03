@@ -1,11 +1,23 @@
-import type { QuizMode, NoteName, IntervalName, FretPosition } from './index';
+import type { NoteName, IntervalName, FretPosition } from './index';
 
 /**
  * 練習エンジンのデータモデル (docs/milestone-1-plan.md / docs/adr/0001)
  *
- * 第一弾は既存3クイズ (QuizMode) のみ計測する。
+ * quizType はモードごとに固有。度数統計(degreeStats)・前回比(getLastSession)・
+ * セッション要約が種目をまたいで混ざらないよう、各クイズが自分の種別で記録する。
+ * - position-to-note / note-to-position … 基本の音名認識（ヒートマップ対象）
+ * - interval … 基本の度数モード（指板で度数を探す＝degreeStats を駆動）
+ * - chordtone/progression/guidetone/keyfunc/ear … 各実戦クイズ（度数統計は汚さない）
  */
-export type QuizType = QuizMode; // 'position-to-note' | 'note-to-position' | 'interval'
+export type QuizType =
+  | 'position-to-note'
+  | 'note-to-position'
+  | 'interval'
+  | 'chordtone'
+  | 'progression'
+  | 'guidetone'
+  | 'keyfunc'
+  | 'ear';
 
 /** 指板ヒートマップの色付け対象になるクイズ種別 (音名認識のみ) */
 export const NOTE_RECOGNITION_TYPES: QuizType[] = ['position-to-note', 'note-to-position'];

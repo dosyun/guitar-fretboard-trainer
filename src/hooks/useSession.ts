@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import type { AttemptInput, SessionSummary, PracticeAttempt } from '../types/practice';
-import { recordAttempt, saveSession, newId, median } from '../data/practiceStore';
+import { recordAttempt, saveSession, newId, median, recordPracticeDay } from '../data/practiceStore';
 
 export type SessionMode = 'daily' | 'free';
 
@@ -65,6 +65,9 @@ export function useSession() {
       endedAt: Date.now(),
     };
     saveSession(summary);
+    // どのモードのセッション完了でも「今日練習した」= 連続日数に算入する。
+    // (以前は基本モードだけが streak を更新していた)
+    recordPracticeDay();
     return summary;
   }, []);
 

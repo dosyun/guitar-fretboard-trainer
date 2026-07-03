@@ -66,10 +66,8 @@ export function CagedQuiz({
   // フレットボードでCAGEDポジション群を表示
   const highlightFirst = quiz.highlightedPositions[0] ?? null;
 
-  // showLabelAt: identify-chord-tone で対象ポジション以外も薄く表示
-  const showLabelAt = (_s: number, _f: number): string | undefined => {
-    return undefined;
-  };
+  // showLabelAt: identify-chord-tone で対象ポジション以外も薄く表示（現状は未使用）
+  const showLabelAt = (): string | undefined => undefined;
 
   return (
     <div className="flex flex-col gap-3">

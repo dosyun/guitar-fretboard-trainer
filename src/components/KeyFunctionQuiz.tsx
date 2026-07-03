@@ -85,7 +85,7 @@ export function KeyFunctionQuiz({ accidental, onLearn }: KeyFunctionQuizProps) {
   };
   const stop = () => {
     clearTimeout(timer.current);
-    const prev = getLastSession('interval');
+    const prev = getLastSession('keyfunc');
     const summary = session.finalize();
     setStarted(false);
     setPicked(null);
@@ -106,7 +106,7 @@ export function KeyFunctionQuiz({ accidental, onLearn }: KeyFunctionQuizProps) {
     if (feedback) return;
     const ok = qType === 'roman' ? choice === chord.roman : choice === chord.func;
     session.record({
-      quizType: 'interval',
+      quizType: 'keyfunc',
       isCorrect: ok,
       responseTimeMs: Date.now() - shownAt.current,
       string: 0,

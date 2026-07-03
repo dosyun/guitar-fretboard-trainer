@@ -18,6 +18,8 @@ interface ResultScreenProps {
 
 const sec = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
 const acc = (s: SessionSummary) => (s.count > 0 ? Math.round((s.correct / s.count) * 100) : 0);
+// これ未満の問題数では前回比・中央値は誤差が大きく、序盤の意欲を折るだけなので出さない。
+const MIN_COMPARE = 5;
 const FAST_MS = 1200;
 const SLOW_MS = 4000;
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
@@ -40,9 +42,10 @@ export function ResultScreen({
   const cleared =
     challenge && target != null && summary.count >= target && summary.correct === summary.count;
 
-  // 前回比 (改善=correct色 / 悪化=wrong色)
-  const accDelta = prev ? accuracy - acc(prev) : null;
-  const avgDelta = prev ? summary.avgMs - prev.avgMs : null; // 負=速くなった
+  // 前回比 (改善=correct色 / 悪化=wrong色)。両セッションが十分な問題数のときだけ比較する。
+  const canCompare = prev != null && summary.count >= MIN_COMPARE && prev.count >= MIN_COMPARE;
+  const accDelta = canCompare ? accuracy - acc(prev!) : null;
+  const avgDelta = canCompare ? summary.avgMs - prev!.avgMs : null; // 負=速くなった
 
   // 一番弱い場所(n>=2) → その音だけ練習する導線（ループを閉じる）
   const weakest = [...getNoteRecognitionMetrics()]
@@ -88,25 +91,31 @@ export function ResultScreen({
         <Stat label="平均" value={sec(summary.avgMs)} />
       </div>
 
-      {/* 中央値・前回比 */}
-      <div className="space-y-2 text-sm">
-        <Row label="中央値">
-          <span className="font-mono tabular-nums text-ink">{sec(summary.medianMs)}</span>
-        </Row>
-        <Row label="前回比">
-          {prev && accDelta !== null && avgDelta !== null ? (
-            <span className="font-mono tabular-nums flex items-center gap-3">
-              <Delta good={accDelta >= 0} text={`${accDelta >= 0 ? '+' : ''}${accDelta}pp`} />
-              <Delta
-                good={avgDelta <= 0}
-                text={`${avgDelta <= 0 ? '▼' : '▲'}${sec(Math.abs(avgDelta))}`}
-              />
-            </span>
-          ) : (
-            <span className="text-dim text-xs">初回 — 次回から比較できます</span>
-          )}
-        </Row>
-      </div>
+      {/* 中央値・前回比（十分な問題数のときだけ。少数だと誤差が大きいため出さない） */}
+      {summary.count >= MIN_COMPARE ? (
+        <div className="space-y-2 text-sm">
+          <Row label="中央値">
+            <span className="font-mono tabular-nums text-ink">{sec(summary.medianMs)}</span>
+          </Row>
+          <Row label="前回比">
+            {accDelta !== null && avgDelta !== null ? (
+              <span className="font-mono tabular-nums flex items-center gap-3">
+                <Delta good={accDelta >= 0} text={`${accDelta >= 0 ? '+' : ''}${accDelta}pp`} />
+                <Delta
+                  good={avgDelta <= 0}
+                  text={`${avgDelta <= 0 ? '▼' : '▲'}${sec(Math.abs(avgDelta))}`}
+                />
+              </span>
+            ) : (
+              <span className="text-dim text-xs">初回 — 次回から比較できます</span>
+            )}
+          </Row>
+        </div>
+      ) : (
+        <p className="text-dim text-xs text-center text-pretty">
+          {summary.count}問の記録。{MIN_COMPARE}問以上つづけると中央値・前回比が出ます。
+        </p>
+      )}
 
       {/* 次の一手: 一番弱い場所をその場で潰す（主導線・音名認識のみ） */}
       {showDrill && weakest && weakNote && (

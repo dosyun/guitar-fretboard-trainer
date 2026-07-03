@@ -6,10 +6,9 @@ import { ProgressChart } from './ProgressChart';
 import { MasteryBar } from './MasteryBar';
 import { SkillMap } from './SkillMap';
 import { MistakeClinic } from './MistakeClinic';
-import { getAllSessions, getAllAttempts, getNoteRecognitionMetrics, getDegreeMetrics } from '../data/practiceStore';
-import { getNoteLabel, getNoteAt } from '../data/fretboard';
+import { getAllSessions, getAllAttempts, getNoteRecognitionMetrics, getDegreeMetrics, getOverallStats } from '../data/practiceStore';
 import type { Accidental } from '../types';
-import type { CellMetrics, DegreeMetrics } from '../types/practice';
+import type { DegreeMetrics } from '../types/practice';
 
 const HEAT_HINT: Record<HeatMetric, string> = {
   weakness: '音名認識の弱点（誤答＋遅さ）',
@@ -27,8 +26,6 @@ const sec = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
 const FAST_MS = 1200;
 const SLOW_MS = 4000;
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
-const weakness = (m: CellMetrics) =>
-  0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
 const degreeWeak = (m: DegreeMetrics) =>
   0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
 const heatColor = (w: number) => (w < 0.25 ? 'var(--correct)' : w < 0.55 ? 'var(--accent)' : 'var(--wrong)');
@@ -40,19 +37,9 @@ export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
   const metrics = getNoteRecognitionMetrics();
   const degreeWorst = [...getDegreeMetrics()].sort((a, b) => degreeWeak(b) - degreeWeak(a));
 
-  // 全体サマリは attempts を正にする（cell/skill/未終了とカウントを揃える）
-  const totalAttempts = attempts.length;
-  const totalCorrect = attempts.filter((a) => a.isCorrect).length;
-  const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
-  const avgMs =
-    metrics.length > 0
-      ? Math.round(metrics.reduce((a, m) => a + m.avgMs * m.n, 0) / metrics.reduce((a, m) => a + m.n, 0))
-      : 0;
-
-  const worst = [...metrics]
-    .filter((m) => m.n >= 2)
-    .sort((a, b) => weakness(b) - weakness(a))
-    .slice(0, 5);
+  // 全体サマリは Home と同じ定義（完了セッション基準）で統一する。
+  const overall = getOverallStats();
+  const accuracy = Math.round(overall.accuracy * 100);
 
   const hasData = sessions.length > 0 || attempts.length > 0 || metrics.length > 0;
   const inProgress = sessions.length === 0 && attempts.length > 0; // 練習中（まだ終了していない）
@@ -80,12 +67,14 @@ export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
             </div>
           )}
 
-          {/* サマリ readout */}
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <Stat label="累計問題数" value={`${totalAttempts}`} />
-            <Stat label="総合正答率" value={`${accuracy}%`} />
-            <Stat label="平均反応" value={sec(avgMs)} />
-          </div>
+          {/* サマリ readout（完了セッションがあるときのみ。練習中は上の案内を出す） */}
+          {overall.count > 0 && (
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <Stat label="累計問題数" value={`${overall.count}`} />
+              <Stat label="総合正答率" value={`${accuracy}%`} />
+              <Stat label="平均反応" value={sec(overall.avgMs)} />
+            </div>
+          )}
 
           {/* 指板習熟度 */}
           <MasteryBar maxFret={maxFret} accidental={accidental} />
@@ -122,33 +111,6 @@ export function StatsPage({ maxFret, accidental, onDrill }: StatsPageProps) {
               <FretboardHeatmap maxFret={maxFret} accidental={accidental} metric={heatMetric} />
             </div>
           </div>
-
-          {/* 苦手ポジション（タップでその音だけ練習） */}
-          {worst.length > 0 && (
-            <div className="space-y-2">
-              <h2 className="text-sm font-medium text-ink">苦手なポジション</h2>
-              <p className="text-xs text-dim">タップでその音だけ集中練習</p>
-              <ul className="space-y-1">
-                {worst.map((m) => (
-                  <li key={`${m.pos.string}-${m.pos.fret}`}>
-                    <button
-                      onClick={() => onDrill(getNoteAt(m.pos.string, m.pos.fret, accidental))}
-                      className="w-full flex items-center justify-between bg-surface border border-hair rounded-lg px-3 py-2 text-sm hover:bg-panel transition-colors"
-                    >
-                      <span className="font-mono text-ink">
-                        {6 - m.pos.string}弦 {m.pos.fret}F
-                        <span className="text-dim ml-2">{getNoteLabel(m.pos.string, m.pos.fret, accidental)}</span>
-                      </span>
-                      <span className="font-mono tabular-nums text-dim flex items-center gap-2">
-                        誤答 {Math.round(m.errorRate * 100)}% / {sec(m.avgMs)}
-                        <span className="text-accent">練習 →</span>
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
 
           {/* 度数の弱点（度数モード） */}
           {degreeWorst.length > 0 && (

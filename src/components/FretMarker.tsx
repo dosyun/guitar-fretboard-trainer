@@ -9,6 +9,7 @@ interface FretMarkerProps {
   feedback: Feedback;
   showLabel?: string;
   noteColor?: string; // 音名を渡すと色分け表示
+  ariaLabel?: string; // 支援技術向けの位置名（例「6弦3フレット」）
   onClick?: () => void;
 }
 
@@ -19,6 +20,7 @@ export function FretMarker({
   feedback,
   showLabel,
   noteColor,
+  ariaLabel,
   onClick,
 }: FretMarkerProps) {
   let fill = 'transparent';
@@ -55,6 +57,20 @@ export function FretMarker({
   return (
     <g
       onClick={onClick}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      aria-label={onClick ? ariaLabel : undefined}
+      className={onClick ? 'fret-cell' : undefined}
       style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
       <circle
@@ -74,6 +90,15 @@ export function FretMarker({
           fill="transparent"
           stroke="none"
         />
+      )}
+      {/* 正誤を色以外でも伝える記号（色覚・SRの両対応）。ラベル表示セルとは重ねない。 */}
+      {highlighted && feedback === 'correct' && !showLabel && (
+        <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" fontSize={11} fontWeight={700}
+          fill={textColor} style={{ pointerEvents: 'none', userSelect: 'none' }}>✓</text>
+      )}
+      {highlighted && feedback === 'wrong' && !showLabel && (
+        <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" fontSize={11} fontWeight={700}
+          fill={textColor} style={{ pointerEvents: 'none', userSelect: 'none' }}>✕</text>
       )}
       {showLabel && (
         <text

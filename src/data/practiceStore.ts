@@ -182,6 +182,31 @@ export function getAllSessions(): SessionSummary[] {
   return load<SessionSummary[]>(SESSIONS_KEY, []);
 }
 
+export interface OverallStats {
+  count: number;
+  correct: number;
+  accuracy: number; // 0-1
+  avgMs: number;
+}
+
+/**
+ * Home / Stats 共通の全体サマリ。**完了済みセッション基準**で統一する。
+ * (以前は Home=セッション合計 / Stats=生ログ件数 と定義が食い違い、
+ *  同じラベルで数字がズレていた)。3指標とも同じ母集団=完了セッション。
+ */
+export function getOverallStats(): OverallStats {
+  const sessions = getAllSessions();
+  const count = sessions.reduce((a, s) => a + s.count, 0);
+  const correct = sessions.reduce((a, s) => a + s.correct, 0);
+  const sumMs = sessions.reduce((a, s) => a + s.avgMs * s.count, 0);
+  return {
+    count,
+    correct,
+    accuracy: count > 0 ? correct / count : 0,
+    avgMs: count > 0 ? Math.round(sumMs / count) : 0,
+  };
+}
+
 /** 指定クイズ種別の「直近の」セッション (前回比の比較対象)。なければ null。 */
 export function getLastSession(quizType: QuizType): SessionSummary | null {
   const sessions = getAllSessions().filter((s) => s.quizType === quizType);

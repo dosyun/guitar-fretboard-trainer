@@ -38,10 +38,12 @@ export function PhaseMap({ onStartPhase }: PhaseMapProps) {
                   <span>{p.scope}</span>
                   {st.started ? (
                     <span className="font-mono tabular-nums">
-                      {Math.round(st.accuracy * 100)}% / {(st.avgMs / 1000).toFixed(1)}s
+                      正答率 {Math.round(st.accuracy * 100)}% ・ 反応 {(st.avgMs / 1000).toFixed(1)}s
                     </span>
                   ) : (
-                    <span>未着手</span>
+                    <span className="font-mono tabular-nums">
+                      目標 {Math.round(p.targetAcc * 100)}% / {(p.targetMs / 1000).toFixed(1)}s
+                    </span>
                   )}
                 </div>
               </button>

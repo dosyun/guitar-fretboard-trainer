@@ -62,7 +62,9 @@ export function Fretboard({
     if (!el) return;
     const renderedWidth = svgRef.current.getBoundingClientRect().width;
     const xPx = (posX(hlFret) / totalWidth) * renderedWidth;
-    el.scrollTo({ left: xPx - el.clientWidth / 2, behavior: 'smooth' });
+    // reduced-motion のときは瞬間移動（プログラム的スクロールにCSS抑制は効かないため）
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    el.scrollTo({ left: xPx - el.clientWidth / 2, behavior: reduce ? 'auto' : 'smooth' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hlString, hlFret]);
 
@@ -77,6 +79,8 @@ export function Fretboard({
       ref={svgRef}
       viewBox={`0 0 ${totalWidth} ${totalHeight}`}
       className="w-full"
+      role="group"
+      aria-label={onPositionClick ? 'ギター指板（弦とフレットを選んで解答）' : 'ギター指板'}
       style={{ touchAction: 'manipulation', minWidth: `${maxFret * 50}px` }}
     >
       {/* 背景 */}
@@ -208,6 +212,7 @@ export function Fretboard({
               showLabel={label}
               // 出題位置のハイライトは中立色(琥珀)。音高カラーは答え/正解表示(label)のときだけ。
               noteColor={label ? note : undefined}
+              ariaLabel={`${6 - s}弦 ${f === 0 ? '開放' : `${f}フレット`}`}
               onClick={onPositionClick ? () => { playMidi(getMidiAt(s, f)); onPositionClick({ string: s, fret: f }); } : undefined}
             />
           );

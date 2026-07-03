@@ -57,7 +57,7 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
 
   const stop = () => {
     clearTimeout(timer.current);
-    const prev = getLastSession('interval');
+    const prev = getLastSession('chordtone');
     const summary = session.finalize();
     setStarted(false);
     setTarget(null);
@@ -79,7 +79,7 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
     const tappedNote = getNoteAt(pos.string, pos.fret, accidental);
     const ok = tappedNote === target.note;
     session.record({
-      quizType: 'interval',
+      quizType: 'chordtone',
       isCorrect: ok,
       responseTimeMs: Date.now() - shownAt.current,
       string: pos.string,

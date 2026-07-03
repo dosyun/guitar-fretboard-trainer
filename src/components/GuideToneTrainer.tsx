@@ -88,7 +88,7 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
   };
   const stop = () => {
     clearTimeout(timer.current);
-    const prev = getLastSession('interval');
+    const prev = getLastSession('guidetone');
     const summary = session.finalize();
     setStarted(false);
     setStep(0);
@@ -117,14 +117,15 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
     const tappedNote = getNoteAt(pos.string, pos.fret, accidental);
     const ok = tappedNote === target.note;
     session.record({
-      quizType: 'interval',
+      quizType: 'guidetone',
       isCorrect: ok,
       responseTimeMs: Date.now() - shownAt.current,
       string: pos.string,
       fret: pos.fret,
+      rootNote: target.root as NoteName,
       degree: INTERVAL_NAMES[target.st % 12],
     });
-    recordSkill('progression', ok);
+    recordSkill('guidetone', ok);
     setWrongPick(ok ? null : { note: tappedNote, deg: INTERVAL_NAMES[(getNoteIndex(tappedNote) - getNoteIndex(target.root) + 12) % 12] });
     setScore((s) => ({ correct: s.correct + (ok ? 1 : 0), total: s.total + 1 }));
     setFeedback(ok ? 'correct' : 'wrong');

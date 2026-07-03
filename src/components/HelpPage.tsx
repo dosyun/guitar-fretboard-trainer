@@ -151,6 +151,20 @@ export function HelpPage() {
         </ul>
       </section>
 
+      {/* データの扱い（プライバシー） */}
+      <section className="bg-surface rounded-lg p-4 border border-hair space-y-2">
+        <h3 className="text-base font-bold text-ink">データの扱い</h3>
+        <p>
+          練習記録・成績・設定はすべて<strong>この端末のブラウザ内（localStorage）にのみ保存</strong>されます。
+          サーバーや外部サービスへ送信されることはありません（アカウント登録も不要です）。
+        </p>
+        <ul className="list-disc ml-5 space-y-1">
+          <li>機種変更やブラウザのデータ削除で記録は消えます。設定の「データを書き出す」でバックアップを取れます。</li>
+          <li>フォントは Google Fonts を利用します（初回のみ取得、以降はオフラインキャッシュ）。</li>
+          <li>設定の「練習履歴を削除」でいつでも記録を消去できます。</li>
+        </ul>
+      </section>
+
       {/* おすすめの学習手順 */}
       <section className="bg-accent-soft rounded-lg p-4 border border-hair space-y-2">
         <h3 className="text-base font-bold text-accent">おすすめの学習ステップ</h3>

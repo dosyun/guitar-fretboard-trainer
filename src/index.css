@@ -64,6 +64,16 @@ a,
   font-feature-settings: 'tnum' 1;
 }
 
+/* 指板セルのキーボードフォーカス可視化（SVG内 role=button） */
+.fret-cell {
+  outline: none;
+}
+.fret-cell:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-radius: 50%;
+}
+
 /* =========================================================================
    Ant Design — ダーク向け微調整 (darkAlgorithm は ConfigProvider 側)
    ========================================================================= */

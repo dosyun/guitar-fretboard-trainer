@@ -1,5 +1,5 @@
 import { Segmented } from 'antd';
-import { getAllSessions, getNoteRecognitionMetrics, getStreak } from '../data/practiceStore';
+import { getOverallStats, getNoteRecognitionMetrics, getStreak } from '../data/practiceStore';
 import { getCompletedLessons } from '../data/lessonProgress';
 import { LESSONS } from '../data/lessons';
 import { getNoteLabel } from '../data/fretboard';
@@ -26,7 +26,6 @@ interface HomePageProps {
   onLearn: (lessonId?: string) => void;
 }
 
-const sec = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
 const FAST_MS = 1200;
 const SLOW_MS = 4000;
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
@@ -34,18 +33,12 @@ const weakness = (m: CellMetrics) =>
   0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
 
 export function HomePage({ accidental, maxFret, dailyLength, goal, onStartGoal, onDailyLengthChange, onStartDaily, onStartPractice, onStartPhase, onOpenStats, onShowHelp, onLearn }: HomePageProps) {
-  const sessions = getAllSessions();
   const metrics = getNoteRecognitionMetrics();
   const streak = getStreak();
-  const totalAttempts = sessions.reduce((a, s) => a + s.count, 0);
-  const totalCorrect = sessions.reduce((a, s) => a + s.correct, 0);
-  const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
-  const avgMs =
-    metrics.length > 0
-      ? Math.round(metrics.reduce((a, m) => a + m.avgMs * m.n, 0) / metrics.reduce((a, m) => a + m.n, 0))
-      : 0;
+  // 数字の詳細は成績タブに集約。Home では「データがあるか」の判定にだけ使う。
+  const overall = getOverallStats();
   const worst = [...metrics].filter((m) => m.n >= 2).sort((a, b) => weakness(b) - weakness(a))[0];
-  const hasData = totalAttempts > 0;
+  const hasData = overall.count > 0;
 
   // 学ぶコースの続き（未完了の最初のレッスン）
   const doneLessons = getCompletedLessons();
@@ -120,7 +113,7 @@ export function HomePage({ accidental, maxFret, dailyLength, goal, onStartGoal, 
           onClick={onStartPractice}
           className="w-full text-sm text-dim hover:text-ink transition-colors"
         >
-          チャレンジ（問題数を選んで挑戦）
+          チャレンジ（全範囲からランダムに腕試し）
         </button>
         {nextLesson ? (
           <button
@@ -139,15 +132,11 @@ export function HomePage({ accidental, maxFret, dailyLength, goal, onStartGoal, 
         )}
       </div>
 
-      {/* 進捗 */}
+      {/* 進捗（Home=次の一手。数字の詳細は成績タブに集約） */}
       {hasData ? (
         <div className="space-y-3">
+          {/* 成長が見える単一指標のみ。累計/正答率/平均の内訳は成績で */}
           <MasteryBar maxFret={maxFret} accidental={accidental} compact />
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <Stat label="累計問題数" value={`${totalAttempts}`} />
-            <Stat label="総合正答率" value={`${accuracy}%`} />
-            <Stat label="平均反応" value={sec(avgMs)} />
-          </div>
 
           {worst && (
             <button
@@ -175,15 +164,6 @@ export function HomePage({ accidental, maxFret, dailyLength, goal, onStartGoal, 
 
       {/* 学習マップ（フェーズ） */}
       <PhaseMap onStartPhase={onStartPhase} />
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="bg-surface rounded-xl py-4 border border-hair">
-      <div className="font-mono tabular-nums text-2xl font-medium text-ink">{value}</div>
-      <div className="text-dim text-xs mt-1">{label}</div>
     </div>
   );
 }

@@ -114,7 +114,7 @@ export function EarTrainingQuiz({ accidental, onLearn }: EarTrainingQuizProps) {
   };
   const stop = () => {
     clearTimeout(timer.current);
-    const prev = getLastSession('interval');
+    const prev = getLastSession('ear');
     const summary = session.finalize();
     setStarted(false);
     setQ(null);
@@ -132,7 +132,7 @@ export function EarTrainingQuiz({ accidental, onLearn }: EarTrainingQuizProps) {
     if (feedback || !q) return;
     const ok = choiceKey === q.answer;
     session.record({
-      quizType: 'interval',
+      quizType: 'ear',
       isCorrect: ok,
       responseTimeMs: Date.now() - shownAt.current,
       string: 0,

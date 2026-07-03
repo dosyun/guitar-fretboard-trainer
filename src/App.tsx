@@ -36,7 +36,7 @@ import { ScaleQuiz } from './components/ScaleQuiz';
 import { useQuiz } from './hooks/useQuiz';
 import { useScore } from './hooks/useScore';
 import { useSession } from './hooks/useSession';
-import { getLastSession, recordPracticeDay, clearPracticeData } from './data/practiceStore';
+import { getLastSession, clearPracticeData } from './data/practiceStore';
 import { recordSkill, clearSkills } from './data/skillStore';
 import { isManualTempo } from './data/tempo';
 import type { SessionSummary } from './types/practice';
@@ -48,7 +48,7 @@ import { toneWhy } from './data/theory';
 import { CAGED_ORDER } from './data/caged';
 import { SCALES, SCALE_LIST, SCALE_COLORS } from './data/scales';
 import type { ScaleName } from './data/scales';
-import { Tabs as AntTabs, Segmented, Switch } from 'antd';
+import { Segmented, Switch } from 'antd';
 import type { Accidental, FretPosition, NoteName, CagedFormName } from './types';
 import './index.css';
 
@@ -358,11 +358,10 @@ function App() {
 
   const handleEnd = () => {
     const prev = getLastSession(quiz.mode); // 保存前 = 前回
-    const summary = session.finalize();     // 今回を保存
+    const summary = session.finalize();     // 今回を保存（連続日数もここで更新）
     stop();
     setSessionTarget(null);
     if (summary) {
-      recordPracticeDay(); // 連続練習日数を更新
       setResult({ summary, prev, kind: sessionKind, target: sessionTarget });
     }
   };
@@ -412,23 +411,8 @@ function App() {
         </h1>
       </header>
 
-      <div className="sticky top-0 z-nav bg-surface px-4 pt-2 border-b border-hair">
-        <AntTabs
-          activeKey={view}
-          onChange={(v) => setView(v as AppView)}
-          centered
-          size="large"
-          items={[
-            { key: 'home', label: 'ホーム' },
-            { key: 'practice', label: '練習' },
-            { key: 'theory', label: '理論' },
-            { key: 'stats', label: '成績' },
-            { key: 'settings', label: '設定' },
-          ]}
-        />
-      </div>
-
-      <div className="flex-1 flex flex-col gap-3 px-4 pb-4 w-full">
+      {/* 主ナビは画面下部（モバイルの親指リーチ）。BottomNav は末尾に固定配置 */}
+      <div className="flex-1 flex flex-col gap-3 px-4 pt-3 pb-24 w-full">
 
         {/* ===== ホームビュー ===== */}
         {view === 'home' && !onboarded && (
@@ -621,12 +605,14 @@ function App() {
             )}
 
             {started && (
-              <div className="text-center">
+              <div className="text-center" role="status" aria-live="polite">
                 <p className="text-ink font-medium">{getPrompt()}</p>
                 {quiz.feedback && (
                   <p className={`text-lg font-bold mt-1 ${
                     quiz.feedback === 'correct' ? 'text-correct' : 'text-wrong'
                   }`}>
+                    {/* 記号で色に依存せず正誤を伝える */}
+                    <span aria-hidden="true">{quiz.feedback === 'correct' ? '✓ ' : '✕ '}</span>
                     {getFeedbackMsg()}
                   </p>
                 )}
@@ -968,7 +954,50 @@ function App() {
           </div>
         )}
       </div>
+
+      <BottomNav view={view} onChange={setView} />
     </div>
+  );
+}
+
+const NAV_ITEMS: { key: AppView; label: string }[] = [
+  { key: 'home', label: 'ホーム' },
+  { key: 'practice', label: '練習' },
+  { key: 'theory', label: '理論' },
+  { key: 'stats', label: '成績' },
+  { key: 'settings', label: '設定' },
+];
+
+/** 画面下部の主ナビ（モバイルの親指リーチ）。固定配置＋セーフエリア対応。 */
+function BottomNav({ view, onChange }: { view: AppView; onChange: (v: AppView) => void }) {
+  return (
+    <nav
+      aria-label="メインナビゲーション"
+      className="fixed bottom-0 inset-x-0 z-nav bg-surface border-t border-hair"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
+      <div className="max-w-2xl mx-auto grid grid-cols-5">
+        {NAV_ITEMS.map((it) => {
+          const active = view === it.key;
+          return (
+            <button
+              key={it.key}
+              onClick={() => onChange(it.key)}
+              aria-current={active ? 'page' : undefined}
+              className={`flex flex-col items-center gap-1 py-2.5 text-xs font-medium transition-colors ${
+                active ? 'text-accent' : 'text-dim hover:text-ink'
+              }`}
+            >
+              <span
+                aria-hidden="true"
+                className={`size-1.5 rounded-full ${active ? 'bg-accent' : 'bg-transparent'}`}
+              />
+              {it.label}
+            </button>
+          );
+        })}
+      </div>
+    </nav>
   );
 }
 

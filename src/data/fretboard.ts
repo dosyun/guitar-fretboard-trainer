@@ -78,6 +78,15 @@ export function getNoteIndex(note: string): number {
   return flatIdx >= 0 ? flatIdx : 0;
 }
 
+/**
+ * 2つの音名が同じピッチクラスを指すか（異名同音を許容）。
+ * 表記が sharp/flat/both で混在しても正しく判定するため、文字列一致でなく
+ * ピッチクラス(0-11)で比較する。'C#' と 'Db' は同一とみなす。
+ */
+export function sameNote(a: string, b: string): boolean {
+  return getNoteIndex(a) === getNoteIndex(b);
+}
+
 /** ポジションの度数を取得 */
 export function getIntervalAt(
   stringIndex: number,

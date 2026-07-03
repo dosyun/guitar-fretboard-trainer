@@ -65,7 +65,7 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
   };
   const stop = () => {
     clearTimeout(timer.current);
-    const prev = getLastSession('interval');
+    const prev = getLastSession('progression');
     const summary = session.finalize();
     setStarted(false);
     setStep(0);
@@ -94,11 +94,12 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
     const tappedNote = getNoteAt(pos.string, pos.fret, accidental);
     const ok = tappedNote === target.note;
     session.record({
-      quizType: 'interval',
+      quizType: 'progression',
       isCorrect: ok,
       responseTimeMs: Date.now() - shownAt.current,
       string: pos.string,
       fret: pos.fret,
+      rootNote: target.root as NoteName,
       degree: INTERVAL_NAMES[target.st % 12],
     });
     recordSkill('progression', ok);

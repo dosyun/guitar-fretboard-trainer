@@ -17,6 +17,7 @@ export function IntervalSelector({ feedback, correctAnswer, onSelect }: Interval
             key={interval}
             onClick={() => onSelect(interval)}
             disabled={feedback !== null}
+            aria-label={isCorrectHighlight ? `${interval}（正解）` : interval}
             className={`
               py-3 px-2 rounded-lg text-base font-semibold font-mono transition-colors
               ${isCorrectHighlight
@@ -26,6 +27,7 @@ export function IntervalSelector({ feedback, correctAnswer, onSelect }: Interval
               disabled:opacity-60 disabled:cursor-not-allowed
             `}
           >
+            {isCorrectHighlight && <span aria-hidden="true">✓ </span>}
             {interval}
           </button>
         );
