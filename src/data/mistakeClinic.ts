@@ -14,6 +14,7 @@ export interface Diagnosis {
   drillNote?: string; // あれば「その音を練習」できる
   drillNotes?: string[]; // 混同ペアなど複数音のドリル
   drillString?: number; // あれば「その弦を練習」できる (0=6弦 .. 5=1弦)
+  drillFretRange?: [number, number]; // あれば「そのフレット帯を練習」できる
 }
 
 const MIN_N = 4;
@@ -41,6 +42,12 @@ function worst(map: Map<string | number, Acc>): { key: string | number; acc: num
 }
 
 const fretBucket = (f: number) => (f <= 4 ? '0–4F' : f <= 9 ? '5–9F' : '10F以上');
+// バケット表示 → 実フレット範囲（上限は呼び出し側で maxFret にクランプ）
+const BUCKET_RANGE: Record<string, [number, number]> = {
+  '0–4F': [0, 4],
+  '5–9F': [5, 9],
+  '10F以上': [10, 99],
+};
 
 /** 弱点診断（最大3件、弱い順）。データが乏しければ空配列。 */
 export function diagnose(accidental: Accidental): Diagnosis[] {
@@ -105,7 +112,11 @@ export function diagnose(accidental: Accidental): Diagnosis[] {
     const wf = worst(byFret);
     if (wf && wf.acc < 0.7) {
       cand.push({
-        d: { id: 'fret', text: `${wf.key} の音名が弱い（正答率 ${Math.round(wf.acc * 100)}%）` },
+        d: {
+          id: 'fret',
+          text: `${wf.key} の音名が弱い（正答率 ${Math.round(wf.acc * 100)}%）`,
+          drillFretRange: BUCKET_RANGE[wf.key as string],
+        },
         sev: (1 - wf.acc) * 0.8,
       });
     }

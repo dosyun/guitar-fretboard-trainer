@@ -374,6 +374,22 @@ function App() {
     start('position-to-note', quiz.rootNote, scope, true);
   };
 
+  // フレット帯ドリル: 指定フレット範囲を位置→音名・弱点優先で集中練習（MistakeClinic「◯F帯が弱い」から）。
+  const handleStartDrillFret = (range: [number, number], count = 10) => {
+    const hi = Math.min(range[1], maxFret);
+    const scope = { strings: [0, 1, 2, 3, 4, 5], fretRange: [range[0], hi] as [number, number], noteFilter: null };
+    setSelectedStrings(scope.strings);
+    setFretRange(scope.fretRange);
+    setSelectedNotes(null);
+    setResult(null);
+    resetScore();
+    setSessionKind('challenge');
+    setSessionTarget(count);
+    session.startSession('free');
+    setView('practice');
+    start('position-to-note', quiz.rootNote, scope, true);
+  };
+
   // 今日の練習: 選んだ問題数(既定15)・位置→音名・弱点優先。Homeから起動。
   const handleStartDaily = () => {
     setResult(null);
@@ -750,7 +766,7 @@ function App() {
         )}
 
         {/* ===== 成績ビュー ===== */}
-        {view === 'stats' && <StatsPage maxFret={maxFret} accidental={accidental} onDrill={handleStartDrill} onDrillString={handleStartDrillString} />}
+        {view === 'stats' && <StatsPage maxFret={maxFret} accidental={accidental} onDrill={handleStartDrill} onDrillString={handleStartDrillString} onDrillFret={handleStartDrillFret} />}
 
         {/* ===== スケールビュー ===== */}
         {view === 'theory' && theoryTab === 'scale' && (

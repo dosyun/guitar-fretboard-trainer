@@ -21,6 +21,7 @@ interface StatsPageProps {
   accidental: Accidental;
   onDrill: (note: string | string[]) => void;
   onDrillString: (string: number) => void;
+  onDrillFret: (range: [number, number]) => void;
 }
 
 const sec = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
@@ -31,7 +32,7 @@ const degreeWeak = (m: DegreeMetrics) =>
   0.6 * m.errorRate + 0.4 * clamp01((m.avgMs - FAST_MS) / (SLOW_MS - FAST_MS));
 const heatColor = (w: number) => (w < 0.25 ? 'var(--correct)' : w < 0.55 ? 'var(--accent)' : 'var(--wrong)');
 
-export function StatsPage({ maxFret, accidental, onDrill, onDrillString }: StatsPageProps) {
+export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrillFret }: StatsPageProps) {
   const [heatMetric, setHeatMetric] = useState<HeatMetric>('weakness');
   const sessions = getAllSessions();
   const attempts = getAllAttempts();
@@ -84,7 +85,7 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString }: Stats
           <SkillMap />
 
           {/* 弱点診断（言語化） */}
-          <MistakeClinic accidental={accidental} onDrill={onDrill} onDrillString={onDrillString} />
+          <MistakeClinic accidental={accidental} onDrill={onDrill} onDrillString={onDrillString} onDrillFret={onDrillFret} />
 
           {/* 推移グラフ（終了済みセッションのみ） */}
           {sessions.length > 0 && <ProgressChart sessions={sessions} />}
