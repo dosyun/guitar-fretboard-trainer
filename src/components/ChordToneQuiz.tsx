@@ -9,6 +9,7 @@ import { useSession } from '../hooks/useSession';
 import { getLastSession } from '../data/practiceStore';
 import { recordSkill } from '../data/skillStore';
 import { ResultScreen } from './ResultScreen';
+import { QuizFooter, QuizScore } from './QuizChrome';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
 import type { SessionSummary } from '../types/practice';
 
@@ -131,14 +132,7 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
 
       {started && (
         <>
-          <div className="flex justify-center gap-6 text-sm">
-            <div className="text-center">
-              <div className="text-dim text-xs">正解</div>
-              <div className="text-lg font-bold font-mono tabular-nums text-ink">
-                {score.correct}/{score.total}
-              </div>
-            </div>
-          </div>
+          <QuizScore correct={score.correct} total={score.total} />
 
           <div className="text-center">
             <p className="text-ink font-medium">
@@ -177,32 +171,13 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
         />
       </div>
 
-      {!started ? (
-        <div className="flex flex-col items-center gap-2">
-          <button
-            onClick={start}
-            className="px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
-          >
-            スタート
-          </button>
-          {onLearn && (
-            <button onClick={() => onLearn()} className="text-xs text-accent hover:opacity-80 underline">
-              はじめて？ まず学ぶ →
-            </button>
-          )}
-        </div>
-      ) : (
-        <button
-          onClick={stop}
-          className="mx-auto px-6 py-2 text-sm bg-panel text-dim border border-hair rounded-lg hover:bg-accent-soft transition-colors"
-        >
-          終了
-        </button>
-      )}
-
-      <p className="text-xs text-dim text-center text-pretty">
-        コードの構成音を指板で見つける練習。ルートとコードタイプを選んで、指定の度数の音をタップしよう。
-      </p>
+      <QuizFooter
+        started={started}
+        onStart={start}
+        onStop={stop}
+        onLearn={onLearn}
+        hint="コードの構成音を指板で見つける練習。ルートとコードタイプを選んで、指定の度数の音をタップしよう。"
+      />
     </>
   );
 }

@@ -5,6 +5,7 @@ import { RootSelector } from './RootSelector';
 import { getNoteAt, getNoteNames, getNoteIndex, getMidiAt, INTERVAL_NAMES } from '../data/fretboard';
 import { playMidi, playChord } from '../data/audio';
 import { recordSkill } from '../data/skillStore';
+import { QuizFooter } from './QuizChrome';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
 
 interface TriadBuilderProps {
@@ -179,33 +180,13 @@ export function TriadBuilder({ accidental, maxFret, onLearn }: TriadBuilderProps
         />
       </div>
 
-      {!started ? (
-        <div className="flex flex-col items-center gap-2">
-          <button
-            onClick={start}
-            className="px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
-          >
-            スタート
-          </button>
-          {onLearn && (
-            <button onClick={() => onLearn()} className="text-xs text-accent hover:opacity-80 underline">
-              はじめて？ まず学ぶ →
-            </button>
-          )}
-        </div>
-      ) : (
-        <button
-          onClick={stop}
-          className="mx-auto px-6 py-2 text-sm bg-panel text-dim border border-hair rounded-lg hover:bg-accent-soft transition-colors"
-        >
-          終了
-        </button>
-      )}
-
-      <p className="text-xs text-dim text-center text-pretty">
-        コードは“覚える”より“作る”。R・3・5を指板から集めよう。メジャー↔マイナーで3度が変わり、明るさが切り替わる。
-        完成したら別の場所でも作ってみよう。
-      </p>
+      <QuizFooter
+        started={started}
+        onStart={start}
+        onStop={stop}
+        onLearn={onLearn}
+        hint="コードは“覚える”より“作る”。R・3・5を指板から集めよう。メジャー↔マイナーで3度が変わり、明るさが切り替わる。完成したら別の場所でも作ってみよう。"
+      />
     </>
   );
 }

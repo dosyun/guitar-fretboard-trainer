@@ -10,6 +10,7 @@ import { useSession } from '../hooks/useSession';
 import { getLastSession } from '../data/practiceStore';
 import { recordSkill } from '../data/skillStore';
 import { ResultScreen } from './ResultScreen';
+import { QuizFooter, QuizScore } from './QuizChrome';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
 import type { SessionSummary } from '../types/practice';
 
@@ -200,14 +201,7 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
 
       {started && (
         <>
-          <div className="flex justify-center text-sm">
-            <div className="text-center">
-              <div className="text-dim text-xs">正解</div>
-              <div className="text-lg font-bold font-mono tabular-nums text-ink">
-                {score.correct}/{score.total}
-              </div>
-            </div>
-          </div>
+          <QuizScore correct={score.correct} total={score.total} />
 
           <div className="text-center space-y-2">
             <button
@@ -249,32 +243,13 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
         />
       </div>
 
-      {!started ? (
-        <div className="flex flex-col items-center gap-2">
-          <button
-            onClick={start}
-            className="px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
-          >
-            スタート
-          </button>
-          {onLearn && (
-            <button onClick={() => onLearn()} className="text-xs text-accent hover:opacity-80 underline">
-              はじめて？ まず学ぶ →
-            </button>
-          )}
-        </div>
-      ) : (
-        <button
-          onClick={stop}
-          className="mx-auto px-6 py-2 text-sm bg-panel text-dim border border-hair rounded-lg hover:bg-accent-soft transition-colors"
-        >
-          終了
-        </button>
-      )}
-
-      <p className="text-xs text-dim text-center text-pretty">
-        鳴っているコードに合わせて、3rd・7th（ガイドトーン）を狙う実戦課題。ガイド音はコードの色を決め、7th→3rdで滑らかに繋がる。理論を“弾ける”に変える。
-      </p>
+      <QuizFooter
+        started={started}
+        onStart={start}
+        onStop={stop}
+        onLearn={onLearn}
+        hint="鳴っているコードに合わせて、3rd・7th（ガイドトーン）を狙う実戦課題。ガイド音はコードの色を決め、7th→3rdで滑らかに繋がる。理論を“弾ける”に変える。"
+      />
     </>
   );
 }

@@ -4,6 +4,7 @@ import { INTERVAL_NAMES } from '../data/fretboard';
 import { playMidi } from '../data/audio';
 import { useSession } from '../hooks/useSession';
 import { getLastSession } from '../data/practiceStore';
+import { QuizFooter, QuizScore } from './QuizChrome';
 import { recordSkill } from '../data/skillStore';
 import { ResultScreen } from './ResultScreen';
 import type { Accidental, Feedback, IntervalName } from '../types';
@@ -176,14 +177,7 @@ export function EarTrainingQuiz({ accidental, onLearn }: EarTrainingQuizProps) {
 
       {started && q && (
         <>
-          <div className="flex justify-center text-sm">
-            <div className="text-center">
-              <div className="text-dim text-xs">正解</div>
-              <div className="text-lg font-bold font-mono tabular-nums text-ink">
-                {score.correct}/{score.total}
-              </div>
-            </div>
-          </div>
+          <QuizScore correct={score.correct} total={score.total} />
 
           <div className="text-center space-y-3">
             <button
@@ -225,33 +219,13 @@ export function EarTrainingQuiz({ accidental, onLearn }: EarTrainingQuizProps) {
         </>
       )}
 
-      {!started ? (
-        <div className="flex flex-col items-center gap-2">
-          <button
-            onClick={start}
-            className="px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
-          >
-            スタート
-          </button>
-          {onLearn && (
-            <button onClick={() => onLearn()} className="text-xs text-accent hover:opacity-80 underline">
-              はじめて？ まず学ぶ →
-            </button>
-          )}
-        </div>
-      ) : (
-        <button
-          onClick={stop}
-          className="mx-auto px-6 py-2 text-sm bg-panel text-dim border border-hair rounded-lg hover:bg-accent-soft transition-colors"
-        >
-          終了
-        </button>
-      )}
-
-      <p className="text-xs text-dim text-center text-pretty">
-        音だけを聴いて答える耳トレ。長3度=明るい、短3度=暗い…を“響き”で覚えると、視覚に頼らず演奏・耳コピに繋がる。
-        （音オフ時は設定でON）
-      </p>
+      <QuizFooter
+        started={started}
+        onStart={start}
+        onStop={stop}
+        onLearn={onLearn}
+        hint="音だけを聴いて答える耳トレ。長3度=明るい、短3度=暗い…を“響き”で覚えると、視覚に頼らず演奏・耳コピに繋がる。（音オフ時は設定でON）"
+      />
     </>
   );
 }
