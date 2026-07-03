@@ -4,10 +4,11 @@ import type { Accidental } from '../types';
 interface MistakeClinicProps {
   accidental: Accidental;
   onDrill: (note: string | string[]) => void;
+  onDrillString: (string: number) => void;
 }
 
 /** 弱点を言語化して見せる診断カード。データが乏しければ何も出さない。 */
-export function MistakeClinic({ accidental, onDrill }: MistakeClinicProps) {
+export function MistakeClinic({ accidental, onDrill, onDrillString }: MistakeClinicProps) {
   const diags = diagnose(accidental);
   if (diags.length === 0) return null;
 
@@ -31,6 +32,13 @@ export function MistakeClinic({ accidental, onDrill }: MistakeClinicProps) {
                 className="shrink-0 text-accent text-xs hover:opacity-80 whitespace-nowrap"
               >
                 練習 →
+              </button>
+            ) : d.drillString != null ? (
+              <button
+                onClick={() => onDrillString(d.drillString!)}
+                className="shrink-0 text-accent text-xs hover:opacity-80 whitespace-nowrap"
+              >
+                この弦を練習 →
               </button>
             ) : null}
           </li>

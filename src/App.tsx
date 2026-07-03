@@ -359,6 +359,21 @@ function App() {
     start('note-to-position', quiz.rootNote, scope, true);
   };
 
+  // 弦ドリル: 指定の弦だけを位置→音名・弱点優先で集中練習（MistakeClinic「N弦が弱い」から）。
+  const handleStartDrillString = (string: number, count = 10) => {
+    const scope = { strings: [string], fretRange: [0, maxFret] as [number, number], noteFilter: null };
+    setSelectedStrings(scope.strings);
+    setFretRange(scope.fretRange);
+    setSelectedNotes(null);
+    setResult(null);
+    resetScore();
+    setSessionKind('challenge');
+    setSessionTarget(count);
+    session.startSession('free');
+    setView('practice');
+    start('position-to-note', quiz.rootNote, scope, true);
+  };
+
   // 今日の練習: 選んだ問題数(既定15)・位置→音名・弱点優先。Homeから起動。
   const handleStartDaily = () => {
     setResult(null);
@@ -735,7 +750,7 @@ function App() {
         )}
 
         {/* ===== 成績ビュー ===== */}
-        {view === 'stats' && <StatsPage maxFret={maxFret} accidental={accidental} onDrill={handleStartDrill} />}
+        {view === 'stats' && <StatsPage maxFret={maxFret} accidental={accidental} onDrill={handleStartDrill} onDrillString={handleStartDrillString} />}
 
         {/* ===== スケールビュー ===== */}
         {view === 'theory' && theoryTab === 'scale' && (

@@ -13,6 +13,7 @@ export interface Diagnosis {
   text: string;
   drillNote?: string; // あれば「その音を練習」できる
   drillNotes?: string[]; // 混同ペアなど複数音のドリル
+  drillString?: number; // あれば「その弦を練習」できる (0=6弦 .. 5=1弦)
 }
 
 const MIN_N = 4;
@@ -93,7 +94,11 @@ export function diagnose(accidental: Accidental): Diagnosis[] {
     const ws = worst(byString);
     if (ws && ws.acc < 0.7) {
       cand.push({
-        d: { id: 'string', text: `${6 - (ws.key as number)}弦の音名が弱い（正答率 ${Math.round(ws.acc * 100)}%）` },
+        d: {
+          id: 'string',
+          text: `${6 - (ws.key as number)}弦の音名が弱い（正答率 ${Math.round(ws.acc * 100)}%）`,
+          drillString: ws.key as number,
+        },
         sev: (1 - ws.acc) * 0.9,
       });
     }
