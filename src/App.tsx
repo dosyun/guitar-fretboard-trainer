@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Fretboard } from './components/Fretboard';
-import { FretboardMap } from './components/FretboardMap';
 import { NoteSelector } from './components/NoteSelector';
 import { IntervalSelector } from './components/IntervalSelector';
 import { ModeSelector } from './components/ModeSelector';
@@ -8,31 +7,36 @@ import { RootSelector } from './components/RootSelector';
 import { ScoreBoard } from './components/ScoreBoard';
 import { SettingsPanel } from './components/SettingsPanel';
 import { PracticeRangeSelector } from './components/PracticeRangeSelector';
-import { CagedMap } from './components/CagedMap';
 import { CagedFormSelector } from './components/CagedFormSelector';
 import { CagedLegend } from './components/CagedLegend';
-import { CagedQuiz } from './components/CagedQuiz';
-import { VoicingPage } from './components/VoicingPage';
-import { DiatonicPage } from './components/DiatonicPage';
-import { ArpeggioPage } from './components/ArpeggioPage';
-import { OpenChordPage } from './components/OpenChordPage';
 import { HelpPage } from './components/HelpPage';
+import { AboutPage } from './components/AboutPage';
 import { HomePage } from './components/HomePage';
 import { ResultScreen } from './components/ResultScreen';
-import { TriadBuilder } from './components/TriadBuilder';
-import { KeyFunctionQuiz } from './components/KeyFunctionQuiz';
-import { EarTrainingQuiz } from './components/EarTrainingQuiz';
-import { GuideToneTrainer } from './components/GuideToneTrainer';
 import { OnboardingScreen } from './components/OnboardingScreen';
 import { PwaReloadPrompt } from './components/PwaReloadPrompt';
 import { getGoal, isOnboarded, resetOnboarding } from './data/goal';
 import type { Goal } from './data/goal';
-import { ChordToneQuiz } from './components/ChordToneQuiz';
-import { ChordProgressionQuiz } from './components/ChordProgressionQuiz';
-import { LessonsPage } from './components/LessonsPage';
-import { StatsPage } from './components/StatsPage';
-import { ScaleMap } from './components/ScaleMap';
-import { ScaleQuiz } from './components/ScaleQuiz';
+
+// 初期ロードに不要な画面は遅延ロード（理論タブ・成績・専門クイズ）。
+// 名前付きエクスポートを default に射影して lazy() に渡す。
+const FretboardMap = lazy(() => import('./components/FretboardMap').then((m) => ({ default: m.FretboardMap })));
+const CagedMap = lazy(() => import('./components/CagedMap').then((m) => ({ default: m.CagedMap })));
+const CagedQuiz = lazy(() => import('./components/CagedQuiz').then((m) => ({ default: m.CagedQuiz })));
+const VoicingPage = lazy(() => import('./components/VoicingPage').then((m) => ({ default: m.VoicingPage })));
+const DiatonicPage = lazy(() => import('./components/DiatonicPage').then((m) => ({ default: m.DiatonicPage })));
+const ArpeggioPage = lazy(() => import('./components/ArpeggioPage').then((m) => ({ default: m.ArpeggioPage })));
+const OpenChordPage = lazy(() => import('./components/OpenChordPage').then((m) => ({ default: m.OpenChordPage })));
+const TriadBuilder = lazy(() => import('./components/TriadBuilder').then((m) => ({ default: m.TriadBuilder })));
+const KeyFunctionQuiz = lazy(() => import('./components/KeyFunctionQuiz').then((m) => ({ default: m.KeyFunctionQuiz })));
+const EarTrainingQuiz = lazy(() => import('./components/EarTrainingQuiz').then((m) => ({ default: m.EarTrainingQuiz })));
+const GuideToneTrainer = lazy(() => import('./components/GuideToneTrainer').then((m) => ({ default: m.GuideToneTrainer })));
+const ChordToneQuiz = lazy(() => import('./components/ChordToneQuiz').then((m) => ({ default: m.ChordToneQuiz })));
+const ChordProgressionQuiz = lazy(() => import('./components/ChordProgressionQuiz').then((m) => ({ default: m.ChordProgressionQuiz })));
+const LessonsPage = lazy(() => import('./components/LessonsPage').then((m) => ({ default: m.LessonsPage })));
+const StatsPage = lazy(() => import('./components/StatsPage').then((m) => ({ default: m.StatsPage })));
+const ScaleMap = lazy(() => import('./components/ScaleMap').then((m) => ({ default: m.ScaleMap })));
+const ScaleQuiz = lazy(() => import('./components/ScaleQuiz').then((m) => ({ default: m.ScaleQuiz })));
 import { useQuiz } from './hooks/useQuiz';
 import { useScore } from './hooks/useScore';
 import { useSession } from './hooks/useSession';
@@ -94,6 +98,7 @@ function App() {
   const [theoryTab, setTheoryTab] = useState<TheoryTab>('learn');
   const [learnOpenId, setLearnOpenId] = useState<string | undefined>(undefined);
   const [settingsShowHelp, setSettingsShowHelp] = useState(false);
+  const [settingsShowAbout, setSettingsShowAbout] = useState(false);
   const [mapDisplay, setMapDisplay] = useState<'notes' | 'intervals'>('notes');
   const [mapRoot, setMapRoot] = useState<NoteName>('C');
   const [maxFret, setMaxFret] = useState(12);
@@ -310,8 +315,17 @@ function App() {
 
   // レッスンの「見る/練習する」導線: 理論サブタブ or 練習モードへ。
   const handleLessonGoto = (target: string) => {
-    if (target === 'practice-chord') { setPracticeMode('chord-tone'); setResult(null); setView('practice'); }
-    else if (target === 'practice-prog') { setPracticeMode('progression'); setResult(null); setView('practice'); }
+    const practiceTarget: Record<string, PracticeMode> = {
+      'practice-chord': 'chord-tone',
+      'practice-prog': 'progression',
+      'practice-triad': 'triad',
+      'practice-keyfunc': 'key-func',
+      'practice-ear': 'ear',
+      'practice-guide': 'guide',
+      'practice-basic': 'basic',
+    };
+    const pm = practiceTarget[target];
+    if (pm) { setPracticeMode(pm); setResult(null); setView('practice'); }
     else setTheoryTab(target as TheoryTab);
   };
 
@@ -413,6 +427,13 @@ function App() {
 
       {/* 主ナビは画面下部（モバイルの親指リーチ）。BottomNav は末尾に固定配置 */}
       <div className="flex-1 flex flex-col gap-3 px-4 pt-3 pb-24 w-full">
+        <Suspense
+          fallback={
+            <div className="flex-1 flex items-center justify-center py-24 text-dim text-sm" role="status" aria-live="polite">
+              読み込み中…
+            </div>
+          }
+        >
 
         {/* ===== ホームビュー ===== */}
         {view === 'home' && !onboarded && (
@@ -942,17 +963,25 @@ function App() {
                 }
               }}
             />
-            <div className="flex justify-center">
+            <div className="flex justify-center gap-4">
               <button
-                onClick={() => setSettingsShowHelp((v) => !v)}
+                onClick={() => { setSettingsShowHelp((v) => !v); setSettingsShowAbout(false); }}
                 className="text-sm text-accent hover:opacity-80 underline"
               >
                 {settingsShowHelp ? '使い方ガイドを閉じる' : '使い方ガイドを開く'}
               </button>
+              <button
+                onClick={() => { setSettingsShowAbout((v) => !v); setSettingsShowHelp(false); }}
+                className="text-sm text-accent hover:opacity-80 underline"
+              >
+                {settingsShowAbout ? 'アプリについて閉じる' : 'アプリについて'}
+              </button>
             </div>
             {settingsShowHelp && <HelpPage />}
+            {settingsShowAbout && <AboutPage />}
           </div>
         )}
+        </Suspense>
       </div>
 
       <BottomNav view={view} onChange={setView} />

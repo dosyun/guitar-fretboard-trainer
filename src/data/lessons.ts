@@ -181,7 +181,7 @@ export const LESSONS: Lesson[] = [
       { q: 'メジャートライアドの構成は？', choices: ['R ♭3 5', 'R 3 5', 'R 3 ♭5'], answer: 1, why: '長3度＝メジャー(明るい)。' },
       { q: 'C メジャーの3度の音は？', choices: ['E♭', 'E', 'G'], answer: 1, why: 'Cから長3度＝E。' },
     ],
-    link: { label: 'オープンコードで押さえ方を見る', target: 'open' },
+    link: { label: 'トライアドを指板で組み立てる練習へ', target: 'practice-triad' },
   },
   {
     id: 'power-chord',
@@ -264,7 +264,7 @@ export const LESSONS: Lesson[] = [
       { q: '緊張（ドミナント）のコードは？', choices: ['F', 'G', 'C'], answer: 1, why: 'V=G(G7)が緊張→I(C)へ解決したくなる。' },
       { q: 'ii-V-I の機能の流れは？', choices: ['T→SD→D', 'SD→D→T', 'D→T→SD'], answer: 1, why: 'ii(SD)→V(D)→I(T)。' },
     ],
-    link: { label: 'ダイアトニックで役割を確認', target: 'diatonic' },
+    link: { label: 'キー機能クイズで役割を答える練習へ', target: 'practice-keyfunc' },
   },
   {
     id: 'secondary-dominant',
@@ -296,6 +296,7 @@ export const LESSONS: Lesson[] = [
       { q: 'G7 の裏コード（トライトーン代理）は？', choices: ['D♭7', 'C7', 'A7'], answer: 0, why: '半音上にルートを持つ7th。トライトーンを共有。' },
       { q: '裏コードで滑らかになる動きは？', choices: ['ルートが半音で下降', 'テンポが上がる'], answer: 0 },
     ],
+    link: { label: 'ボイシングで 7th コードの形を見る', target: 'voicing' },
   },
   {
     id: 'modes',

@@ -1,6 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ConfigProvider, theme } from 'antd'
+// フォントは同梱（セルフホスト）。外部CDNへの取得＝IP送信とレンダーブロックを避ける。
+import '@fontsource/dm-mono/400.css'
+import '@fontsource/dm-mono/500.css'
 import './index.css'
 import App from './App.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary.tsx'

@@ -1,13 +1,13 @@
 # Cloudflare Pages セキュリティヘッダ（public/ は dist 直下に配置される）
 # 注意: これは vite preview では適用されない。本番デプロイ後にブラウザの
-# コンソールで CSP 違反が出ないか必ず確認すること。もしフォントやスタイルが
-# 崩れたら style-src / font-src の許可元を調整する。
+# コンソールで CSP 違反が出ないか必ず確認すること。もしスタイルが崩れたら
+# style-src を調整する。フォントは同梱(self)なので外部許可は不要。
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'
 
 # ハッシュ付きアセットは長期キャッシュ（Vite が内容ハッシュを付与）
 /assets/*

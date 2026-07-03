@@ -26,20 +26,8 @@ export default defineConfig({
         scope: '/',
       },
       workbox: {
+        // フォントも同梱(woff2)なので precache に含まれオフライン対応。外部フォント取得なし。
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
-        // Googleフォントはオフライン用にランタイムキャッシュ
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) =>
-              url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com',
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts',
-              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-        ],
       },
     }),
   ],
