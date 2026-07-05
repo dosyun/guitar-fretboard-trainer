@@ -4,7 +4,7 @@
 
 ギター指板の音名・度数を**反射で使えるようにする練習トレーナー**(React Web/PWA)。
 単なる理論ビューアではなく、1問ごとに回答時間を計測し、弱点をヒートマップで可視化する
-「練習エンジン」が中核（方針は [CONTEXT.md] と `docs/adr/`、計画は [docs/milestone-1-plan.md]）。
+「練習エンジン」が中核（方針は [CONTEXT.md] と `docs/adr/`、経緯は [docs/history.md]）。
 UIは**ダーク・スタジオ系**（エボニー指板＋白蝶貝インレイ＋琥珀アクセント、等幅データ表示）。
 Cloudflare Pages で自動デプロイ（GitHub master push → 即反映）。
 
@@ -58,7 +58,7 @@ src/
 └── App.tsx                      — 全体統合・5タブ＋理論サブナビ管理
 ```
 
-★ = M1「練習エンジン化」で追加・拡張（[docs/milestone-1-plan.md]）。
+★ = M1「練習エンジン化」で追加・拡張（経緯は [docs/history.md]）。
 
 ## タブ構成 (AppView) — Home中心5タブ
 
