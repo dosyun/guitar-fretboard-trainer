@@ -5,6 +5,7 @@ import {
   getNoteRecognitionMetrics,
   saveSession,
   getLastSession,
+  getOverallStats,
   median,
 } from './practiceStore';
 import type { PracticeAttempt, SessionSummary, QuizType } from '../types/practice';
@@ -91,6 +92,37 @@ describe('getLastSession は種目ごとに前回を返す（前回比の汚染�
     expect(getLastSession('chordtone')!.id).toBe('c2');
     expect(getLastSession('ear')!.id).toBe('e1');
     expect(getLastSession('guidetone')).toBeNull();
+  });
+});
+
+describe('getOverallStats', () => {
+  it('結果画面まで進んでいない回答も累計に含める', () => {
+    recordAttempt(attempt({ quizType: 'position-to-note', isCorrect: true, responseTimeMs: 1000 }));
+    recordAttempt(attempt({ quizType: 'position-to-note', isCorrect: false, responseTimeMs: 3000 }));
+
+    expect(getOverallStats()).toEqual({
+      count: 2,
+      correct: 1,
+      accuracy: 0.5,
+      avgMs: 2000,
+    });
+  });
+
+  it('セッション要約を保存しても回答を二重計上しない', () => {
+    recordAttempt(attempt({ quizType: 'position-to-note', isCorrect: true, responseTimeMs: 1200 }));
+    saveSession({
+      id: 's1',
+      quizType: 'position-to-note',
+      mode: 'free',
+      count: 1,
+      correct: 1,
+      avgMs: 1200,
+      medianMs: 1200,
+      startedAt: 0,
+      endedAt: 1,
+    });
+
+    expect(getOverallStats().count).toBe(1);
   });
 });
 

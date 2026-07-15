@@ -44,7 +44,8 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
   const accuracy = Math.round(overall.accuracy * 100);
 
   const hasData = sessions.length > 0 || attempts.length > 0 || metrics.length > 0;
-  const inProgress = sessions.length === 0 && attempts.length > 0; // 練習中（まだ終了していない）
+  const completedSessionIds = new Set(sessions.map((s) => s.id));
+  const unfinalizedCount = attempts.filter((attempt) => !completedSessionIds.has(attempt.sessionId)).length;
 
   return (
     <div className="max-w-2xl mx-auto w-full space-y-5">
@@ -62,14 +63,14 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
         </div>
       ) : (
         <>
-          {inProgress && (
+          {unfinalizedCount > 0 && (
             <div className="bg-accent-soft border border-accent rounded-xl px-4 py-3 text-sm text-pretty">
-              <span className="text-accent font-medium">練習中の記録があります。</span>
-              <span className="text-dim"> 「終了」すると結果画面に記録され、推移グラフにも反映されます。</span>
+              <span className="text-accent font-medium">結果にまとめていない回答が{unfinalizedCount}問あります。</span>
+              <span className="text-dim"> 累計と弱点分析には反映済みです。</span>
             </div>
           )}
 
-          {/* サマリ readout（完了セッションがあるときのみ。練習中は上の案内を出す） */}
+          {/* サマリ readout（回答ログ基準。途中で閉じた回答も「解いた1問」に含める） */}
           {overall.count > 0 && (
             <div className="grid grid-cols-3 gap-2 text-center">
               <Stat label="累計問題数" value={`${overall.count}`} />

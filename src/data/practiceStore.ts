@@ -190,15 +190,15 @@ export interface OverallStats {
 }
 
 /**
- * Home / Stats 共通の全体サマリ。**完了済みセッション基準**で統一する。
- * (以前は Home=セッション合計 / Stats=生ログ件数 と定義が食い違い、
- *  同じラベルで数字がズレていた)。3指標とも同じ母集団=完了セッション。
+ * Home / Stats 共通の全体サマリ。実際に回答した全ログを母集団にする。
+ * セッションは結果画面・推移・前回比のまとまりであり、途中で画面を閉じた回答も
+ * 「解いた1問」として累計・正答率・平均反応に含める。
  */
 export function getOverallStats(): OverallStats {
-  const sessions = getAllSessions();
-  const count = sessions.reduce((a, s) => a + s.count, 0);
-  const correct = sessions.reduce((a, s) => a + s.correct, 0);
-  const sumMs = sessions.reduce((a, s) => a + s.avgMs * s.count, 0);
+  const attempts = getAllAttempts();
+  const count = attempts.length;
+  const correct = attempts.filter((a) => a.isCorrect).length;
+  const sumMs = attempts.reduce((a, attempt) => a + attempt.responseTimeMs, 0);
   return {
     count,
     correct,

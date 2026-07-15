@@ -10,6 +10,7 @@ interface PracticeRangeSelectorProps {
   onStringsChange: (strings: number[]) => void;
   onFretRangeChange: (range: [number, number]) => void;
   onNotesChange: (notes: string[] | null) => void;
+  embedded?: boolean;
 }
 
 const STRING_LABELS = ['6弦(E)', '5弦(A)', '4弦(D)', '3弦(G)', '2弦(B)', '1弦(E)'];
@@ -27,6 +28,7 @@ export function PracticeRangeSelector({
   onStringsChange,
   onFretRangeChange,
   onNotesChange,
+  embedded = false,
 }: PracticeRangeSelectorProps) {
   const allNotes = getNoteNames(accidental);
 
@@ -63,7 +65,7 @@ export function PracticeRangeSelector({
     selectedNotes === null || selectedNotes.includes(note);
 
   return (
-    <div className="space-y-3 bg-surface rounded-lg p-3 border border-hair">
+    <div className={`space-y-3 p-3 ${embedded ? '' : 'bg-surface rounded-lg border border-hair'}`}>
       <div className="text-sm font-medium text-dim">練習範囲</div>
 
       {/* 弦の選択 */}

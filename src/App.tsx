@@ -1,5 +1,5 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
-import { Fretboard } from './components/Fretboard';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { Fretboard, PinnedStringLabels } from './components/Fretboard';
 import { NoteSelector } from './components/NoteSelector';
 import { IntervalSelector } from './components/IntervalSelector';
 import { ModeSelector } from './components/ModeSelector';
@@ -59,6 +59,20 @@ import './index.css';
 type AppView = 'home' | 'practice' | 'theory' | 'stats' | 'settings';
 type TheoryTab = 'learn' | 'map' | 'scale' | 'caged' | 'voicing' | 'open' | 'diatonic' | 'arpeggio';
 
+function practiceRangeSummary(
+  strings: number[],
+  fretRange: [number, number],
+  notes: string[] | null,
+): string {
+  const stringLabel = strings.length === 6
+    ? '全弦'
+    : strings.map((s) => `${6 - s}弦`).join('・');
+  const noteLabel = notes === null
+    ? '全音'
+    : notes.length <= 3 ? notes.join('・') : `${notes.length}音`;
+  return `${stringLabel} / ${fretRange[0]}〜${fretRange[1]}F / ${noteLabel}`;
+}
+
 // 理論ビューの1行解説（“調べる”を“分かる”に）
 const THEORY_INTRO: Record<TheoryTab, string> = {
   learn: '',
@@ -107,6 +121,7 @@ function App() {
   const [selectedStrings, setSelectedStrings] = useState<number[]>([0, 1, 2, 3, 4, 5]);
   const [fretRange, setFretRange] = useState<[number, number]>([0, 12]);
   const [selectedNotes, setSelectedNotes] = useState<string[] | null>(null);
+  const fretboardScrollRef = useRef<HTMLDivElement>(null);
 
   // CAGED state
   const [cagedSubView, setCagedSubView] = useState<'display' | 'quiz'>('display');
@@ -437,6 +452,7 @@ function App() {
       maxFret={maxFret}
       accidental={accidental}
       selectedNotes={selectedNotes}
+      embedded
       onStringsChange={(s) => { setSelectedStrings(s); if (started) { start(quiz.mode, quiz.rootNote); session.startSession('free'); } resetScore(); }}
       onFretRangeChange={(r) => { setFretRange(r); if (started) { start(quiz.mode, quiz.rootNote); session.startSession('free'); } resetScore(); }}
       onNotesChange={(n) => { setSelectedNotes(n); if (started) { start(quiz.mode, quiz.rootNote); session.startSession('free'); } resetScore(); }}
@@ -445,7 +461,7 @@ function App() {
 
   return (
     <div className="min-h-dvh flex flex-col bg-bg">
-      <PwaReloadPrompt />
+      <PwaReloadPrompt deferReload={view === 'practice'} />
       <header
         className="bg-surface border-b border-hair py-3 px-4"
         style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top))' }}
@@ -631,7 +647,7 @@ function App() {
           />
         )}
         {view === 'practice' && practiceMode === 'basic' && !result && (
-          <>
+          <div className="max-w-2xl mx-auto w-full flex flex-col gap-3">
             <ModeSelector
               current={quiz.mode}
               onChange={(mode) => { setMode(mode); resetScore(); restartSession(); }}
@@ -683,16 +699,20 @@ function App() {
               </div>
             )}
 
-            <div className="overflow-x-auto bg-surface rounded-xl border border-hair p-2">
-              <Fretboard
-                maxFret={maxFret}
-                accidental={accidental}
-                highlightPosition={quiz.currentPosition}
-                feedback={quiz.feedback}
-                correctPositions={correctPositions}
-                showLabelAt={showLabelAt}
-                onPositionClick={started && quiz.mode === 'note-to-position' ? handlePositionClick : undefined}
-              />
+            <div className="relative bg-surface rounded-xl border border-hair">
+              <div ref={fretboardScrollRef} className="overflow-x-auto p-2">
+                <Fretboard
+                  maxFret={maxFret}
+                  accidental={accidental}
+                  highlightPosition={quiz.currentPosition}
+                  feedback={quiz.feedback}
+                  correctPositions={correctPositions}
+                  showLabelAt={showLabelAt}
+                  onPositionClick={started && quiz.mode === 'note-to-position' ? handlePositionClick : undefined}
+                  scrollContainerRef={fretboardScrollRef}
+                />
+              </div>
+              <PinnedStringLabels />
             </div>
 
             {started && quiz.mode === 'position-to-note' && (
@@ -750,19 +770,26 @@ function App() {
               </div>
             )}
 
-            {started ? (
-              <details className="group border border-hair rounded-xl bg-surface">
-                <summary className="cursor-pointer list-none px-4 py-2 text-sm text-dim hover:text-ink flex items-center justify-between">
-                  <span className="group-open:hidden">練習範囲を変更</span>
-                  <span className="hidden group-open:inline">練習範囲を閉じる</span>
-                  <span className="text-xs transition-transform group-open:rotate-180">▾</span>
-                </summary>
-                <div className="px-2 pb-2">{practiceRangeSelector}</div>
-              </details>
-            ) : (
-              practiceRangeSelector
-            )}
-          </>
+            <details className="group border border-hair rounded-xl bg-surface">
+              <summary className="cursor-pointer list-none px-4 py-2.5 text-sm text-dim hover:text-ink flex items-center justify-between gap-3">
+                <span className="group-open:hidden min-w-0">
+                  {started ? (
+                    '練習範囲を変更'
+                  ) : (
+                    <span className="flex items-center gap-2 min-w-0">
+                      <span className="shrink-0">練習範囲</span>
+                      <span className="text-ink font-mono text-xs truncate">
+                        {practiceRangeSummary(selectedStrings, fretRange, selectedNotes)}
+                      </span>
+                    </span>
+                  )}
+                </span>
+                <span className="hidden group-open:inline">練習範囲を閉じる</span>
+                <span className="text-xs transition-transform group-open:rotate-180" aria-hidden="true">▾</span>
+              </summary>
+              <div className="border-t border-hair">{practiceRangeSelector}</div>
+            </details>
+          </div>
         )}
 
         {/* ===== 成績ビュー ===== */}

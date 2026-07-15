@@ -9,7 +9,7 @@ interface IntervalSelectorProps {
 
 export function IntervalSelector({ feedback, correctAnswer, onSelect }: IntervalSelectorProps) {
   return (
-    <div className="grid grid-cols-4 gap-2 max-w-sm mx-auto">
+    <div className="grid grid-cols-4 gap-2 max-w-sm w-full mx-auto">
       {INTERVAL_NAMES.map((interval) => {
         const isCorrectHighlight = feedback === 'wrong' && interval === correctAnswer;
         return (

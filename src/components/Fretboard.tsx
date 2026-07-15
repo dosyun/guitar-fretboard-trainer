@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import { FretMarker } from './FretMarker';
 import { getOpenStringName, getNoteAt, getMidiAt } from '../data/fretboard';
 import { playMidi } from '../data/audio';
@@ -13,6 +13,7 @@ interface FretboardProps {
   correctPositions?: FretPosition[];
   showLabelAt?: (stringIndex: number, fret: number) => string | undefined;
   onPositionClick?: (pos: FretPosition) => void;
+  scrollContainerRef?: RefObject<HTMLElement | null>;
 }
 
 // レイアウト定数
@@ -28,6 +29,34 @@ const NUT_WIDTH = 4;
 const SINGLE_DOTS = [3, 5, 7, 9];
 const DOUBLE_DOT = 12;
 
+/** 横スクロール後も残す、スマホ用の弦名オーバーレイ。 */
+export function PinnedStringLabels() {
+  return (
+    <svg
+      viewBox={`0 0 ${PADDING_LEFT} ${PADDING_TOP + STRING_SPACING * 5 + PADDING_BOTTOM}`}
+      className="pointer-events-none absolute left-2 top-2 h-[calc(100%-1rem)] w-10 sm:hidden"
+      preserveAspectRatio="xMinYMid meet"
+      aria-hidden="true"
+    >
+      {Array.from({ length: 6 }, (_, s) => (
+        <text
+          key={s}
+          x={16}
+          y={PADDING_TOP + STRING_SPACING * (5 - s)}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize={10}
+          fill={BOARD.stringLabel}
+          fontWeight={500}
+          style={{ paintOrder: 'stroke', stroke: 'var(--surface)', strokeWidth: 3, strokeLinejoin: 'round' }}
+        >
+          {getOpenStringName(s)}
+        </text>
+      ))}
+    </svg>
+  );
+}
+
 export function Fretboard({
   maxFret,
   accidental,
@@ -36,6 +65,7 @@ export function Fretboard({
   correctPositions,
   showLabelAt,
   onPositionClick,
+  scrollContainerRef,
 }: FretboardProps) {
   const totalWidth = PADDING_LEFT + NUT_WIDTH + FRET_WIDTH * maxFret + PADDING_RIGHT;
   const totalHeight = PADDING_TOP + STRING_SPACING * 5 + PADDING_BOTTOM;
@@ -57,16 +87,21 @@ export function Fretboard({
   const hlFret = highlightPosition?.fret;
   useEffect(() => {
     if (hlFret == null || !svgRef.current) return;
-    let el: HTMLElement | null = svgRef.current.parentElement;
-    while (el && el.scrollWidth <= el.clientWidth + 1) el = el.parentElement;
-    if (!el) return;
-    const renderedWidth = svgRef.current.getBoundingClientRect().width;
-    const xPx = (posX(hlFret) / totalWidth) * renderedWidth;
-    // reduced-motion のときは瞬間移動（プログラム的スクロールにCSS抑制は効かないため）
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    el.scrollTo({ left: xPx - el.clientWidth / 2, behavior: reduce ? 'auto' : 'smooth' });
+    const frame = window.requestAnimationFrame(() => {
+      let el: HTMLElement | null = scrollContainerRef?.current ?? svgRef.current?.parentElement ?? null;
+      while (el && el.scrollWidth <= el.clientWidth + 1) el = el.parentElement;
+      if (!el || !svgRef.current) return;
+
+      const renderedWidth = svgRef.current.getBoundingClientRect().width;
+      const xPx = (posX(hlFret) / totalWidth) * renderedWidth;
+      const maxLeft = Math.max(0, el.scrollWidth - el.clientWidth);
+      const targetLeft = Math.min(maxLeft, Math.max(0, xPx - el.clientWidth / 2));
+      const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      el.scrollTo({ left: targetLeft, behavior: reduce ? 'auto' : 'smooth' });
+    });
+    return () => window.cancelAnimationFrame(frame);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hlString, hlFret]);
+  }, [hlString, hlFret, scrollContainerRef, totalWidth]);
 
   const isHighlighted = (s: number, f: number) =>
     highlightPosition?.string === s && highlightPosition?.fret === f;

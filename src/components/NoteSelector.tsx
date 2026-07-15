@@ -13,7 +13,7 @@ export function NoteSelector({ accidental, feedback, correctAnswer, onSelect }: 
   const notes = getNoteNames(accidental);
 
   return (
-    <div className="grid grid-cols-4 gap-2 max-w-sm mx-auto">
+    <div className="grid grid-cols-4 gap-2 max-w-sm w-full mx-auto">
       {notes.map((note) => {
         const isCorrectHighlight =
           feedback === 'wrong' && correctAnswer !== null && sameNote(note, correctAnswer);

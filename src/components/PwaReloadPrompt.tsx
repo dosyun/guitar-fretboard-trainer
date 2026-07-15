@@ -1,18 +1,25 @@
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
+interface PwaReloadPromptProps {
+  /** 練習画面では更新によるリロードを出さず、別画面へ移ってから再表示する。 */
+  deferReload?: boolean;
+}
+
 /** 新しい版が出たときに「更新」トーストを出す（autoUpdateの旧版掴み対策）。 */
-export function PwaReloadPrompt() {
+export function PwaReloadPrompt({ deferReload = false }: PwaReloadPromptProps) {
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
   } = useRegisterSW();
 
-  if (!needRefresh) return null;
+  if (!needRefresh || deferReload) return null;
 
   return (
     <div
-      className="fixed inset-x-0 z-50 flex justify-center px-4"
-      style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom))' }}
+      className="fixed inset-x-0 z-overlay flex justify-center px-4"
+      style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom))' }}
+      role="status"
+      aria-live="polite"
     >
       <div className="flex items-center gap-3 bg-surface border border-accent rounded-xl px-4 py-3 shadow-lg max-w-md w-full">
         <span className="flex-1 text-sm text-ink">新しい版があります。</span>
