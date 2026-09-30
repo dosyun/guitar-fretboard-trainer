@@ -10,7 +10,7 @@ export function ScoreBoard({ score }: ScoreBoardProps) {
     : 0;
 
   return (
-    <div className="flex justify-center gap-6 text-sm">
+    <div className="grid grid-cols-4 divide-x divide-hair rounded-lg bg-bg py-4 text-sm">
       <div className="text-center">
         <div className="text-dim text-xs">正解率</div>
         <div className="text-lg font-bold font-mono tabular-nums text-ink">

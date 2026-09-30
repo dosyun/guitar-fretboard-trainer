@@ -64,6 +64,14 @@ a,
   font-feature-settings: 'tnum' 1;
 }
 
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+[role='button']:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
 /* 指板セルのキーボードフォーカス可視化（SVG内 role=button） */
 .fret-cell {
   outline: none;
@@ -114,6 +122,10 @@ a,
 }
 .ant-segmented-item-label {
   font-weight: 600 !important;
+  min-height: 48px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
 }
 
 /* モーション配慮 (baseline-ui) */

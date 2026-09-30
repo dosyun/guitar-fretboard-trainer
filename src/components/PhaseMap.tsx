@@ -7,8 +7,8 @@ interface PhaseMapProps {
 
 export function PhaseMap({ onStartPhase }: PhaseMapProps) {
   return (
-    <div className="space-y-2">
-      <h2 className="text-sm font-medium text-ink">学習マップ</h2>
+    <div className="space-y-4">
+      <h2 className="text-base font-semibold text-ink">学習マップ</h2>
       <ul className="space-y-2">
         {PHASES.map((p, i) => {
           const st = computePhaseStatus(p);
@@ -16,16 +16,19 @@ export function PhaseMap({ onStartPhase }: PhaseMapProps) {
             <li key={p.id}>
               <button
                 onClick={() => onStartPhase(p)}
-                className="w-full text-left bg-surface border border-hair rounded-xl px-4 py-3 space-y-2 hover:bg-panel transition-colors"
+                className="w-full text-left bg-surface border border-hair rounded-xl p-4 flex items-start gap-4 hover:bg-panel"
               >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm text-ink font-medium">
-                    <span className="font-mono text-dim mr-2">{i + 1}</span>
+                <span className="size-12 shrink-0 flex items-center justify-center rounded-lg bg-bg border border-hair text-accent text-xl font-mono tabular-nums" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="flex-1 min-w-0 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-sm text-ink font-semibold">
                     {p.title}
                   </span>
                   <Badge st={st} />
                 </div>
-                <div className="h-1.5 rounded-full bg-bg overflow-hidden">
+                <div className="h-1 rounded-full bg-bg overflow-hidden">
                   <div
                     className="h-full rounded-full"
                     style={{
@@ -34,7 +37,7 @@ export function PhaseMap({ onStartPhase }: PhaseMapProps) {
                     }}
                   />
                 </div>
-                <div className="flex items-center justify-between text-[11px] text-dim">
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-dim">
                   <span>{p.scope}</span>
                   {st.started ? (
                     <span className="font-mono tabular-nums">
@@ -45,6 +48,7 @@ export function PhaseMap({ onStartPhase }: PhaseMapProps) {
                       目標 {Math.round(p.targetAcc * 100)}% / {(p.targetMs / 1000).toFixed(1)}s
                     </span>
                   )}
+                </div>
                 </div>
               </button>
             </li>
@@ -58,20 +62,20 @@ export function PhaseMap({ onStartPhase }: PhaseMapProps) {
 function Badge({ st }: { st: PhaseStatus }) {
   if (st.clear) {
     return (
-      <span className="shrink-0 text-[11px] font-medium text-correct bg-panel border border-hair rounded-full px-2 py-0.5">
+      <span className="shrink-0 text-xs font-medium text-correct bg-panel border border-hair rounded-full px-2 py-1">
         ✓ クリア
       </span>
     );
   }
   if (st.started) {
     return (
-      <span className="shrink-0 text-[11px] font-medium text-accent bg-accent-soft border border-accent rounded-full px-2 py-0.5">
+      <span className="shrink-0 text-xs font-medium text-accent bg-accent-soft border border-accent rounded-full px-2 py-1">
         挑戦中
       </span>
     );
   }
   return (
-    <span className="shrink-0 text-[11px] text-dim bg-panel border border-hair rounded-full px-2 py-0.5">
+    <span className="shrink-0 text-xs text-dim bg-panel border border-hair rounded-full px-2 py-1">
       未着手
     </span>
   );

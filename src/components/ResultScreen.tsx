@@ -54,9 +54,9 @@ export function ResultScreen({
   const weakNote = weakest ? getNoteAt(weakest.pos.string, weakest.pos.fret, accidental) : null;
 
   return (
-    <div className="max-w-md mx-auto w-full bg-surface border border-hair rounded-2xl p-6 space-y-6">
+    <div className="mx-auto w-full max-w-2xl bg-surface border border-hair rounded-2xl p-6 sm:p-8 space-y-8">
       <div
-        className="font-mono text-xs tracking-widest flex items-center gap-2"
+        className="text-sm font-medium flex items-center gap-2"
         style={{ color: cleared ? 'var(--correct)' : 'var(--accent)' }}
       >
         <span
@@ -64,18 +64,18 @@ export function ResultScreen({
           style={{ background: cleared ? 'var(--correct)' : 'var(--accent)' }}
           aria-hidden="true"
         />
-        {challenge ? (cleared ? 'CHALLENGE CLEAR' : 'CHALLENGE') : 'SESSION COMPLETE'}
+        {challenge ? (cleared ? 'チャレンジ クリア' : 'チャレンジ結果') : '練習の結果'}
       </div>
 
       {/* チャレンジ クリア判定 */}
       {challenge && (
         cleared ? (
-          <div className="text-center py-1">
-            <div className="text-3xl font-bold" style={{ color: 'var(--correct)' }}>✓ クリア！</div>
+          <div className="text-center py-4">
+            <div className="text-2xl font-semibold" style={{ color: 'var(--correct)' }}>✓ クリア！</div>
             <div className="text-dim text-sm mt-1 font-mono tabular-nums">{summary.count}問 全問正解</div>
           </div>
         ) : (
-          <div className="text-center py-1">
+          <div className="text-center py-4">
             <div className="text-2xl font-bold text-ink font-mono tabular-nums">
               {summary.correct}/{summary.count}
             </div>
@@ -85,7 +85,7 @@ export function ResultScreen({
       )}
 
       {/* 主要指標 readout */}
-      <div className="grid grid-cols-3 gap-2 text-center">
+      <div className="grid grid-cols-3 gap-3 sm:gap-4 text-center">
         <Stat label="正答率" value={`${accuracy}%`} />
         <Stat label="問題数" value={`${summary.count}`} />
         <Stat label="平均" value={sec(summary.avgMs)} />
@@ -93,7 +93,7 @@ export function ResultScreen({
 
       {/* 中央値・前回比（十分な問題数のときだけ。少数だと誤差が大きいため出さない） */}
       {summary.count >= MIN_COMPARE ? (
-        <div className="space-y-2 text-sm">
+        <div className="space-y-4 rounded-xl bg-panel p-4 text-sm">
           <Row label="中央値">
             <span className="font-mono tabular-nums text-ink">{sec(summary.medianMs)}</span>
           </Row>
@@ -112,14 +112,14 @@ export function ResultScreen({
           </Row>
         </div>
       ) : (
-        <p className="text-dim text-xs text-center text-pretty">
+        <p className="text-dim text-sm leading-relaxed text-center text-pretty">
           {summary.count}問の記録。{MIN_COMPARE}問以上つづけると中央値・前回比が出ます。
         </p>
       )}
 
       {/* 次の一手: 一番弱い場所をその場で潰す（主導線・音名認識のみ） */}
       {showDrill && weakest && weakNote && (
-        <div className="space-y-2 pt-1">
+        <div className="space-y-4 border-t border-hair pt-6">
           <Row label="一番弱い">
             <span className="font-mono text-ink">
               {6 - weakest.pos.string}弦 {weakest.pos.fret}F（{weakNote}）
@@ -127,7 +127,7 @@ export function ResultScreen({
           </Row>
           <button
             onClick={() => onDrill?.(weakNote)}
-            className="w-full px-4 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
+            className="min-h-12 w-full px-4 py-3 bg-accent text-bg text-sm font-semibold rounded-xl hover:opacity-90 active:opacity-80"
           >
             「{weakNote}」を10問だけ練習
           </button>
@@ -135,10 +135,10 @@ export function ResultScreen({
       )}
 
       {/* アクション */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-3">
         <button
           onClick={onRestart}
-          className={`flex-1 px-4 py-3 rounded-lg transition-colors ${
+          className={`min-h-12 flex-1 px-4 py-3 rounded-xl text-sm ${
             showDrill && weakest
               ? 'bg-panel text-ink border border-hair hover:bg-accent-soft'
               : 'bg-accent text-bg font-semibold hover:opacity-90 active:opacity-80'
@@ -148,7 +148,7 @@ export function ResultScreen({
         </button>
         <button
           onClick={onClose}
-          className="px-5 py-3 bg-panel text-dim border border-hair rounded-lg hover:bg-accent-soft transition-colors"
+          className="min-h-12 px-6 py-3 text-sm text-dim rounded-xl hover:bg-panel hover:text-ink"
         >
           終了
         </button>
@@ -159,16 +159,16 @@ export function ResultScreen({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-panel rounded-xl py-4 border border-hair">
-      <div className="font-mono tabular-nums text-2xl font-medium text-ink text-balance">{value}</div>
-      <div className="text-dim text-xs mt-1">{label}</div>
+    <div className="bg-panel rounded-xl px-2 py-6 sm:px-4">
+      <div className="font-mono tabular-nums text-2xl sm:text-4xl font-medium text-ink text-balance">{value}</div>
+      <div className="text-dim text-xs mt-3">{label}</div>
     </div>
   );
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-wrap items-center justify-between gap-3">
       <span className="text-dim">{label}</span>
       {children}
     </div>

@@ -48,16 +48,21 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
   const unfinalizedCount = attempts.filter((attempt) => !completedSessionIds.has(attempt.sessionId)).length;
 
   return (
-    <div className="max-w-2xl mx-auto w-full space-y-5">
-      <div className="font-mono text-xs tracking-widest text-accent flex items-center gap-2">
+    <div className="mx-auto w-full max-w-5xl min-w-0 space-y-8">
+      <div className="text-xs font-medium text-dim flex items-center gap-2">
         <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true" />
-        STATS
+        練習の記録
+      </div>
+
+      <div className="space-y-4">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">成績と弱点</h1>
+        <p className="text-sm leading-relaxed text-dim">練習の手応えを確かめて、次に練習する音を見つけましょう。</p>
       </div>
 
       {!hasData ? (
         <div className="bg-surface border border-hair rounded-2xl p-8 text-center space-y-3">
-          <p className="text-ink font-medium text-balance">まだ練習記録がありません</p>
-          <p className="text-dim text-sm text-pretty">
+          <p className="text-lg text-ink font-semibold text-balance">まだ練習記録がありません</p>
+          <p className="text-dim text-sm leading-relaxed text-pretty">
             クイズで音名を練習すると、ここに正答率・反応速度・指板の弱点ヒートマップが表示されます。
           </p>
         </div>
@@ -72,7 +77,7 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
 
           {/* サマリ readout（回答ログ基準。途中で閉じた回答も「解いた1問」に含める） */}
           {overall.count > 0 && (
-            <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="grid grid-cols-3 gap-3 sm:gap-4 text-center">
               <Stat label="累計問題数" value={`${overall.count}`} />
               <Stat label="総合正答率" value={`${accuracy}%`} />
               <Stat label="平均反応" value={sec(overall.avgMs)} />
@@ -80,10 +85,12 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
           )}
 
           {/* 指板習熟度 */}
-          <MasteryBar maxFret={maxFret} accidental={accidental} />
+          <div className="grid items-start gap-4 md:grid-cols-2">
+            <div className="min-w-0"><MasteryBar maxFret={maxFret} accidental={accidental} /></div>
 
           {/* スキルマップ（種類別の正答率） */}
-          <SkillMap />
+            <div className="min-w-0"><SkillMap /></div>
+          </div>
 
           {/* 弱点診断（言語化） */}
           <MistakeClinic accidental={accidental} onDrill={onDrill} onDrillString={onDrillString} onDrillFret={onDrillFret} />
@@ -92,9 +99,9 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
           {sessions.length > 0 && <ProgressChart sessions={sessions} />}
 
           {/* ヒートマップ（総合/誤答/遅さ 切替） */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="text-sm font-medium text-ink">指板ヒートマップ</h2>
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <h2 className="text-lg font-semibold text-ink">指板ヒートマップ</h2>
               <Segmented
                 size="small"
                 value={heatMetric}
@@ -106,20 +113,20 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
                 ]}
               />
             </div>
-            <div className="flex items-center justify-between gap-2 text-xs text-dim">
+            <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-dim">
               <span className="text-pretty">{HEAT_HINT[heatMetric]}</span>
               <Legend />
             </div>
-            <div className="bg-surface rounded-xl border border-hair p-2 overflow-x-auto">
-              <FretboardHeatmap maxFret={maxFret} accidental={accidental} metric={heatMetric} />
+            <div className="min-w-0 bg-surface rounded-2xl border border-hair p-4 overflow-x-auto">
+              <div className="min-w-[640px]"><FretboardHeatmap maxFret={maxFret} accidental={accidental} metric={heatMetric} /></div>
             </div>
           </div>
 
           {/* 度数の弱点（度数モード） */}
           {degreeWorst.length > 0 && (
-            <div className="space-y-2">
-              <h2 className="text-sm font-medium text-ink">度数の弱点（度数モード）</h2>
-              <ul className="space-y-1.5">
+            <div className="space-y-4 rounded-2xl border border-hair bg-surface p-6">
+              <h2 className="text-lg font-semibold text-ink">度数の弱点（度数モード）</h2>
+              <ul className="space-y-4">
                 {degreeWorst.map((d) => {
                   const w = degreeWeak(d);
                   return (
@@ -148,9 +155,9 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-surface rounded-xl py-4 border border-hair">
-      <div className="font-mono tabular-nums text-2xl font-medium text-ink">{value}</div>
-      <div className="text-dim text-xs mt-1">{label}</div>
+    <div className="bg-surface rounded-2xl px-2 py-6 sm:px-6 border border-hair">
+      <div className="font-mono tabular-nums text-2xl sm:text-4xl font-medium text-ink">{value}</div>
+      <div className="text-dim text-xs mt-3">{label}</div>
     </div>
   );
 }

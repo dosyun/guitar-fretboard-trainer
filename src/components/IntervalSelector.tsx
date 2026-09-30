@@ -9,7 +9,7 @@ interface IntervalSelectorProps {
 
 export function IntervalSelector({ feedback, correctAnswer, onSelect }: IntervalSelectorProps) {
   return (
-    <div className="grid grid-cols-4 gap-2 max-w-sm w-full mx-auto">
+    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-w-xl w-full mx-auto">
       {INTERVAL_NAMES.map((interval) => {
         const isCorrectHighlight = feedback === 'wrong' && interval === correctAnswer;
         return (
@@ -19,7 +19,7 @@ export function IntervalSelector({ feedback, correctAnswer, onSelect }: Interval
             disabled={feedback !== null}
             aria-label={isCorrectHighlight ? `${interval}（正解）` : interval}
             className={`
-              py-3 px-2 rounded-lg text-base font-semibold font-mono transition-colors
+              min-h-12 py-3 px-2 rounded-lg text-base font-semibold font-mono shadow-sm
               ${isCorrectHighlight
                 ? 'bg-correct text-bg'
                 : 'bg-panel hover:bg-accent-soft active:opacity-80 text-ink border border-hair'
