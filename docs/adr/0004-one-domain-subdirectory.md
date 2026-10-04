@@ -6,7 +6,7 @@ date: 2026-10-04
 ---
 
 Guitar Fretboard Trainer と Guitar Practice Looper（`C:\workspace\guitar-player`）を1つの独自ドメイン `guitartoolbox.site`（2026-10-04 取得、ギター練習ツールの道具箱として今後もツールを足す）にまとめ、このアプリは `https://guitartoolbox.site/fretboard/` で配信する。
-全体の決定（ハブ、sitemap の分担、計測、言語パス、進める順序）は guitar-player の `docs/adr/0007-one-domain-subdirectory.md` が正で、ここにはこのアプリに固有の決定だけを書く。
+全体の決定（ハブ、sitemap の分担、計測、言語パス、進める順序）は guitartoolbox リポジトリの `C:\workspace\guitartoolbox\docs\adr\0001-one-domain-subdirectory-and-hub.md` が正で、ここにはこのアプリに固有の決定だけを書く（当初は guitar-player の ADR-0007 が正だったが、2026-10-04 にハブとともに guitartoolbox へ移した）。
 需要の根拠は affiliate-brain `context/FINDINGS.md` §84（guitar fretboard 18,100/月、guitar fretboard notes 8,100/月、guitar caged system 4,400/月 など、米国、2026-10-04 実測）。
 
 ## 決定
@@ -27,7 +27,7 @@ Guitar Fretboard Trainer と Guitar Practice Looper（`C:\workspace\guitar-playe
 
 ## 検討して採らなかった案
 
-- **サブドメインで Pages のまま配信**: 手間は最も少ないが、guitar-player の ADR-0007 でサブディレクトリに決めたため不採用。
+- **サブドメインで Pages のまま配信**: 手間は最も少ないが、ドメイン全体でサブディレクトリに決めたため不採用（guitartoolbox の ADR-0001）。
 - **Pages を Router Worker の後ろに置いて中継する**: 全リクエストが Worker 実行になり、pages.dev 側の重複コンテンツも残るため不採用。
 
 ## 結果として生じること

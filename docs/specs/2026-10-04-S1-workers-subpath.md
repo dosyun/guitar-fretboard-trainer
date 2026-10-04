@@ -1,21 +1,24 @@
 ---
 id: 2026-10-04-S1-fretboard
 title: Workers の静的アセットへ移し、独自ドメインの /fretboard/ で配信する（段階1）
-status: draft
+status: approved
 owner: codex
 decision: docs/adr/0004-one-domain-subdirectory.md
-pair: C:\workspace\guitar-player\docs\specs\2026-10-04-S1-domain-hub-measurement.md
+pair:
+  - C:\workspace\guitartoolbox\docs\specs\2026-10-04-S1-hub.md
+  - C:\workspace\guitar-player\docs\specs\2026-10-04-S1-domain-hub-measurement.md
 ---
 
 # Workers の静的アセットへ移し、独自ドメインの /fretboard/ で配信する（段階1）
 
 ## 目的
 ADR-0004 を実装する。`https://guitartoolbox.site/fretboard/` でアプリと PWA が動き、`/fretboard/sitemap.xml` があり、GA4 で計測でき、旧 URL から 301 で移り、旧 URL のデータを書き出せる状態にする。
-ハブ・`/robots.txt`・`/sitemap.xml`（sitemap index）は guitar-player の担当で、このリポジトリでは作らない。
+ハブ・`/robots.txt`・`/sitemap.xml`（sitemap index）は guitartoolbox リポジトリの担当で、このリポジトリでは作らない。
 
 ## 着手条件（運営者の操作。すべて済むまで status は draft のまま）
 - `guitartoolbox.site`（ムームードメインで取得済み）を Cloudflare にゾーンとして追加し、ムームードメインのネームサーバー設定を Cloudflare が指定する2つに変え、Cloudflare 上でゾーンが Active になった
-- GA4 の測定 ID を控えた（guitar-player と同じもの。リポジトリには書かない）
+- GA4 の測定 ID を控えた（ドメイン共通のもの。2026-10-04 にプロパティ作成済み。リポジトリには書かない）
+- guitartoolbox のハブが `https://guitartoolbox.site/` で公開されている（ルートを先に載せると、ハブが無いあいだ `/` が応答しないため）
 - 旧 URL の成績・設定を、アプリの書き出し機能で JSON に保存した
 
 ## やること
@@ -44,7 +47,7 @@ ADR-0004 を実装する。`https://guitartoolbox.site/fretboard/` でアプリ�
 
 ## 受け入れ条件
 - `npm run build`・`npm test`・`npm run lint` が通る。`npx wrangler deploy --dry-run` が通る
-- dist に `fretboard/index.html`・`fretboard/sw.js`・`fretboard/manifest.webmanifest`・`fretboard/sitemap.xml` があり、JS/CSS/アイコンは `dist/fretboard/` 配下にある。dist 直下に `index.html` が無い（guitar-player のハブと衝突しない）
+- dist に `fretboard/index.html`・`fretboard/sw.js`・`fretboard/manifest.webmanifest`・`fretboard/sitemap.xml` があり、JS/CSS/アイコンは `dist/fretboard/` 配下にある。dist 直下に `index.html` が無い（guitartoolbox のハブと衝突しない）
 - `npx wrangler dev` で次が成り立つ（Playwright CLI で実測）
   - `/fretboard/` が 200 で開き、5タブ・練習・統計が動く。資産の取得に 404 が無い
   - `/fretboard/no-such-page` は 404
