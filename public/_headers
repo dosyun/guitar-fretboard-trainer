@@ -1,14 +1,30 @@
-# Cloudflare Pages セキュリティヘッダ（public/ は dist 直下に配置される）
-# 注意: これは vite preview では適用されない。本番デプロイ後にブラウザの
-# コンソールで CSP 違反が出ないか必ず確認すること。もしスタイルが崩れたら
-# style-src を調整する。フォントは同梱(self)なので外部許可は不要。
-/*
+# Workers 静的アセット用。ビルド時に dist/_headers へコピーする。
+# vite preview では適用されない。wrangler dev と本番で確認する。
+/fretboard/*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data: https://www.google-analytics.com https://region1.google-analytics.com; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com; worker-src 'self'; manifest-src 'self'
 
-# ハッシュ付きアセットは長期キャッシュ（Vite が内容ハッシュを付与）
-/assets/*
+/fretboard/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/fretboard/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/fretboard/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/fretboard/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/fretboard/manifest.webmanifest
+  Cache-Control: public, max-age=0, must-revalidate
+
+/fretboard/analytics.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Vite が内容ハッシュを付ける資産だけを長期保存する。
+/fretboard/assets/*
   Cache-Control: public, max-age=31536000, immutable

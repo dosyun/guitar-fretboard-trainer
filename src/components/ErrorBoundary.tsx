@@ -38,7 +38,7 @@ export class ErrorBoundary extends Component<Props, State> {
             画面の描画でエラーが起きました。練習記録は端末に保存されているので、再読み込みで元に戻ります。
           </p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => window.location.replace(import.meta.env.BASE_URL)}
             className="w-full px-4 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
           >
             再読み込み

@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && npx --yes wrangler@4 deploy",
+    "deploy:check": "npm run build && npx --yes wrangler@4 deploy --dry-run"
   },
   "dependencies": {
     "@fontsource/dm-mono": "^5.2.7",

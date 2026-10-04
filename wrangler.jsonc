@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "guitar-fretboard-trainer",
+  "compatibility_date": "2026-10-04",
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "none",
+    "html_handling": "auto-trailing-slash"
+  },
+  "routes": [
+    {
+      "pattern": "guitartoolbox.site/fretboard/*",
+      "zone_name": "guitartoolbox.site"
+    },
+    {
+      "pattern": "guitartoolbox.site/fretboard",
+      "zone_name": "guitartoolbox.site"
+    }
+  ]
+}

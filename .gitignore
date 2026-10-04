@@ -26,3 +26,6 @@ temp/
 *.njsproj
 *.sln
 *.sw?
+
+# Wrangler local state
+.wrangler/

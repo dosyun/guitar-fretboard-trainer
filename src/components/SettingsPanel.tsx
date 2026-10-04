@@ -51,7 +51,7 @@ export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, on
       const res = importBackup(json);
       if (res.ok) {
         window.alert('復元しました。再読み込みします。');
-        window.location.reload();
+        window.location.replace(import.meta.env.BASE_URL);
       } else {
         window.alert(res.error ?? '読み込みに失敗しました。');
       }

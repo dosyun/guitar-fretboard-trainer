@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>旧サイトの練習データを書き出す</title>
+  </head>
+  <body>
+    <main>
+      <h1>旧サイトの練習データを書き出す</h1>
+      <p>このブラウザに保存されている成績と設定を JSON ファイルに保存します。</p>
+      <p>新しいサイトの「設定」で「読み込む」を選び、保存したファイルを指定してください。</p>
+      <button id="export" type="button">データを書き出す</button>
+      <p id="status" role="status"></p>
+      <p><a href="https://guitartoolbox.site/fretboard/">新しいサイトを開く</a></p>
+    </main>
+    <script>
+      document.getElementById('export').addEventListener('click', () => {
+        const status = document.getElementById('status');
+        try {
+          const data = Object.create(null);
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!key || !(key.startsWith('gft-') || key === 'guitar-fret-best-streak')) continue;
+            const value = localStorage.getItem(key);
+            if (value !== null) data[key] = value;
+          }
+          if (Object.keys(data).length === 0) {
+            status.textContent = '保存された練習データがありません。旧サイトで練習したブラウザを使ってください。';
+            return;
+          }
+          const exportedAt = Date.now();
+          const backup = { app: 'guitar-flet', version: 1, exportedAt, data };
+          const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'guitar-flet-backup-' + new Date(exportedAt).toISOString().slice(0, 10) + '.json';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          status.textContent = '書き出しました。新しいサイトの設定から読み込んでください。';
+        } catch {
+          status.textContent = '書き出せませんでした。ブラウザのストレージ設定を確認してください。';
+        }
+      });
+
+      // 旧 PWA のキャッシュに戻らず、このオリジンのデータを書き出せるようにする。
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration('/')
+          .then((registration) => {
+            // 片付け後の再読込では再登録しない。再読込のループを防ぐ。
+            if (!registration) return;
+            return navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' })
+              .then((updated) => updated.update());
+          })
+          .catch(() => {});
+      }
+    </script>
+  </body>
+</html>
