@@ -10,21 +10,20 @@ pair: C:\workspace\guitar-player\docs\specs\2026-10-04-S1-domain-hub-measurement
 # Workers の静的アセットへ移し、独自ドメインの /fretboard/ で配信する（段階1）
 
 ## 目的
-ADR-0004 を実装する。`https://<DOMAIN>/fretboard/` でアプリと PWA が動き、`/fretboard/sitemap.xml` があり、GA4 で計測でき、旧 URL から 301 で移り、旧 URL のデータを書き出せる状態にする。
+ADR-0004 を実装する。`https://guitartoolbox.site/fretboard/` でアプリと PWA が動き、`/fretboard/sitemap.xml` があり、GA4 で計測でき、旧 URL から 301 で移り、旧 URL のデータを書き出せる状態にする。
 ハブ・`/robots.txt`・`/sitemap.xml`（sitemap index）は guitar-player の担当で、このリポジトリでは作らない。
 
 ## 着手条件（運営者の操作。すべて済むまで status は draft のまま）
-- `<DOMAIN>` を購入し、Cloudflare のゾーンが有効
+- `guitartoolbox.site`（ムームードメインで取得済み）を Cloudflare にゾーンとして追加し、ムームードメインのネームサーバー設定を Cloudflare が指定する2つに変え、Cloudflare 上でゾーンが Active になった
 - GA4 の測定 ID を控えた（guitar-player と同じもの。リポジトリには書かない）
 - 旧 URL の成績・設定を、アプリの書き出し機能で JSON に保存した
-- 仕様書の `<DOMAIN>` を実際のドメインに置き換えた
 
 ## やること
 1. Vite の `base` を `/fretboard/`、ビルド出力を `dist/fretboard/` にする。
 2. PWA（vite-plugin-pwa）の manifest の `scope`・`start_url`・`id` を `/fretboard/` にし、Service Worker を `/fretboard/sw.js`・登録範囲 `/fretboard/` で出す。Workbox のキャッシュ名に `gft-` を付ける。navigateFallback を使う場合は `/fretboard/` 配下に限る。
-3. `index.html` の favicon・アイコン・og:image などの参照を base に追従させる（`/favicon.svg` のような直書きを残さない）。canonical（`https://<DOMAIN>/fretboard/`）と og:url を足す。
+3. `index.html` の favicon・アイコン・og:image などの参照を base に追従させる（`/favicon.svg` のような直書きを残さない）。canonical（`https://guitartoolbox.site/fretboard/`）と og:url を足す。
 4. `location.pathname` を使っている `src/components/SettingsPanel.tsx` と `src/components/ErrorBoundary.tsx` を、`/fretboard/` 配下で正しく動くように直す（再読込・リセット後の遷移先が `/` にならないこと）。
-5. `wrangler.jsonc` を新規作成する。assets のみの Worker（`main` なし）、assets の directory は `./dist`、`not_found_handling` は `404-page` または `none`（SPA フォールバックにしない）、routes に `{ "pattern": "<DOMAIN>/fretboard/*", "zone_name": "<DOMAIN>" }`。`/fretboard`（末尾スラッシュなし）も `/fretboard/` に届くよう、routes に `<DOMAIN>/fretboard` も加えるか、`html_handling` で正規化する。
+5. `wrangler.jsonc` を新規作成する。assets のみの Worker（`main` なし）、assets の directory は `./dist`、`not_found_handling` は `404-page` または `none`（SPA フォールバックにしない）、routes に `{ "pattern": "guitartoolbox.site/fretboard/*", "zone_name": "guitartoolbox.site" }`。`/fretboard`（末尾スラッシュなし）も `/fretboard/` に届くよう、routes に `guitartoolbox.site/fretboard` も加えるか、`html_handling` で正規化する。
 6. `public/_headers` の CSP とキャッシュ設定を `/fretboard/*` のパスで効くように直す。GA4 に必要なドメインだけ許可を足す。HTML と `sw.js` は再検証、ハッシュ付き資産は長期キャッシュにする。
 7. `/fretboard/sitemap.xml` をビルドで出す（段階1は `/fretboard/` の1件）。
 8. GA4 のタグを入れる。測定 ID は `VITE_GA_MEASUREMENT_ID` から読み、未設定ならタグを出さない。
@@ -54,10 +53,10 @@ ADR-0004 を実装する。`https://<DOMAIN>/fretboard/` でアプリと PWA が
   - 書き出した JSON を読み込むと成績が戻る
 - `legacy-redirect/export.html` で書き出した JSON を、新しいアプリの読み込みで取り込める（ローカルで2つのオリジンを立てて実測）
 - `VITE_GA_MEASUREMENT_ID` 未設定のビルドに gtag が含まれない
-- 本番反映後（運営者と実施）: 旧 URL の `/` が `https://<DOMAIN>/fretboard/` へ 301、`/export.html` と `/sw.js` は 200。新 URL で PWA をインストールでき、オフラインで開ける。GA4 のリアルタイムに自分のアクセスが出る
+- 本番反映後（運営者と実施）: 旧 URL の `/` が `https://guitartoolbox.site/fretboard/` へ 301、`/export.html` と `/sw.js` は 200。新 URL で PWA をインストールでき、オフラインで開ける。GA4 のリアルタイムに自分のアクセスが出る
 
 ## 運営者の操作（実装後）
 Pages は master への push で自動ビルドされる。この変更を push すると、旧 URL が `base: /fretboard/` のビルドに置き換わって壊れるため、push より先に 3 を済ませるか、作業ブランチのまま 1〜2 を済ませてから 3 と push を同時に行う。
-1. `npm run deploy` で Workers に初回デプロイし、ルート `<DOMAIN>/fretboard/*` が有効か確かめる
+1. `npm run deploy` で Workers に初回デプロイし、ルート `guitartoolbox.site/fretboard/*` が有効か確かめる
 2. 新 URL で JSON を読み込み、成績が戻ったことを確かめる
 3. Pages プロジェクト guitar-fretboard-trainer のビルド設定を、ビルドコマンドなし・出力 `legacy-redirect` に変える
