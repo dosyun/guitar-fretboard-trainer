@@ -14,7 +14,8 @@ Guitar Fretboard Trainer と Guitar Practice Looper（`C:\workspace\guitar-playe
 - 配信を Cloudflare Pages から、assets のみの Worker（Workers の静的アセット）へ移し、ゾーンのルート `guitartoolbox.site/fretboard/*` に載せる。Pages のカスタムドメインはホスト名単位でしか付けられず、パスで振り分けられないため。
 - Vite の `base` を `/fretboard/`、ビルド出力を `dist/fretboard/` にし、assets の directory は `dist` にする。
 - PWA は manifest の `scope`・`start_url` と、Service Worker のファイル位置（`/fretboard/sw.js`）と登録範囲（`/fretboard/`）をすべて `/fretboard/` にそろえる。manifest の scope だけでは Service Worker の制御範囲は変わらない。Workbox のキャッシュ名には `gft-` を付け、同じオリジンの guitar-player とぶつけない。
-- 全体への SPA フォールバックは使わない。`/fretboard/` 配下の未知のパスは 404 にする（段階2で機能ごとの URL を足すときは、その URL の HTML を個別に出す）。
+- 全体への SPA フォールバックは使わない。`/fretboard/` 配下の未知のパスは 404 にする（段階3で機能ごとの URL を足すときは、その URL の HTML を個別に出す）。
+- 英語版は段階2で `/fretboard/en/` に置く（2026-10-04 に段階3から繰り上げ。理由と言語・内部リンクの決まりは guitartoolbox ADR-0001）。Service Worker は `/fretboard/` の1つで両言語を受け持つ。英語版には英語の manifest（`start_url` と `id` が `/fretboard/en/`、`scope` は `/fretboard/`）を別に付け、英語版から入れた PWA が英語で開くようにする。
 - 成績・設定は既存の書き出し／読み込み（`src/data/backup.ts`）で移す。自動移行はしない。
 
 ## 旧 URL（guitar-fretboard-trainer.pages.dev）
