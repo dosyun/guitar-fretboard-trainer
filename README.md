@@ -42,6 +42,13 @@ npm run build
 npm run preview
 ```
 
+## 公開
+
+公開先は https://guitartoolbox.site/fretboard/ で、Cloudflare Workers の `guitar-fretboard-trainer` が配信する。
+GitHub の `master` へ push すると、Cloudflare の Workers Builds が `npm run build` と `npx wrangler deploy` を実行して本番へ反映する。
+GA4 の測定 ID は Workers Builds のビルド変数 `VITE_GA_MEASUREMENT_ID` に設定してあり、リポジトリには書かない。
+手元から `npm run deploy` を実行すると測定 ID なしでビルドされ、計測タグが消えるため、通常は push で公開する。
+
 ## おすすめの学習手順
 
 1. 「指板マップ」で全体像を把握する
