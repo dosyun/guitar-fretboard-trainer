@@ -1,3 +1,4 @@
+import { phrase, intervalLabel } from '../i18n';
 import { useState, useRef } from 'react';
 import { Segmented } from 'antd';
 import { Fretboard } from './Fretboard';
@@ -174,8 +175,10 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
 
           <div className="text-center">
             <p className="text-ink font-medium">
-              <span className="font-mono text-accent">{chords[step].symbol}</span> の{' '}
-              <span className="font-mono text-lg">{target?.deg}</span> を弾け
+              {phrase('{0} の {1} を弾け', [
+                <span key="chord" className="font-mono text-accent">{chords[step].symbol}</span>,
+                <span key="degree" className="font-mono text-lg">{intervalLabel(target?.deg)}</span>,
+              ])}
             </p>
             {feedback && (
               <p className={`text-lg font-bold mt-1 ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
@@ -184,7 +187,7 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
             )}
             {feedback === 'wrong' && wrongPick && (
               <p className="text-xs text-wrong mt-0.5 font-mono">
-                選んだ {wrongPick.note} は {wrongPick.deg}（このコードの構成音ではない）
+                {`選んだ ${wrongPick.note} は ${intervalLabel(wrongPick.deg)}（このコードの構成音ではない）`}
               </p>
             )}
             {feedback && target && (

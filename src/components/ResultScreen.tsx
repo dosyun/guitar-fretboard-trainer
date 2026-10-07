@@ -113,7 +113,7 @@ export function ResultScreen({
         </div>
       ) : (
         <p className="text-dim text-sm leading-relaxed text-center text-pretty">
-          {summary.count}問の記録。{MIN_COMPARE}問以上つづけると中央値・前回比が出ます。
+          {`${summary.count}問の記録。${MIN_COMPARE}問以上つづけると中央値・前回比が出ます。`}
         </p>
       )}
 
@@ -129,7 +129,7 @@ export function ResultScreen({
             onClick={() => onDrill?.(weakNote)}
             className="min-h-12 w-full px-4 py-3 bg-accent text-bg text-sm font-semibold rounded-xl hover:opacity-90 active:opacity-80"
           >
-            「{weakNote}」を10問だけ練習
+            {`「${weakNote}」を10問だけ練習`}
           </button>
         </div>
       )}

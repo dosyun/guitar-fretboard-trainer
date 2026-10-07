@@ -1,3 +1,4 @@
+import { phrase } from '../i18n';
 import { useEffect, useState } from 'react';
 
 // beforeinstallprompt は標準型に無いので最小定義
@@ -84,7 +85,10 @@ export function InstallPrompt() {
           </>
         ) : (
           <p className="text-ink text-pretty">
-            Safariの共有ボタン <span className="font-mono">□↑</span> →「<span className="text-accent">ホーム画面に追加</span>」でアプリになります。
+            {phrase('Safariの共有ボタン {0} →「{1}」でアプリになります。', [
+              <span key="share" className="font-mono">□↑</span>,
+              <span key="install" className="text-accent">ホーム画面に追加</span>,
+            ])}
           </p>
         )}
       </div>

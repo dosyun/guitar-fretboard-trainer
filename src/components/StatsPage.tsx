@@ -1,3 +1,4 @@
+import { intervalLabel } from '../i18n';
 import { useState } from 'react';
 import { Segmented } from 'antd';
 import { FretboardHeatmap } from './FretboardHeatmap';
@@ -131,7 +132,7 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
                   const w = degreeWeak(d);
                   return (
                     <li key={d.degree} className="flex items-center gap-3 text-sm">
-                      <span className="font-mono text-ink w-12 shrink-0">{d.degree}</span>
+                      <span className="font-mono text-ink w-12 shrink-0" title={intervalLabel(d.degree)}>{d.degree}</span>
                       <div className="flex-1 h-2 rounded-full bg-panel overflow-hidden">
                         <div
                           className="h-full rounded-full"

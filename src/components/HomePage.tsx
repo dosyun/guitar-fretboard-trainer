@@ -94,7 +94,7 @@ export function HomePage({ accidental, maxFret, dailyLength, goal, onStartGoal, 
                 <Segmented aria-label="今日の問題数" value={dailyLength} onChange={(v) => onDailyLengthChange(v as number)} options={[{ label: '10', value: 10 }, { label: '15', value: 15 }, { label: '20', value: 20 }]} />
               </div>
               <button onClick={onStartDaily} className="flex min-h-12 w-full items-center justify-center gap-4 rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-bg hover:opacity-90 sm:w-auto">
-                今日の{dailyLength}問をはじめる <span aria-hidden="true">→</span>
+                {`今日の${dailyLength}問をはじめる`} <span aria-hidden="true">→</span>
               </button>
             </div>
           </div>

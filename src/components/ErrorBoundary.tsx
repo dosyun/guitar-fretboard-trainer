@@ -1,3 +1,4 @@
+import { currentLanguageUrl } from '../i18n';
 import { Component, type ReactNode, type ErrorInfo } from 'react';
 
 interface Props {
@@ -38,7 +39,7 @@ export class ErrorBoundary extends Component<Props, State> {
             画面の描画でエラーが起きました。練習記録は端末に保存されているので、再読み込みで元に戻ります。
           </p>
           <button
-            onClick={() => window.location.replace(import.meta.env.BASE_URL)}
+            onClick={() => window.location.replace(currentLanguageUrl())}
             className="w-full px-4 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
           >
             再読み込み

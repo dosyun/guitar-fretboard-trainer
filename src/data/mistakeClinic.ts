@@ -1,3 +1,4 @@
+import { t, intervalLabel } from '../i18n';
 /**
  * Mistake Clinic: 練習ログから弱点を「言語化」する診断。
  * 「2弦の音名が弱い」「度数mの3を探す問題の正答率が低い」のように、
@@ -33,7 +34,7 @@ function bump(map: Map<string | number, Acc>, key: string | number, correct: boo
 
 function worst(map: Map<string | number, Acc>): { key: string | number; acc: number } | null {
   let best: { key: string | number; acc: number } | null = null;
-  for (const [key, v] of map) {
+  for (const [key, v] of Array.from(map)) {
     if (v.n < MIN_N) continue;
     const acc = v.c / v.n;
     if (!best || acc < best.acc) best = { key, acc };
@@ -114,7 +115,7 @@ export function diagnose(accidental: Accidental): Diagnosis[] {
       cand.push({
         d: {
           id: 'fret',
-          text: `${wf.key} の音名が弱い（正答率 ${Math.round(wf.acc * 100)}%）`,
+          text: `${t(String(wf.key))} の音名が弱い（正答率 ${Math.round(wf.acc * 100)}%）`,
           drillFretRange: BUCKET_RANGE[wf.key as string],
         },
         sev: (1 - wf.acc) * 0.8,
@@ -127,7 +128,7 @@ export function diagnose(accidental: Accidental): Diagnosis[] {
     .sort((a, b) => b.errorRate - a.errorRate)[0];
   if (deg && deg.errorRate > 0.3) {
     cand.push({
-      d: { id: 'degree', text: `度数「${deg.degree}」を探す問題の正答率が低い（${Math.round((1 - deg.errorRate) * 100)}%）` },
+      d: { id: 'degree', text: `度数「${intervalLabel(deg.degree)}」を探す問題の正答率が低い（${Math.round((1 - deg.errorRate) * 100)}%）` },
       sev: deg.errorRate * 0.85,
     });
   }

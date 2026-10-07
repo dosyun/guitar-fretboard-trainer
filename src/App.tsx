@@ -1,3 +1,4 @@
+import { intervalLabel } from './i18n';
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Fretboard, PinnedStringLabels } from './components/Fretboard';
 import { NoteSelector } from './components/NoteSelector';
@@ -290,7 +291,7 @@ function App() {
   const getFeedbackMsg = () => {
     if (!quiz.feedback) return null;
     if (quiz.feedback === 'correct') return '正解!';
-    if (quiz.correctAnswer) return `不正解... 正解: ${quiz.correctAnswer}`;
+    if (quiz.correctAnswer) return `不正解... 正解: ${quiz.mode === 'interval' ? intervalLabel(quiz.correctAnswer) : quiz.correctAnswer}`;
     return '不正解...';
   };
 

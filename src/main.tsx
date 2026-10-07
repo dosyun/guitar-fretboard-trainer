@@ -1,6 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ConfigProvider, theme } from 'antd'
+import enUS from 'antd/locale/en_US'
+import jaJP from 'antd/locale/ja_JP'
+import { getLanguage } from './i18n'
 // フォントは同梱（セルフホスト）。外部CDNへの取得＝IP送信とレンダーブロックを避ける。
 import '@fontsource/dm-mono/400.css'
 import '@fontsource/dm-mono/500.css'
@@ -17,6 +20,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <ConfigProvider
+        locale={getLanguage() === 'en' ? enUS : jaJP}
         theme={{
           algorithm: theme.darkAlgorithm,
           token: {

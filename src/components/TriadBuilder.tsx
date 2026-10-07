@@ -1,3 +1,4 @@
+import { phrase } from '../i18n';
 import { useState, useRef } from 'react';
 import { Segmented } from 'antd';
 import { Fretboard } from './Fretboard';
@@ -145,7 +146,9 @@ export function TriadBuilder({ accidental, maxFret, onLearn }: TriadBuilderProps
 
           <div className="text-center space-y-1">
             <p className="text-ink font-medium">
-              <span className="font-mono text-accent">{symbol}</span>（{qual.label}）を作ろう
+              {phrase('{0}（{1}）を作ろう', [
+                <span key="chord" className="font-mono text-accent">{symbol}</span>, qual.label,
+              ])}
             </p>
             <p className="text-xs text-dim font-mono">{symbol} = {spelling.join(' · ')}</p>
             <div className="flex justify-center gap-2 pt-1">

@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useState } from 'react';
 import { LESSONS, LESSON_CHAPTERS, CHAPTER_LEVEL } from '../data/lessons';
 import type { LessonCheckQ, LessonLevel } from '../data/lessons';
@@ -20,7 +21,7 @@ const LEVEL_STYLE: Record<LessonLevel, string> = {
 function LevelBadge({ level }: { level: LessonLevel }) {
   return (
     <span className={`px-2 py-1 rounded-lg text-xs font-mono border border-hair bg-panel ${LEVEL_STYLE[level]}`}>
-      {level}
+      {t(level)}
     </span>
   );
 }
@@ -108,7 +109,7 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
 
         {allDone ? (
           <div className="bg-accent-soft border border-accent rounded-xl px-4 py-3 text-center">
-            <p className="text-accent font-semibold">🎉 全{LESSONS.length}レッスン制覇！</p>
+            <p className="text-accent font-semibold">{`🎉 全${LESSONS.length}レッスン制覇！`}</p>
             <p className="text-xs text-dim mt-1">理論コースを完走しました。練習で実戦に活かそう。</p>
           </div>
         ) : (

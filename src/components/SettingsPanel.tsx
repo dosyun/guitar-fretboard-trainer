@@ -1,3 +1,4 @@
+import { currentLanguageUrl } from '../i18n';
 import { useState, useRef } from 'react';
 import { isSoundEnabled, setSoundEnabled } from '../data/audio';
 import { isManualTempo, setManualTempo } from '../data/tempo';
@@ -51,11 +52,12 @@ export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, on
       const res = importBackup(json);
       if (res.ok) {
         window.alert('復元しました。再読み込みします。');
-        window.location.replace(import.meta.env.BASE_URL);
+        window.location.replace(currentLanguageUrl());
       } else {
         window.alert(res.error ?? '読み込みに失敗しました。');
       }
     };
+    reader.onerror = () => window.alert('ファイルを読み取れませんでした。');
     reader.readAsText(file);
   };
 

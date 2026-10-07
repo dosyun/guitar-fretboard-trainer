@@ -1,3 +1,4 @@
+import { intervalLabel } from '../i18n';
 import { INTERVAL_NAMES } from '../data/fretboard';
 import type { Feedback } from '../types';
 
@@ -17,7 +18,7 @@ export function IntervalSelector({ feedback, correctAnswer, onSelect }: Interval
             key={interval}
             onClick={() => onSelect(interval)}
             disabled={feedback !== null}
-            aria-label={isCorrectHighlight ? `${interval}（正解）` : interval}
+            aria-label={isCorrectHighlight ? `${intervalLabel(interval)}（正解）` : intervalLabel(interval)}
             className={`
               min-h-12 py-3 px-2 rounded-lg text-base font-semibold font-mono shadow-sm
               ${isCorrectHighlight
@@ -28,7 +29,7 @@ export function IntervalSelector({ feedback, correctAnswer, onSelect }: Interval
             `}
           >
             {isCorrectHighlight && <span aria-hidden="true">✓ </span>}
-            {interval}
+            {intervalLabel(interval)}
           </button>
         );
       })}

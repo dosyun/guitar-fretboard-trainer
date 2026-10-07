@@ -1,3 +1,4 @@
+import { intervalLabel } from '../i18n';
 /**
  * その場の「なぜ?」(Layer1) — 度数/コードトーンの種明かしを1行で。
  * 練習の回答時に表示し、暗記をその場で理解に変える。
@@ -26,5 +27,5 @@ const ROLE: Record<string, string> = {
 /** 例: 「♭3 = D から半音3つ → F（短3度＝暗い）」 */
 export function toneWhy(deg: string, semitones: number, root: string, note: string): string {
   const role = ROLE[deg];
-  return `${deg} = ${root} から半音${semitones}つ → ${note}${role ? `（${role}）` : ''}`;
+  return `${intervalLabel(deg)} = ${root} から半音${semitones}つ → ${note}${role ? `（${role}）` : ''}`;
 }

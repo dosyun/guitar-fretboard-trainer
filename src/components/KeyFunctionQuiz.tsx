@@ -1,3 +1,4 @@
+import { phrase } from '../i18n';
 import { useState, useRef } from 'react';
 import { Segmented } from 'antd';
 import { RootSelector } from './RootSelector';
@@ -164,8 +165,10 @@ export function KeyFunctionQuiz({ accidental, onLearn }: KeyFunctionQuizProps) {
 
           <div className="text-center space-y-2">
             <p className="text-ink font-medium">
-              Key <span className="font-mono text-accent">{keyRoot}</span> で{' '}
-              <span className="font-mono text-lg text-accent">{symbol}</span> は？
+              {phrase('Key {0} で {1} は？', [
+                <span key="key" className="font-mono text-accent">{keyRoot}</span>,
+                <span key="chord" className="font-mono text-lg text-accent">{symbol}</span>,
+              ])}
             </p>
 
             <div className="flex flex-wrap justify-center gap-2">

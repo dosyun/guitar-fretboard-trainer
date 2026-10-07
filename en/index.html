@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="ja">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="description" content="ギター指板の音名・度数を反射的に覚えるための練習トレーナー。回答時間を計測し、弱点をヒートマップで可視化します。" />
+    <meta name="description" content="Learn guitar fretboard notes and intervals with timed quizzes, chord-tone practice, ear training, and a heatmap of your progress." />
+    <link rel="manifest" href="/fretboard/en/manifest.webmanifest" />
     <meta name="theme-color" content="#0e0f12" />
     <!-- iOS: ホーム画面に追加してスタンドアロン起動 -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -12,21 +13,21 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Fretboard" />
 
-    <link rel="canonical" href="https://guitartoolbox.site/fretboard/" />
+    <link rel="canonical" href="https://guitartoolbox.site/fretboard/en/" />
     <link rel="alternate" hreflang="ja" href="https://guitartoolbox.site/fretboard/" />
     <link rel="alternate" hreflang="en" href="https://guitartoolbox.site/fretboard/en/" />
     <link rel="alternate" hreflang="x-default" href="https://guitartoolbox.site/fretboard/en/" />
-    <meta property="og:url" content="https://guitartoolbox.site/fretboard/" />
+    <meta property="og:url" content="https://guitartoolbox.site/fretboard/en/" />
     <!-- OGP / Twitter Card（SNS共有プレビュー） -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Guitar Fretboard Trainer" />
-    <meta property="og:title" content="Guitar Fretboard Trainer — 指板を反射で覚える練習トレーナー" />
-    <meta property="og:description" content="ギター指板の音名・度数を反射で使えるようにする練習エンジン。1問ごとに回答時間を計測し、弱点をヒートマップで可視化。コード/スケール/耳トレも。" />
+    <meta property="og:title" content="Guitar Fretboard Trainer — Learn Notes, Intervals & Chord Tones" />
+    <meta property="og:description" content="Make the fretboard second nature with timed quizzes, chord tones, scales, and ear training. Track accuracy and response times with a weakness heatmap." />
     <meta property="og:image" content="https://guitartoolbox.site%BASE_URL%pwa-512x512.png" />
-    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Guitar Fretboard Trainer" />
-    <meta name="twitter:description" content="ギター指板の音名・度数を反射で覚える練習トレーナー。回答時間を計測し弱点をヒートマップで可視化。" />
+    <meta name="twitter:description" content="Learn guitar fretboard notes and intervals. Track accuracy and response times, and focus on your weaker positions." />
     <meta name="twitter:image" content="https://guitartoolbox.site%BASE_URL%pwa-512x512.png" />
 
     <script type="application/ld+json">
@@ -36,19 +37,19 @@
         "name": "Guitar Fretboard Trainer",
         "applicationCategory": "EducationalApplication",
         "operatingSystem": "Any",
-        "url": "https://guitartoolbox.site/fretboard/",
-        "description": "ギター指板の音名・度数を反射で使えるようにする練習トレーナー。回答時間を計測し弱点をヒートマップで可視化する。",
-        "inLanguage": "ja",
+        "url": "https://guitartoolbox.site/fretboard/en/",
+        "description": "Learn guitar fretboard notes and intervals with timed practice and a weakness heatmap.",
+        "inLanguage": "en",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" }
       }
     </script>
 
-    <title>Guitar Fretboard Trainer — 指板を反射で覚える練習トレーナー</title>
+    <title>Guitar Fretboard Trainer — Learn Notes, Intervals & Chord Tones</title>
   </head>
   <body>
-    <nav aria-label="言語とツール一覧" class="flex justify-end gap-6 border-b border-hair bg-bg px-6 py-3 text-sm text-dim">
-      <a href="https://guitartoolbox.site/">Guitar Toolbox</a>
-      <a href="https://guitartoolbox.site/fretboard/en/" lang="en" hreflang="en">English</a>
+    <nav aria-label="Language and guitar tools" class="flex justify-end gap-6 border-b border-hair bg-bg px-6 py-3 text-sm text-dim">
+      <a href="https://guitartoolbox.site/en/">Guitar Toolbox</a>
+      <a href="https://guitartoolbox.site/fretboard/" lang="ja" hreflang="ja">Japanese</a>
     </nav>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

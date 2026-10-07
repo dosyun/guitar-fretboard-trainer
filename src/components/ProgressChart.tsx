@@ -25,7 +25,7 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
 
   return (
     <div className="space-y-2">
-      <h2 className="text-sm font-medium text-ink">推移（直近{recent.length}セッション）</h2>
+      <h2 className="text-sm font-medium text-ink">{`推移（直近${recent.length}セッション）`}</h2>
       <Sparkline
         label="正答率"
         values={acc}

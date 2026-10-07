@@ -1,3 +1,4 @@
+import { phrase, intervalLabel } from '../i18n';
 import { useState, useRef } from 'react';
 import { Segmented } from 'antd';
 import { Fretboard } from './Fretboard';
@@ -211,8 +212,10 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
               ▶ コードを聴く
             </button>
             <p className="text-ink font-medium">
-              <span className="font-mono text-accent">{chords[step].symbol}</span> の{' '}
-              <span className="font-mono text-lg">{guideLabel}</span>（ガイド音）を弾け
+              {phrase('{0} の {1}（ガイド音）を弾け', [
+                <span key="chord" className="font-mono text-accent">{chords[step].symbol}</span>,
+                <span key="degree" className="font-mono text-lg">{intervalLabel(guideLabel)}</span>,
+              ])}
             </p>
             {feedback && (
               <p className={`text-lg font-bold ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
@@ -220,7 +223,7 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
               </p>
             )}
             {feedback === 'wrong' && wrongPick && (
-              <p className="text-xs text-wrong font-mono">選んだ {wrongPick.note} は {wrongPick.deg}</p>
+              <p className="text-xs text-wrong font-mono">{`選んだ ${wrongPick.note} は ${intervalLabel(wrongPick.deg)}`}</p>
             )}
             {feedback && (
               <p className="text-xs text-dim text-pretty font-mono">

@@ -3,6 +3,8 @@ import { resolve } from 'node:path'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { localizeSource } from './src/i18n/source'
+import { dictionary } from './src/i18n'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -11,8 +13,24 @@ export default defineConfig(({ mode }) => {
 
   return {
     base: '/fretboard/',
-    build: { outDir: 'dist/fretboard' },
+    build: {
+      outDir: 'dist/fretboard',
+      rolldownOptions: { input: { ja: resolve('index.html'), en: resolve('en/index.html') } },
+    },
     plugins: [
+      {
+        name: 'fretboard-ui-language',
+        enforce: 'pre',
+        transform(source, id) {
+          const path = id.split('?')[0].replaceAll('\\', '/');
+          if (!path.includes('/src/') || path.includes('/i18n/') || path.endsWith('.test.ts') || !/\.tsx?$/.test(path)) return;
+          const localized = localizeSource(source, path);
+          for (const key of localized.messages) {
+            if (!(key in dictionary.en)) this.error(`Missing English UI text in ${path}: ${key}`);
+          }
+          return localized.code === source ? undefined : { code: localized.code, map: null };
+        },
+      } satisfies Plugin,
       {
         name: 'fretboard-worker-assets',
         apply: 'build',
@@ -82,9 +100,44 @@ export default defineConfig(({ mode }) => {
           // 未知の URL はオンライン・オフラインともアプリへ置き換えない。
           navigateFallback: null,
           // フォントも同梱(woff2)なので precache に含まれオフライン対応。外部フォント取得なし。
-          globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+          globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,webmanifest}'],
         },
       }),
+      {
+        name: 'fretboard-english-pwa',
+        enforce: 'post',
+        transformIndexHtml: {
+          order: 'post',
+          handler(html) {
+            if (!html.includes('<html lang="en">')) return html;
+            return html.replace(/<link\b[^>]*\brel=["']manifest["'][^>]*>/g, '')
+              .replace('</head>', '<link rel="manifest" href="/fretboard/en/manifest.webmanifest" /></head>');
+          },
+        },
+        generateBundle(_options, bundle) {
+          const asset = bundle['manifest.webmanifest'];
+          if (!asset || asset.type !== 'asset') this.error('Japanese manifest is missing');
+          const source = typeof asset.source === 'string' ? asset.source : new TextDecoder().decode(asset.source);
+          const manifest = JSON.parse(source) as { icons: { src: string; [key: string]: unknown }[] };
+          this.emitFile({
+            type: 'asset',
+            fileName: 'en/manifest.webmanifest',
+            source: JSON.stringify({
+              ...manifest,
+              name: 'Guitar Fretboard Trainer',
+              short_name: 'Fretboard',
+              description: 'Learn guitar fretboard notes and intervals with timed practice and a weakness heatmap.',
+              lang: 'en',
+              id: '/fretboard/en/',
+              start_url: '/fretboard/en/',
+              scope: '/fretboard/',
+              icons: manifest.icons.map((icon) => ({
+                ...icon, src: new URL(icon.src, 'https://guitartoolbox.site/fretboard/').pathname,
+              })),
+            }),
+          });
+        },
+      } satisfies Plugin,
     ],
   }
 })
