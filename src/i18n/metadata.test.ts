@@ -31,20 +31,22 @@ describe('static bilingual discovery', () => {
     });
   }
 
-  it('generates two sitemap URLs with three reciprocal language links each', async () => {
+  it('generates four sitemap URLs with three reciprocal language links each', async () => {
     const generator = await import(pathToFileURL(resolve('scripts/generate-sitemap.mjs')).href);
     const xml: string = generator.renderSitemap();
     expect(xml).toContain('xmlns:xhtml="http://www.w3.org/1999/xhtml"');
     const urls = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1]);
-    expect(urls).toHaveLength(2);
-    expect(urls[0]).toContain('<loc>https://guitartoolbox.site/fretboard/</loc>');
-    expect(urls[1]).toContain('<loc>https://guitartoolbox.site/fretboard/en/</loc>');
-    for (const entry of urls) {
+    expect(urls).toHaveLength(4);
+    const pages = ['', '', 'ear-training/', 'ear-training/'];
+    urls.forEach((entry, i) => {
+      const page = pages[i];
+      const loc = i % 2 === 0 ? `fretboard/${page}` : `fretboard/en/${page}`;
+      expect(entry).toContain(`<loc>https://guitartoolbox.site/${loc}</loc>`);
       expect([...entry.matchAll(/<xhtml:link /g)]).toHaveLength(3);
-      expect(entry).toContain('hreflang="ja" href="https://guitartoolbox.site/fretboard/"');
-      expect(entry).toContain('hreflang="en" href="https://guitartoolbox.site/fretboard/en/"');
-      expect(entry).toContain('hreflang="x-default" href="https://guitartoolbox.site/fretboard/en/"');
-    }
+      expect(entry).toContain(`hreflang="ja" href="https://guitartoolbox.site/fretboard/${page}"`);
+      expect(entry).toContain(`hreflang="en" href="https://guitartoolbox.site/fretboard/en/${page}"`);
+      expect(entry).toContain(`hreflang="x-default" href="https://guitartoolbox.site/fretboard/en/${page}"`);
+    });
   });
 });
 
@@ -64,7 +66,7 @@ describe.runIf(existsSync(resolve('dist/fretboard/index.html')))('built bilingua
     expect(sw).toContain('en/index.html');
     expect(sw).toContain('en/manifest.webmanifest');
     const sitemap = readFileSync(resolve('dist/fretboard/sitemap.xml'), 'utf8');
-    expect([...sitemap.matchAll(/<url>/g)]).toHaveLength(2);
-    expect([...sitemap.matchAll(/<xhtml:link /g)]).toHaveLength(6);
+    expect([...sitemap.matchAll(/<url>/g)]).toHaveLength(4);
+    expect([...sitemap.matchAll(/<xhtml:link /g)]).toHaveLength(12);
   });
 });

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Practice playing melodies by ear on the guitar fretboard. Replay short phrases, compare notes and scale degrees, and build confidence with four levels and step-by-step hints." />
+    <link rel="manifest" href="/fretboard/en/manifest.webmanifest" />
+    <meta name="theme-color" content="#0e0f12" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Fretboard" />
+    <link rel="canonical" href="https://guitartoolbox.site/fretboard/en/ear-training/" />
+    <link rel="alternate" hreflang="ja" href="https://guitartoolbox.site/fretboard/ear-training/" />
+    <link rel="alternate" hreflang="en" href="https://guitartoolbox.site/fretboard/en/ear-training/" />
+    <link rel="alternate" hreflang="x-default" href="https://guitartoolbox.site/fretboard/en/ear-training/" />
+    <meta property="og:url" content="https://guitartoolbox.site/fretboard/en/ear-training/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Guitar Toolbox" />
+    <meta property="og:title" content="Guitar Ear Training — Play Back Melodies on the Fretboard" />
+    <meta property="og:description" content="Practice playing melodies by ear on the guitar fretboard. Replay short phrases, compare notes and scale degrees, and build confidence with four levels and step-by-step hints." />
+    <meta property="og:image" content="https://guitartoolbox.site%BASE_URL%pwa-512x512.png" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Guitar Ear Training — Play Back Melodies on the Fretboard" />
+    <meta name="twitter:description" content="Practice playing melodies by ear on the guitar fretboard. Replay short phrases, compare notes and scale degrees, and build confidence with four levels and step-by-step hints." />
+    <meta name="twitter:image" content="https://guitartoolbox.site%BASE_URL%pwa-512x512.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Guitar Toolbox Guitar Ear Training",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "url": "https://guitartoolbox.site/fretboard/en/ear-training/",
+        "description": "Practice playing melodies by ear on the guitar fretboard. Replay short phrases, compare notes and scale degrees, and build confidence with four levels and step-by-step hints.",
+        "inLanguage": "en",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" }
+      }
+    </script>
+    <style>
+      body { margin: 0; background: var(--bg, #0e0f12); color: var(--ink, #ece5d6); font-family: system-ui, sans-serif; }
+      .ear-training-intro { max-width: 48rem; margin: 2rem auto; padding: 1.5rem; background: var(--surface, #1b1813); border: 1px solid var(--hair, #322c22); border-radius: 0.75rem; }
+      .ear-training-intro h1 { margin: 0 0 1.5rem; font-size: 1.5rem; line-height: 1.4; }
+      .ear-training-intro p { margin: 1rem 0 0; line-height: 1.8; }
+      @media (max-width: 52rem) { .ear-training-intro { margin: 1.5rem 1rem; } }
+    </style>
+    <title>Guitar Ear Training — Play Back Melodies on the Fretboard</title>
+  </head>
+  <body>
+    <nav aria-label="Language and guitar tools" class="flex justify-end gap-6 border-b border-hair bg-bg px-6 py-3 text-sm text-dim">
+      <a href="https://guitartoolbox.site/en/">Guitar Toolbox</a>
+      <a href="https://guitartoolbox.site/fretboard/ear-training/" lang="ja" hreflang="ja">Japanese</a>
+    </nav>
+    <div id="root"></div>
+    <section class="ear-training-intro" aria-labelledby="ear-training-heading">
+      <h1 id="ear-training-heading">Learn to play melodies by ear on the guitar</h1>
+      <p>Build the connection between what you hear and where you play it on the guitar. This ear training exercise plays a short melody, then asks you to recreate it by tapping notes on the fretboard. It is a useful place to start if you can follow guitar tabs but struggle to find a melody by ear. You can replay each phrase as often as you need, so take time to listen before reaching for an answer.</p>
+      <p>First, check the key. Listen to the opening chord and the tonic, the note that gives the key its sense of home. Then listen to the phrase and notice its contour: does each note move up, move down, or stay the same? Tap the notes in the order you heard them. Each tap sounds immediately, letting you compare the pitch with the melody in your memory. Choose a range of strings and frets that feels manageable.</p>
+      <p>After your answer, compare the correct phrase with your own using the separate playback controls. The answer shows both note names and scale degrees. A scale degree describes a note’s position relative to the tonic; in C major, E, G, A, G forms the pattern 3, 5, 6, 5. Thinking in degrees helps you recognize the same melodic shape in another key. Once you get a phrase right, try it in a different key while keeping that pattern.</p>
+      <p>Start with level 1 for short phrases that move between neighboring scale notes. Levels 1 and 2 show the first note and accept octave equivalents by default. Later levels introduce longer phrases, wider leaps, more keys, and eventually natural minor. You can change whether octave equivalents count as correct. If you get stuck, reveal hints one step at a time: melodic contour, notes in the key, then the next note. Aim for a few attentive repetitions, listen again to any mismatch, and gradually expand your range as you become more confident.</p>
+    </section>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

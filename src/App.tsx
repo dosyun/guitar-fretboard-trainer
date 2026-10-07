@@ -1,4 +1,4 @@
-import { intervalLabel } from './i18n';
+import { currentLanguageUrl, intervalLabel } from './i18n';
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Fretboard, PinnedStringLabels } from './components/Fretboard';
 import { NoteSelector } from './components/NoteSelector';
@@ -110,7 +110,8 @@ const PRACTICE_MODE_GROUPS: { label: string; modes: { v: PracticeMode; l: string
 
 function App() {
   const [accidental, setAccidental] = useState<Accidental>('flat');
-  const [view, setView] = useState<AppView>('home');
+  const [view, setView] = useState<AppView>(() =>
+    /\/ear-training\/?$/.test(window.location.pathname) ? 'practice' : 'home');
   const [theoryTab, setTheoryTab] = useState<TheoryTab>('learn');
   const [learnOpenId, setLearnOpenId] = useState<string | undefined>(undefined);
   const [settingsShowHelp, setSettingsShowHelp] = useState(false);
@@ -147,9 +148,20 @@ function App() {
   const [sessionKind, setSessionKind] = useState<'daily' | 'challenge'>('challenge');
   const [challengeLength, setChallengeLength] = useState<number | null>(10);
   const [dailyLength, setDailyLength] = useState(15);
-  const [practiceMode, setPracticeMode] = useState<PracticeMode>('basic');
+  const [practiceMode, setPracticeMode] = useState<PracticeMode>(() =>
+    /\/ear-training\/?$/.test(window.location.pathname) ? 'ear' : 'basic');
   const [onboarded, setOnboarded] = useState(isOnboarded());
   const goal = getGoal();
+
+  useEffect(() => {
+    const home = currentLanguageUrl();
+    const path = view === 'practice' && practiceMode === 'ear'
+      ? home + 'ear-training/' : home;
+    if (window.location.pathname !== path) {
+      window.history.replaceState(window.history.state, '',
+        path + window.location.search + window.location.hash);
+    }
+  }, [view, practiceMode]);
 
   const {
     quiz,

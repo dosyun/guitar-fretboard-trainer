@@ -15,7 +15,14 @@ export default defineConfig(({ mode }) => {
     base: '/fretboard/',
     build: {
       outDir: 'dist/fretboard',
-      rolldownOptions: { input: { ja: resolve('index.html'), en: resolve('en/index.html') } },
+      rolldownOptions: {
+        input: {
+          ja: resolve('index.html'),
+          en: resolve('en/index.html'),
+          earTrainingJa: resolve('ear-training/index.html'),
+          earTrainingEn: resolve('en/ear-training/index.html'),
+        },
+      },
     },
     plugins: [
       {
@@ -99,6 +106,9 @@ export default defineConfig(({ mode }) => {
           cacheId: 'gft-fretboard',
           // 未知の URL はオンライン・オフラインともアプリへ置き換えない。
           navigateFallback: null,
+          // 各ディレクトリの専用 HTML に解決し、言語と耳トレの URL を保つ。
+          // 下の globPatterns で4つの HTML をすべて precache に含める。
+          directoryIndex: 'index.html',
           // フォントも同梱(woff2)なので precache に含まれオフライン対応。外部フォント取得なし。
           globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,webmanifest}'],
         },

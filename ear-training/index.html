@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="聴いた短いフレーズを指板で再現するギター耳トレ。音名と度数で答え合わせし、ヒントや聴き直しを使いながら、耳コピを段階的に練習できます。" />
+    <meta name="theme-color" content="#0e0f12" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Fretboard" />
+    <link rel="canonical" href="https://guitartoolbox.site/fretboard/ear-training/" />
+    <link rel="alternate" hreflang="ja" href="https://guitartoolbox.site/fretboard/ear-training/" />
+    <link rel="alternate" hreflang="en" href="https://guitartoolbox.site/fretboard/en/ear-training/" />
+    <link rel="alternate" hreflang="x-default" href="https://guitartoolbox.site/fretboard/en/ear-training/" />
+    <meta property="og:url" content="https://guitartoolbox.site/fretboard/ear-training/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Guitar Toolbox" />
+    <meta property="og:title" content="耳コピ練習｜聴いたフレーズを指板で弾く耳トレ — Guitar Toolbox" />
+    <meta property="og:description" content="聴いた短いフレーズを指板で再現するギター耳トレ。音名と度数で答え合わせし、ヒントや聴き直しを使いながら、耳コピを段階的に練習できます。" />
+    <meta property="og:image" content="https://guitartoolbox.site%BASE_URL%pwa-512x512.png" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="耳コピ練習｜聴いたフレーズを指板で弾く耳トレ — Guitar Toolbox" />
+    <meta name="twitter:description" content="聴いた短いフレーズを指板で再現するギター耳トレ。音名と度数で答え合わせし、ヒントや聴き直しを使いながら、耳コピを段階的に練習できます。" />
+    <meta name="twitter:image" content="https://guitartoolbox.site%BASE_URL%pwa-512x512.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Guitar Toolbox ギター耳トレ",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "url": "https://guitartoolbox.site/fretboard/ear-training/",
+        "description": "聴いた短いフレーズを指板で再現するギター耳トレ。音名と度数で答え合わせし、ヒントや聴き直しを使いながら、耳コピを段階的に練習できます。",
+        "inLanguage": "ja",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" }
+      }
+    </script>
+    <style>
+      body { margin: 0; background: var(--bg, #0e0f12); color: var(--ink, #ece5d6); font-family: system-ui, sans-serif; }
+      .ear-training-intro { max-width: 48rem; margin: 2rem auto; padding: 1.5rem; background: var(--surface, #1b1813); border: 1px solid var(--hair, #322c22); border-radius: 0.75rem; }
+      .ear-training-intro h1 { margin: 0 0 1.5rem; font-size: 1.5rem; line-height: 1.4; }
+      .ear-training-intro p { margin: 1rem 0 0; line-height: 1.8; }
+      @media (max-width: 52rem) { .ear-training-intro { margin: 1.5rem 1rem; } }
+    </style>
+    <title>耳コピ練習｜聴いたフレーズを指板で弾く耳トレ — Guitar Toolbox</title>
+  </head>
+  <body>
+    <nav aria-label="言語とツール一覧" class="flex justify-end gap-6 border-b border-hair bg-bg px-6 py-3 text-sm text-dim">
+      <a href="https://guitartoolbox.site/">Guitar Toolbox</a>
+      <a href="https://guitartoolbox.site/fretboard/en/ear-training/" lang="en" hreflang="en">English</a>
+    </nav>
+    <div id="root"></div>
+    <section class="ear-training-intro" aria-labelledby="ear-training-heading">
+      <h1 id="ear-training-heading">聴いたフレーズを指板で再現する耳コピ練習</h1>
+      <p>聴いた短いメロディーを、画面の指板で再現する耳コピ練習です。TABを見れば弾けても、聴いた音の場所を探すのに迷う人は、まずレベル1から始めてください。キーを確かめ、最初に鳴る和音と主音を聴いてから、続くフレーズを何度か聴きます。音が上がるか下がるかに耳を向け、聴こえた順に指板をタップしましょう。</p>
+      <p>回答すると、正解の音名とキーに対する度数が並びます。度数は、そのキーの主音から数えた音の位置です。正解と自分の回答を聴き比べ、違った音を確かめてください。迷ったときはヒントで音の動き、音階、次の1音を順に確認できます。</p>
+      <p>レベル1と2は最初の音を手がかりにし、短いフレーズから練習します。慣れたら音数や跳躍の大きいレベルへ進みましょう。正解後には同じ度数の並びを別のキーで試せます。無理なく探せる弦とフレットの範囲を選び、少しずつ耳と指板の位置を結び付けていきます。</p>
+    </section>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

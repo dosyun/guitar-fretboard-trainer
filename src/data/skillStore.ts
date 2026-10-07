@@ -3,13 +3,28 @@
  * 練習エンジン（位置/度数）とは別に、スキル種別ごとの正答率を持ち、
  * 「音名/度数/トライアド/コードトーン/進行/キー機能」の習熟を横断表示する。
  */
-const KEY = 'gft-skills-v1';
+import type { PhraseKey, PhraseLevel } from './earPhrase';
 
-export type SkillId = 'note' | 'degree' | 'triad' | 'chordtone' | 'progression' | 'guidetone' | 'keyfunc' | 'ear';
+const KEY = 'gft-skills-v1';
+const MAX_PHRASE_ATTEMPTS = 2000;
+
+export type SkillId = 'note' | 'degree' | 'triad' | 'chordtone' | 'progression' | 'guidetone' | 'keyfunc' | 'ear' | 'ear-phrase';
+
+export interface PhraseSkillAttempt {
+  level: PhraseLevel;
+  hintLevel: 0 | 1 | 2 | 3;
+  playCount: number;
+  key: PhraseKey;
+  midis: number[];
+  answer: number[];
+  responseTimeMs: number;
+  allowOctave: boolean;
+}
 
 export interface SkillStat {
   n: number;
   correct: number;
+  phraseAttempts?: (PhraseSkillAttempt & { correct: boolean })[];
 }
 export type SkillMap = Partial<Record<SkillId, SkillStat>>;
 
@@ -22,6 +37,7 @@ export const SKILL_META: { id: SkillId; label: string }[] = [
   { id: 'guidetone', label: 'ガイド音' },
   { id: 'keyfunc', label: 'キー機能' },
   { id: 'ear', label: '耳（聴き分け）' },
+  { id: 'ear-phrase', label: '耳（フレーズ再現）' },
 ];
 
 function load(): SkillMap {
@@ -33,10 +49,17 @@ function load(): SkillMap {
   }
 }
 
-export function recordSkill(id: SkillId, correct: boolean): void {
+export function recordSkill(id: SkillId, correct: boolean, phrase?: PhraseSkillAttempt): void {
   const map = load();
   const cur = map[id] ?? { n: 0, correct: 0 };
-  map[id] = { n: cur.n + 1, correct: cur.correct + (correct ? 1 : 0) };
+  map[id] = {
+    ...cur,
+    n: cur.n + 1,
+    correct: cur.correct + (correct ? 1 : 0),
+    ...(phrase ? { phraseAttempts: [...(cur.phraseAttempts ?? []), {
+      ...phrase, key: { ...phrase.key }, midis: [...phrase.midis], answer: [...phrase.answer], correct,
+    }].slice(-MAX_PHRASE_ATTEMPTS) } : {}),
+  };
   try {
     localStorage.setItem(KEY, JSON.stringify(map));
   } catch {

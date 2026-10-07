@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Segmented } from 'antd';
 import { INTERVAL_NAMES } from '../data/fretboard';
 import { playMidi } from '../data/audio';
@@ -7,12 +7,16 @@ import { getLastSession } from '../data/practiceStore';
 import { QuizFooter, QuizScore } from './QuizChrome';
 import { recordSkill } from '../data/skillStore';
 import { ResultScreen } from './ResultScreen';
+import { EarPhraseQuiz } from './EarPhraseQuiz';
 import type { Accidental, Feedback, IntervalName } from '../types';
 import type { SessionSummary } from '../types/practice';
 
 interface EarTrainingQuizProps {
   accidental: Accidental;
   onLearn?: () => void;
+  strings?: number[];
+  fretRange?: [number, number];
+  maxFret?: number;
 }
 
 type EarMode = 'third' | 'chord' | 'interval';
@@ -59,8 +63,8 @@ function playQuestion(midis: number[]) {
  * 耳トレ（Sound First）: 音だけ聴いて「明るい3rd?暗い3rd?」などを答える。
  * 視覚に頼らず“響き”で理論を身体化する。音が入ったので実現できた。
  */
-export function EarTrainingQuiz({ accidental, onLearn }: EarTrainingQuizProps) {
-  const [mode, setMode] = useState<EarMode>('third');
+export function EarTrainingQuiz({ accidental, onLearn, strings, fretRange, maxFret }: EarTrainingQuizProps) {
+  const [mode, setMode] = useState<EarMode | 'phrase'>('third');
   const [started, setStarted] = useState(false);
   const [q, setQ] = useState<Question | null>(null);
   const [picked, setPicked] = useState<string | null>(null);
@@ -70,6 +74,7 @@ export function EarTrainingQuiz({ accidental, onLearn }: EarTrainingQuizProps) {
   const session = useSession();
   const shownAt = useRef<number>(0);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   const choices: Choice[] =
     mode === 'third'
@@ -107,6 +112,7 @@ export function EarTrainingQuiz({ accidental, onLearn }: EarTrainingQuizProps) {
   };
 
   const start = () => {
+    if (mode === 'phrase') return;
     setResult(null);
     setScore({ correct: 0, total: 0 });
     setStarted(true);
@@ -124,9 +130,15 @@ export function EarTrainingQuiz({ accidental, onLearn }: EarTrainingQuizProps) {
     setResult(summary ? { summary, prev } : null);
   };
 
-  const handleMode = (m: EarMode) => {
+  const handleMode = (m: EarMode | 'phrase') => {
+    if (m === 'phrase') {
+      clearTimeout(timer.current);
+      if (started) session.finalize();
+      setStarted(false);
+      setQ(null);
+      setResult(null);
+    } else if (started) ask(m);
     setMode(m);
-    if (started) ask(m);
   };
 
   const answer = (choiceKey: string) => {
@@ -145,10 +157,10 @@ export function EarTrainingQuiz({ accidental, onLearn }: EarTrainingQuizProps) {
     setFeedback(ok ? 'correct' : 'wrong');
     setScore((s) => ({ correct: s.correct + (ok ? 1 : 0), total: s.total + 1 }));
     clearTimeout(timer.current);
-    timer.current = setTimeout(() => ask(mode), ok ? 1100 : 2400);
+    timer.current = setTimeout(() => { if (mode !== 'phrase') ask(mode); }, ok ? 1100 : 2400);
   };
 
-  if (result) {
+  if (result && mode !== 'phrase') {
     return (
       <ResultScreen
         summary={result.summary}
@@ -166,15 +178,20 @@ export function EarTrainingQuiz({ accidental, onLearn }: EarTrainingQuizProps) {
       <div className="flex justify-center overflow-x-auto">
         <Segmented
           value={mode}
-          onChange={(v) => handleMode(v as EarMode)}
+          onChange={(v) => handleMode(v as EarMode | 'phrase')}
           options={[
             { label: '3度（明暗）', value: 'third' },
             { label: 'コード（明暗）', value: 'chord' },
             { label: '音程', value: 'interval' },
+            { label: 'フレーズ', value: 'phrase' },
           ]}
         />
       </div>
 
+      {mode === 'phrase' ? (
+        <EarPhraseQuiz accidental={accidental} onLearn={onLearn} strings={strings} fretRange={fretRange} maxFret={maxFret} />
+      ) : (
+        <>
       {started && q && (
         <>
           <QuizScore correct={score.correct} total={score.total} />
@@ -226,6 +243,8 @@ export function EarTrainingQuiz({ accidental, onLearn }: EarTrainingQuizProps) {
         onLearn={onLearn}
         hint="音だけを聴いて答える耳トレ。長3度=明るい、短3度=暗い…を“響き”で覚えると、視覚に頼らず演奏・耳コピに繋がる。（音オフ時は設定でON）"
       />
+        </>
+      )}
     </>
   );
 }
