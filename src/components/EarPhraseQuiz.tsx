@@ -22,6 +22,23 @@ const NOTE_STEP_MS = 550;
 const BUTTON = 'px-4 py-2 rounded-lg bg-panel text-ink border border-hair hover:bg-accent-soft disabled:opacity-50 font-mono';
 const MOTION = { up: '↑', down: '↓', same: '→' };
 
+function noteCountLabel(min: number, max: number) {
+  return min === max ? t('{0}音', min) : t('{0}〜{1}音', min, max);
+}
+
+// maxScaleStep は音階上の段数。1 は隣の音だけ、7 はオクターブ。
+function motionLabel(maxScaleStep: number) {
+  switch (maxScaleStep) {
+    case 1: return t('隣の音へ順に動くだけ');
+    case 2: return t('3度までの跳躍');
+    case 3: return t('4度までの跳躍');
+    case 4: return t('5度までの跳躍');
+    case 5: return t('6度までの跳躍');
+    case 6: return t('7度までの跳躍');
+    default: return t('オクターブまでの跳躍');
+  }
+}
+
 export interface EarPhraseQuizProps {
   accidental: Accidental;
   onLearn?: () => void;
@@ -231,7 +248,7 @@ export function EarPhraseQuiz({
           ))}
         </div>
         <p className="text-xs text-dim text-center font-mono tabular-nums">
-          {t('{0}〜{1}音・最大{2}度の動き', PHRASE_LEVELS[level].minNotes, PHRASE_LEVELS[level].maxNotes, PHRASE_LEVELS[level].maxScaleStep + 1)}
+          {t('{0}・{1}', noteCountLabel(PHRASE_LEVELS[level].minNotes, PHRASE_LEVELS[level].maxNotes), motionLabel(PHRASE_LEVELS[level].maxScaleStep))}
         </p>
         <PracticeRangeSelector selectedStrings={selectedStrings} fretRange={range.fretRange}
           maxFret={limit} accidental={accidental} selectedNotes={selectedNotes}
