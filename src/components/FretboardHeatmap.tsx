@@ -10,6 +10,8 @@ interface FretboardHeatmapProps {
   maxFret: number;
   accidental: Accidental;
   metric?: HeatMetric;
+  /** 記録がないとき指板の中央に案内文を重ねる。周りで同じ説明をしている画面では false */
+  emptyHint?: boolean;
 }
 
 // レイアウト (FretboardMap の非both設定に揃える)
@@ -42,7 +44,7 @@ function heat(v: number): { fill: string; opacity: number } {
   return { fill, opacity: 0.35 + 0.55 * clamp01(Math.max(v, 0.18)) };
 }
 
-export function FretboardHeatmap({ maxFret, accidental, metric = 'weakness' }: FretboardHeatmapProps) {
+export function FretboardHeatmap({ maxFret, accidental, metric = 'weakness', emptyHint = true }: FretboardHeatmapProps) {
   const metrics = getNoteRecognitionMetrics();
   const byCell = new Map<string, CellMetrics>();
   metrics.forEach((m) => byCell.set(`${m.pos.string}:${m.pos.fret}`, m));
@@ -142,7 +144,7 @@ export function FretboardHeatmap({ maxFret, accidental, metric = 'weakness' }: F
         })
       )}
 
-      {!hasData && (
+      {!hasData && emptyHint && (
         <text x={totalWidth / 2} y={totalHeight / 2} textAnchor="middle" dominantBaseline="central" fontSize={11} fill={BOARD.stringLabel}>
           まだ記録がありません — クイズで音名を練習すると弱点が色で見えます
         </text>

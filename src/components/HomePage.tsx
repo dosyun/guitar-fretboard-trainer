@@ -79,12 +79,11 @@ export function HomePage({ accidental, maxFret, dailyLength, goal, onStartGoal, 
       <section aria-labelledby="daily-title" className="rounded-2xl border border-hair border-t-case-edge bg-surface p-3 sm:p-6">
         <div className="grid gap-3 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="flex flex-col justify-end gap-6 rounded-lg bg-glass p-4 sm:p-6">
-            {/* 窓の主役: 自分の弱点を指板の上に (成績タブのヒートマップと同じ集計)。スマホでは数字だけ */}
-            {hasData && (
-              <div className="hidden overflow-x-auto sm:block">
-                <FretboardHeatmap maxFret={maxFret} accidental={accidental} />
-              </div>
-            )}
+            {/* 窓の主役: 自分の弱点を指板の上に (成績タブのヒートマップと同じ集計)。スマホでは数字だけ。
+                記録がなくても空の指板を出す (初回に窓の上半分が空かないように)。案内は下の「次にやること」が担う */}
+            <div className="hidden overflow-x-auto sm:block">
+              <FretboardHeatmap maxFret={maxFret} accidental={accidental} emptyHint={false} />
+            </div>
             <div className="flex flex-wrap items-end gap-x-12 gap-y-6">
             <div>
               <p className="text-xs text-dim">指板習熟度</p>
