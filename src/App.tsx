@@ -125,6 +125,16 @@ function App() {
   const [fretRange, setFretRange] = useState<[number, number]>([0, 12]);
   const [selectedNotes, setSelectedNotes] = useState<string[] | null>(null);
   const fretboardScrollRef = useRef<HTMLDivElement>(null);
+  const theoryNavRef = useRef<HTMLDivElement>(null);
+
+  // 理論サブナビはスマホ幅では横スクロールの1行。レッスンの導線などで切り替わったとき、
+  // 選択中の項目を帯の中央へ寄せる（ページ自体は縦にスクロールさせない）
+  useEffect(() => {
+    const nav = theoryNavRef.current;
+    const active = nav?.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (!nav || !active || nav.scrollWidth <= nav.clientWidth) return;
+    nav.scrollLeft = active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2;
+  }, [view, theoryTab]);
 
   // CAGED state
   const [cagedSubView, setCagedSubView] = useState<'display' | 'quiz'>('display');
@@ -533,13 +543,15 @@ function App() {
 
         {/* ===== 理論ビュー: サブナビ ===== */}
         {view === 'theory' && (
-          <div className="flex flex-wrap gap-2">
+          // スマホ幅は8項目を折り返さず横スクロールの1行にする（3行に折れて画面上部を取るため）。
+          // 帯を画面端まで広げ、端で切れた項目が見えることで続きがあると分かるようにする
+          <div ref={theoryNavRef} className="relative -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
             {THEORY_TABS.map((t) => (
               <button
                 key={t.key}
                 onClick={() => setTheoryTab(t.key)}
                 aria-pressed={theoryTab === t.key}
-                className={`min-h-12 whitespace-nowrap px-4 py-3 rounded-lg text-sm font-medium border ${
+                className={`min-h-12 shrink-0 whitespace-nowrap px-4 py-3 rounded-lg text-sm font-medium border ${
                   theoryTab === t.key
                     ? 'bg-accent-soft text-accent border-accent'
                     : 'bg-panel text-dim border-hair'

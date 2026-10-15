@@ -10,7 +10,7 @@ import { useSession } from '../hooks/useSession';
 import { getLastSession } from '../data/practiceStore';
 import { recordSkill } from '../data/skillStore';
 import { ResultScreen } from './ResultScreen';
-import { QuizFooter, QuizScore } from './QuizChrome';
+import { QuizFooter, QuizScore, QuizStart } from './QuizChrome';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
 import type { SessionSummary } from '../types/practice';
 
@@ -132,7 +132,7 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
       </div>
 
       <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
-      {started && (
+      {started ? (
         <>
           <QuizScore correct={score.correct} total={score.total} />
 
@@ -161,6 +161,8 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
             )}
           </div>
         </>
+      ) : (
+        <QuizStart onStart={start} onLearn={onLearn} />
       )}
 
       <div className="bg-glass rounded-lg p-2 overflow-x-auto">
@@ -178,9 +180,7 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
 
       <QuizFooter
         started={started}
-        onStart={start}
         onStop={stop}
-        onLearn={onLearn}
         hint="コードの構成音を指板で見つける練習。ルートとコードタイプを選んで、指定の度数の音をタップします。"
       />
     </>

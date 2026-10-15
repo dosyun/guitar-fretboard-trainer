@@ -5,7 +5,8 @@ import { playMidi } from '../data/audio';
 import { useSession } from '../hooks/useSession';
 import { getLastSession } from '../data/practiceStore';
 import { FootSwitch } from './FootSwitch';
-import { QuizFooter, QuizScore } from './QuizChrome';
+import { footSwitchGridClass } from './footSwitchGrid';
+import { QuizFooter, QuizScore, QuizStart } from './QuizChrome';
 import { recordSkill } from '../data/skillStore';
 import { ResultScreen } from './ResultScreen';
 import { EarPhraseQuiz } from './EarPhraseQuiz';
@@ -193,8 +194,11 @@ export function EarTrainingQuiz({ accidental, onLearn, strings, fretRange, maxFr
         <EarPhraseQuiz accidental={accidental} onLearn={onLearn} strings={strings} fretRange={fretRange} maxFret={maxFret} />
       ) : (
         <>
-      {started && q && (
-        <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
+      <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
+        {!started ? (
+          <QuizStart onStart={start} onLearn={onLearn} />
+        ) : q && (
+          <>
           <QuizScore correct={score.correct} total={score.total} />
 
           <div className="text-center space-y-3">
@@ -207,7 +211,7 @@ export function EarTrainingQuiz({ accidental, onLearn, strings, fretRange, maxFr
 
             <p className="text-sm text-dim">聴こえた響きは？</p>
 
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3 w-full">
+            <div className={footSwitchGridClass(choices.map((c) => c.label))}>
               {choices.map((c) => {
                 const isAnswer = !!feedback && c.key === q.answer;
                 const isWrongPick = !!feedback && c.key === picked && !isAnswer;
@@ -230,14 +234,13 @@ export function EarTrainingQuiz({ accidental, onLearn, strings, fretRange, maxFr
               </p>
             )}
           </div>
-        </div>
-      )}
+          </>
+        )}
+      </div>
 
       <QuizFooter
         started={started}
-        onStart={start}
         onStop={stop}
-        onLearn={onLearn}
         hint="音だけを聴いて答える耳トレ。長3度=明るい、短3度=暗い…を“響き”で覚えると、視覚に頼らず演奏・耳コピに繋がる。（音オフ時は設定でON）"
       />
         </>

@@ -57,7 +57,7 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
     <div className="flex flex-col gap-6 sm:gap-8">
       <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6">
         {/* キー選択 */}
-        <RootSelector current={key} accidental={accidental} onChange={setKey} />
+        <RootSelector label="キー:" current={key} accidental={accidental} onChange={setKey} />
 
         {/* サブビュー切替 */}
         <div className="flex justify-center mt-3">

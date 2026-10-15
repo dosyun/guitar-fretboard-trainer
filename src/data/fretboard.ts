@@ -32,6 +32,22 @@ export const NOTE_COLORS: Record<string, { bg: string; text: string; border: str
   'B':  { bg: '#db2777', text: '#fff', border: '#be185d' },   // ピンク
 };
 
+/** 度数ごとの色 (指板マップの度数表示の縁取り。R はマーカーの塗りにも使う) */
+export const INTERVAL_COLORS: Record<string, string> = {
+  'R': '#dc2626',    // 赤 (ルート)
+  'm2': '#9ca3af',
+  'M2': '#6b7280',
+  'm3': '#2563eb',   // 青系
+  'M3': '#3b82f6',
+  'P4': '#16a34a',   // 緑
+  '#4/b5': '#a855f7', // 紫
+  'P5': '#ea580c',   // オレンジ
+  'm6': '#64748b',
+  'M6': '#475569',
+  'm7': '#0891b2',   // シアン
+  'M7': '#06b6d4',
+};
+
 export const INTERVAL_NAMES: IntervalName[] = [
   'R', 'm2', 'M2', 'm3', 'M3', 'P4', '#4/b5', 'P5', 'm6', 'M6', 'm7', 'M7',
 ];

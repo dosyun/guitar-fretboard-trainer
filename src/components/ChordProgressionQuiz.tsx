@@ -10,7 +10,7 @@ import { useSession } from '../hooks/useSession';
 import { getLastSession } from '../data/practiceStore';
 import { recordSkill } from '../data/skillStore';
 import { ResultScreen } from './ResultScreen';
-import { QuizFooter, QuizScore } from './QuizChrome';
+import { QuizFooter, QuizScore, QuizStart } from './QuizChrome';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
 import type { SessionSummary } from '../types/practice';
 
@@ -138,10 +138,7 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
 
   return (
     <>
-      <div className="flex items-center gap-2 justify-center flex-wrap">
-        <span className="text-sm text-dim">キー:</span>
-        <RootSelector current={keyRoot} accidental={accidental} onChange={handleKey} />
-      </div>
+      <RootSelector label="キー:" current={keyRoot} accidental={accidental} onChange={handleKey} />
 
       <div className="flex justify-center overflow-x-auto">
         <Segmented
@@ -170,7 +167,7 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
       </div>
 
       <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
-      {started && (
+      {started ? (
         <>
           <QuizScore correct={score.correct} total={score.total} />
 
@@ -196,6 +193,8 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
             )}
           </div>
         </>
+      ) : (
+        <QuizStart onStart={start} onLearn={onLearn} />
       )}
 
       <div className="bg-glass rounded-lg p-2 overflow-x-auto">
@@ -213,9 +212,7 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
 
       <QuizFooter
         started={started}
-        onStart={start}
         onStop={stop}
-        onLearn={onLearn}
         hint="コード進行に合わせて、各コードのターゲット音を指板で押さえる練習。チェンジに乗ってコードトーンを狙う感覚を養う。"
       />
     </>

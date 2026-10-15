@@ -6,7 +6,8 @@ import { getNoteNames, getNoteIndex, INTERVAL_NAMES } from '../data/fretboard';
 import { useSession } from '../hooks/useSession';
 import { getLastSession } from '../data/practiceStore';
 import { FootSwitch } from './FootSwitch';
-import { QuizFooter, QuizScore } from './QuizChrome';
+import { footSwitchGridClass } from './footSwitchGrid';
+import { QuizFooter, QuizScore, QuizStart } from './QuizChrome';
 import { recordSkill } from '../data/skillStore';
 import { ResultScreen } from './ResultScreen';
 import type { Accidental, NoteName, Feedback } from '../types';
@@ -144,10 +145,7 @@ export function KeyFunctionQuiz({ accidental, onLearn }: KeyFunctionQuizProps) {
 
   return (
     <>
-      <div className="flex items-center gap-2 justify-center flex-wrap">
-        <span className="text-sm text-dim">キー:</span>
-        <RootSelector current={keyRoot} accidental={accidental} onChange={handleKey} />
-      </div>
+      <RootSelector label="キー:" current={keyRoot} accidental={accidental} onChange={handleKey} />
 
       <div className="flex justify-center">
         <Segmented
@@ -160,8 +158,9 @@ export function KeyFunctionQuiz({ accidental, onLearn }: KeyFunctionQuizProps) {
         />
       </div>
 
-      {started && (
-        <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
+      <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
+        {started ? (
+          <>
           <QuizScore correct={score.correct} total={score.total} />
 
           <div className="text-center space-y-2">
@@ -172,7 +171,7 @@ export function KeyFunctionQuiz({ accidental, onLearn }: KeyFunctionQuizProps) {
               ])}
             </p>
 
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3 w-full">
+            <div className={footSwitchGridClass(choices.map((c) => c.label))}>
               {choices.map((c) => {
                 const isAnswer = !!feedback && c.val === correctVal;
                 const isWrongPick = !!feedback && c.val === picked && !isAnswer;
@@ -201,14 +200,15 @@ export function KeyFunctionQuiz({ accidental, onLearn }: KeyFunctionQuizProps) {
               </div>
             )}
           </div>
-        </div>
-      )}
+          </>
+        ) : (
+          <QuizStart onStart={start} onLearn={onLearn} />
+        )}
+      </div>
 
       <QuizFooter
         started={started}
-        onStart={start}
         onStop={stop}
-        onLearn={onLearn}
         hint="音名ではなく“キーの中での役割”を答える練習。FはIV、Amはvi、Vはドミナント…が分かると、曲の構造・耳コピ・アドリブに直結する。"
       />
     </>

@@ -13,13 +13,14 @@ import { t } from '../i18n';
 import type { Accidental } from '../types';
 import type { AttemptInput, SessionSummary } from '../types/practice';
 import { PracticeRangeSelector } from './PracticeRangeSelector';
-import { QuizFooter, QuizScore } from './QuizChrome';
+import { QuizFooter, QuizScore, QuizStart } from './QuizChrome';
 import { ResultScreen } from './ResultScreen';
 
 const ALL_STRINGS = [0, 1, 2, 3, 4, 5];
 const DEFAULT_RANGE: [number, number] = [0, 12];
 const NOTE_STEP_MS = 550;
-const BUTTON = 'px-4 min-h-12 rounded-lg bg-panel text-ink border border-hair hover:border-dim disabled:opacity-50';
+const BUTTON_BASE = 'px-4 min-h-12 rounded-lg border disabled:opacity-50';
+const BUTTON = `${BUTTON_BASE} bg-panel text-ink border-hair hover:border-dim`;
 const MOTION = { up: '↑', down: '↓', same: '→' };
 
 function noteCountLabel(min: number, max: number) {
@@ -242,7 +243,7 @@ export function EarPhraseQuiz({
         <div className="flex flex-wrap justify-center gap-2">
           {([1, 2, 3, 4] as PhraseLevel[]).map((value) => (
             <button key={value} aria-pressed={level === value} onClick={() => changeLevel(value)}
-              className={BUTTON + (level === value ? ' bg-accent-soft text-accent border-accent' : '')}>
+              className={level === value ? `${BUTTON_BASE} bg-accent-soft text-accent border-accent` : BUTTON}>
               {t('レベル {0}', value)}
             </button>
           ))}
@@ -261,8 +262,12 @@ export function EarPhraseQuiz({
       </label>
       {notice && <p role="alert" className="text-sm text-ink text-center text-pretty">{notice}</p>}
       {started && !question && <button className={BUTTON} onClick={nextQuestion}>{t('この範囲で再出題')}</button>}
-      {started && question && (
+      {(!started || question) && (
         <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
+          {!started || !question ? (
+            <QuizStart onStart={start} onLearn={onLearn} />
+          ) : (
+          <>
           <QuizScore correct={sessionCorrect} total={count} />
           <div className="text-center space-y-3">
             <p className="font-mono tabular-nums text-ink">
@@ -340,9 +345,11 @@ export function EarPhraseQuiz({
               </div>
             </div>
           )}
+          </>
+          )}
         </div>
       )}
-      <QuizFooter started={started} onStart={start} onStop={stop} onLearn={onLearn} />
+      <QuizFooter started={started} onStop={stop} />
     </section>
   );
 }

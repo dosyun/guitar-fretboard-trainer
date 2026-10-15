@@ -1,4 +1,4 @@
-import { getNoteAt, getNoteLabel, getIntervalAt, NOTE_COLORS } from '../data/fretboard';
+import { getNoteAt, getNoteLabel, getIntervalAt, NOTE_COLORS, INTERVAL_COLORS } from '../data/fretboard';
 import { getOpenStringName } from '../data/fretboard';
 import { BOARD } from '../data/boardPalette';
 import type { Accidental, NoteName } from '../types';
@@ -19,22 +19,6 @@ const NUT_WIDTH = 4;
 
 const SINGLE_DOTS = [3, 5, 7, 9];
 const DOUBLE_DOT = 12;
-
-// 度数に応じた色
-const INTERVAL_COLORS: Record<string, string> = {
-  'R': '#dc2626',    // 赤 (ルート)
-  'm2': '#9ca3af',
-  'M2': '#6b7280',
-  'm3': '#2563eb',   // 青系
-  'M3': '#3b82f6',
-  'P4': '#16a34a',   // 緑
-  '#4/b5': '#a855f7', // 紫
-  'P5': '#ea580c',   // オレンジ
-  'm6': '#64748b',
-  'M6': '#475569',
-  'm7': '#0891b2',   // シアン
-  'M7': '#06b6d4',
-};
 
 export function FretboardMap({
   maxFret,
@@ -183,11 +167,11 @@ export function FretboardMap({
           const interval = getIntervalAt(s, f, rootNote);
           const label = displayMode === 'notes' ? noteDisplay : interval;
           const noteColor = NOTE_COLORS[noteKey] || { bg: 'var(--dim)', text: 'var(--bg)', border: 'var(--hair)' };
-          const intervalColor = INTERVAL_COLORS[interval] || '#6b7280';
+          const intervalColor = INTERVAL_COLORS[interval] || 'var(--dim)';
 
           const circleFill = displayMode === 'notes'
             ? noteColor.bg
-            : interval === 'R' ? '#dc2626' : 'var(--ink)';
+            : interval === 'R' ? INTERVAL_COLORS.R : 'var(--ink)';
           const circleStroke = displayMode === 'notes'
             ? noteColor.border
             : (inRange ? intervalColor : 'var(--dim)');

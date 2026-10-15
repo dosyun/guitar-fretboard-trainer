@@ -5,6 +5,7 @@ import type { LessonCheckQ, LessonLevel } from '../data/lessons';
 import { getCompletedLessons, markLessonComplete } from '../data/lessonProgress';
 import { LessonFretboard } from './LessonFretboard';
 import { FootSwitch } from './FootSwitch';
+import { footSwitchGridClass } from './footSwitchGrid';
 
 interface LessonsPageProps {
   onGoto: (target: string) => void;
@@ -34,7 +35,7 @@ function LessonCheck({ check }: { check: LessonCheckQ[] }) {
         return (
           <div key={qi} className="space-y-3">
             <p className="text-sm leading-relaxed text-ink text-pretty">{q.q}</p>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className={footSwitchGridClass(q.choices)}>
               {q.choices.map((c, ci) => (
                 <FootSwitch
                   key={ci}

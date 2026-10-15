@@ -6,7 +6,7 @@ import { RootSelector } from './RootSelector';
 import { getNoteAt, getNoteNames, getNoteIndex, getMidiAt, INTERVAL_NAMES } from '../data/fretboard';
 import { playMidi, playChord } from '../data/audio';
 import { recordSkill } from '../data/skillStore';
-import { QuizFooter } from './QuizChrome';
+import { QuizFooter, QuizStart } from './QuizChrome';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
 
 interface TriadBuilderProps {
@@ -136,7 +136,7 @@ export function TriadBuilder({ accidental, maxFret, onLearn }: TriadBuilderProps
       </div>
 
       <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
-      {started && (
+      {started ? (
         <>
           <div className="flex justify-center text-sm">
             <div className="text-center">
@@ -171,6 +171,8 @@ export function TriadBuilder({ accidental, maxFret, onLearn }: TriadBuilderProps
             {wrongMsg && <p className="text-wrong text-sm mt-1">{wrongMsg}</p>}
           </div>
         </>
+      ) : (
+        <QuizStart onStart={start} onLearn={onLearn} />
       )}
 
       <div className="bg-glass rounded-lg p-2 overflow-x-auto">
@@ -187,9 +189,7 @@ export function TriadBuilder({ accidental, maxFret, onLearn }: TriadBuilderProps
 
       <QuizFooter
         started={started}
-        onStart={start}
         onStop={stop}
-        onLearn={onLearn}
         hint="R・3・5を指板から集めてコードを組み立てます。メジャーとマイナーは3度だけが半音違います。"
       />
     </>

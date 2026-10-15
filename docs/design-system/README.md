@@ -73,6 +73,8 @@
 | 4 | 筐体: 12音のフットスイッチ | 6列×2段（スマホ 4列×3段）、下に状態ランプ | 3割 |
 | 5 | 終了 | 筐体の下に控えめなボタン | — |
 
+開始前は、2 の読み取りの位置に窓（`bg-glass`）を置き、問題数の切り替えと開始ボタン（主ボタン）を入れる。コードトーン・進行・トライアド・キー機能・耳トレ・ガイド音も同じで、共通部品 `QuizStart`（`QuizChrome.tsx`）を筐体の中に置く。終了ボタン（`QuizFooter`）と1行の説明は筐体の下に置く。
+
 ### ホーム
 
 元の骨格は「小ラベル＋大見出し＋短文3行 → 今日の練習カード（飾りの指板図）＋目標カード＋レッスンカード → 学習マップ＋手応え」。
@@ -188,7 +190,7 @@ Tailwind の 1・2・3・4・6・8（4・8・12・16・24・32px）だけを使�
 | セクションの区切り | 筐体の外は、見出し（`text-sm font-semibold text-ink`）と `border-t border-hair` の線で区切る。カードで囲まない |
 | カードの並び | 使わない。選択肢の一覧（目標・レッスン・フェーズ）は、罫線で区切ったリストの行か、`bg-panel rounded-lg` の選択肢ボタンにする |
 | ボタン | 主: `bg-accent text-bg font-semibold rounded-lg min-h-12`（1画面1つ）。副: `bg-panel text-ink border border-hair rounded-lg min-h-12`。文字リンク型: `text-dim hover:text-ink` |
-| 選択肢（フットスイッチ） | `bg-panel border border-hair rounded-lg min-h-14`。音名は `font-mono text-xl`。下に状態ランプ（`size-2 rounded-full`、平常 `bg-glass`、正解 `bg-correct`、不正解 `bg-wrong`）。選択中は `border-accent` |
+| 選択肢（フットスイッチ） | `bg-panel border border-hair rounded-lg min-h-14`。音名は `font-mono text-xl`（4文字以上のラベルは `text-sm`）。下に状態ランプ（`size-2 rounded-full`、平常 `bg-glass`、正解 `bg-correct`、不正解 `bg-wrong`）。選択中は `border-accent`。並べる列数は下の「選択肢の列数」で決める |
 | モード・範囲の切り替え | 閉じた `details` の1行（`summary` は `text-sm`）。中のトグルは選択肢と同じ形で小さく（`min-h-12 text-sm`） |
 | タグ | `rounded border border-hair px-2 text-xs text-dim`。クリア済みだけ `border-correct text-correct` |
 | 注意書き | `bg-glass rounded-lg p-3 text-sm`、先頭に状態ランプ1つ |
@@ -197,11 +199,26 @@ Tailwind の 1・2・3・4・6・8（4・8・12・16・24・32px）だけを使�
 | ブランド | 「Guitar Fretboard Trainer」を文字だけで。前に飾りの四角や点を置かない |
 | 計測バー | 習熟度・スキル・度数の弱点の棒。高さ `h-2`、溝は `bg-panel`、棒は値に応じた状態色。角丸なし |
 | 進捗バー | 高さ `h-1`（細い目盛り）。角丸なし。溝は `bg-glass`、進んだ分は `bg-dim`。完了したものだけ `bg-correct`。琥珀は使わない（琥珀は読み取りの主な数字と主ボタンのため） |
+| ルートとキーの選択 | `RootSelector`。行頭のラベルは部品が持ち、キーを選ぶ画面では `label="キー:"` を渡す。外側に別のラベルを足さない（「キー:」「ルート:」が二重になるため） |
+| 理論のサブナビ | 8項目を `bg-panel rounded-lg min-h-12` のボタンで並べる。スマホ幅（640px 未満）は折り返さず横スクロールの1行にし、帯を画面の端まで広げて続きがあることを見せる。選択中の項目は帯の中央へ寄せる。`sm` 以上は折り返して全項目を見せる |
 | 小さなトグル | 2〜4択の切り替えは antd `Segmented`（`src/index.css` で窓の色・選択中は琥珀の枠線にしてある）。自前で作るときは選択肢と同じ `bg-panel border border-hair rounded-lg min-h-12 text-sm`、選択中は `bg-accent-soft text-accent border-accent` |
+
+### 選択肢の列数
+
+フットスイッチを並べるグリッドの列数は、最長ラベルの表示幅（全角=2・半角=1）で決める。英語版の訳語も同じ規則で扱える。実装は `src/components/footSwitchGrid.ts` の `footSwitchGridClass`。
+
+| 最長ラベル | 例 | スマホ | `sm` 以上 |
+|---|---|---|---|
+| 全角4文字以内（幅8以下） | 音名、度数、ローマ数字、トニック | 3列 | 4列 |
+| 全角9文字以内（幅18以下） | サブドミナント、メジャー（明るい）、Dm7-G7-Cmaj7 | 2列 | 3列 |
+| それより長い | 2本細い弦・2フレット上 | 1列 | 2列 |
+
+列数は選択肢の数を超えない（2択を3列に置いて空きを作らない）。12音（`NoteSelector`）と度数（`IntervalSelector`）は全角4文字以内なので、それぞれの固定の並び（6列×2段など）のままにする。
+決め方の根拠: 375px 幅の筐体の中で3列にすると1列の内側は約84px で、`text-sm`（14px）の全角が6文字までしか入らない。2列なら約134px で9文字まで入る。
 
 ## 実装上の注意
 
-- 色は Tailwind のトークン名（`bg-surface` `text-dim` など）で指定し、`#` の色を直書きしない。例外は指板SVG（`boardPalette.ts` に集約）と、スケール・CAGED・度数などの音高の色分けデータだけ。度数の色（`FretboardMap.tsx` の `INTERVAL_COLORS`）はまだ部品の中にあり、`data/` への移動が残っている
+- 色は Tailwind のトークン名（`bg-surface` `text-dim` など）で指定し、`#` の色を直書きしない。例外は指板SVG（`boardPalette.ts` に集約）と、スケール・CAGED・度数などの音高の色分けデータだけ。音名の色（`NOTE_COLORS`）と度数の色（`INTERVAL_COLORS`）は `src/data/fretboard.ts` に置く
 - Ant Design の `Segmented`・`Tabs` は `src/index.css` の上書きでこの文書に合わせる
 - 例外として残した角丸・色には、その場で理由をコメントする
 
@@ -212,12 +229,8 @@ SNS で共有したときの画像は、[og-image.html](og-image.html) を版下
 
 ## 残っている課題
 
-- 度数の色分けデータ（`FretboardMap.tsx` の `INTERVAL_COLORS`）を `data/` に移す
-- 練習画面の一部（`QuizFooter` の開始ボタン）が筐体の外にある。各練習モードの開始操作を筐体の中にそろえる
-- フットスイッチの長いラベル（コード名・機能名）は2行に折れることがある。4文字を超える選択肢の幅の決め方を決める
-- `EarPhraseQuiz` のレベル選択に背景クラスが2つ重なっている（今回の作業より前から）
-- キー機能の画面で「キー:」の下に `RootSelector` 固定の「ルート:」が出て、ラベルが二重になる（今回の作業より前から）
-- 理論のサブナビ（8項目）がスマホ幅で3行に折り返し、画面の上部を取る
+2026-10-15 に、度数の色の移動・開始ボタンの筐体内への移動・選択肢の列数・キーの二重ラベル・理論サブナビ・`EarPhraseQuiz` のレベル選択の背景の重複を片付けた。残りは次のとおり。
+
 - レッスン一覧のリード文「各レッスンは1分ほど」は所要時間を測った値ではない（本文のため今回は変えていない）
 - `src/main.tsx` の antd 設定は CSS 変数を読めないため hex の実値を持つ。トークンを変えたらここもそろえる
 - 使われていない `src/App.css`（Vite テンプレートの残り）と、静的HTML（`ear-training/`・`en/`）に旧色値が残っている

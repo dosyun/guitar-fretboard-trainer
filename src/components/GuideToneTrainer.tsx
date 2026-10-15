@@ -11,7 +11,7 @@ import { useSession } from '../hooks/useSession';
 import { getLastSession } from '../data/practiceStore';
 import { recordSkill } from '../data/skillStore';
 import { ResultScreen } from './ResultScreen';
-import { QuizFooter, QuizScore } from './QuizChrome';
+import { QuizFooter, QuizScore, QuizStart } from './QuizChrome';
 import type { Accidental, NoteName, FretPosition, Feedback } from '../types';
 import type { SessionSummary } from '../types/practice';
 
@@ -171,10 +171,7 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
 
   return (
     <>
-      <div className="flex items-center gap-2 justify-center flex-wrap">
-        <span className="text-sm text-dim">キー:</span>
-        <RootSelector current={keyRoot} accidental={accidental} onChange={handleKey} />
-      </div>
+      <RootSelector label="キー:" current={keyRoot} accidental={accidental} onChange={handleKey} />
 
       <div className="flex justify-center overflow-x-auto">
         <Segmented
@@ -201,7 +198,7 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
       </div>
 
       <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
-      {started && (
+      {started ? (
         <>
           <QuizScore correct={score.correct} total={score.total} />
 
@@ -233,6 +230,8 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
             )}
           </div>
         </>
+      ) : (
+        <QuizStart onStart={start} onLearn={onLearn} />
       )}
 
       <div className="bg-glass rounded-lg p-2 overflow-x-auto">
@@ -250,9 +249,7 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
 
       <QuizFooter
         started={started}
-        onStart={start}
         onStop={stop}
-        onLearn={onLearn}
         hint="鳴っているコードに合わせて、3rd・7th（ガイドトーン）を狙う実戦課題。ガイド音はコードの色を決め、7th→3rdで滑らかに繋がる。理論を“弾ける”に変える。"
       />
     </>
