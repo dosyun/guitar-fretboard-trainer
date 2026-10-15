@@ -6,7 +6,7 @@ import { IntervalSelector } from './components/IntervalSelector';
 import { ModeSelector } from './components/ModeSelector';
 import { StudioIcon } from './components/StudioIcon';
 import { RootSelector } from './components/RootSelector';
-import { ScoreBoard } from './components/ScoreBoard';
+import { PracticeReadout } from './components/PracticeReadout';
 import { SettingsPanel } from './components/SettingsPanel';
 import { PracticeRangeSelector } from './components/PracticeRangeSelector';
 import { CagedFormSelector } from './components/CagedFormSelector';
@@ -80,7 +80,7 @@ const THEORY_INTRO: Record<TheoryTab, string> = {
   learn: '',
   map: '指板の全ポジションの音名・度数を一覧。まず全体像を掴むのに。',
   scale: 'スケール＝ソロやメロディで使う音の集合。ボックスごとに段階的に。',
-  caged: 'CAGED＝C/A/G/E/D の5フォームで指板全体を1つに繋ぐ考え方。',
+  caged: 'CAGED＝C/A/G/E/D の5つのフォームを並べて、指板全体を覚える方法。',
   voicing: 'バレーコードの押さえ方を度数で。ルートのある弦でフォームが決まる。',
   open: '開放弦を使うコード。最初に覚える定番フォーム集。',
   diatonic: 'キーで使えるコードの基本セット＋定番進行。曲はこの中で動く。',
@@ -146,6 +146,8 @@ function App() {
   const [result, setResult] = useState<{ summary: SessionSummary; prev: SessionSummary | null; kind: 'daily' | 'challenge'; target: number | null } | null>(null);
   const [sessionTarget, setSessionTarget] = useState<number | null>(null);
   const [sessionKind, setSessionKind] = useState<'daily' | 'challenge'>('challenge');
+  // 回答ごとの反応時間 (ms)。読み取り表示の「今回」「平均」に使い、平均は今のセッション分 (末尾 session.count 件)
+  const [msLog, setMsLog] = useState<number[]>([]);
   const [challengeLength, setChallengeLength] = useState<number | null>(10);
   const [dailyLength, setDailyLength] = useState(15);
   const [practiceMode, setPracticeMode] = useState<PracticeMode>(() =>
@@ -187,6 +189,7 @@ function App() {
     onWrong: recordWrong,
     onAttempt: (input) => {
       session.record(input);
+      setMsLog((log) => [...log.slice(-499), input.responseTimeMs]);
       recordSkill(input.quizType === 'interval' ? 'degree' : 'note', input.isCorrect);
     },
   });
@@ -482,11 +485,9 @@ function App() {
         style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top))' }}
       >
         <div className="max-w-screen-xl mx-auto flex flex-wrap items-center justify-between gap-x-8 gap-y-2">
-          <p className="font-mono text-base font-medium text-ink flex items-center gap-3">
-            <span className="inline-block size-2 rounded-sm bg-accent" aria-hidden="true" />
+          <p className="text-base font-semibold text-ink">
             Guitar Fretboard Trainer
           </p>
-          <p className={`${view === 'practice' && practiceMode === 'basic' && started ? 'hidden sm:block' : ''} text-xs text-dim`}>指板を覚える。音楽で使う。</p>
         </div>
       </header>
 
@@ -494,10 +495,7 @@ function App() {
       <main className="flex-1 flex flex-col gap-4 px-4 pt-6 pb-24 sm:gap-6 sm:px-8 lg:pb-8 max-w-screen-xl mx-auto w-full min-w-0">
         {(view === 'practice' || (view === 'theory' && theoryTab !== 'learn')) && (
           <div className={view === 'practice' && practiceMode === 'basic' && started ? 'sr-only' : 'space-y-2'}>
-            {!(view === 'practice' && practiceMode === 'basic' && started) && (
-              <p className="text-xs font-mono text-accent tracking-wide">{VIEW_HEADINGS[view].label}</p>
-            )}
-            <h1 className={`${view === 'practice' && practiceMode === 'basic' && started ? 'text-xl' : 'text-2xl'} font-semibold text-ink`}>{VIEW_HEADINGS[view].title}</h1>
+            <h1 className="text-xl font-semibold text-ink">{VIEW_HEADINGS[view].title}</h1>
             {!(view === 'practice' && practiceMode === 'basic' && started) && (
               <p className="text-sm text-dim text-pretty">{VIEW_HEADINGS[view].description}</p>
             )}
@@ -585,7 +583,7 @@ function App() {
               <RootSelector current={mapRoot} accidental={accidental} onChange={setMapRoot} />
             )}
 
-            <div className="overflow-x-auto bg-surface rounded-xl border border-hair p-2">
+            <div className="overflow-x-auto bg-glass rounded-lg p-2">
               <FretboardMap
                 maxFret={maxFret}
                 accidental={accidental}
@@ -609,14 +607,14 @@ function App() {
             />
 
             <p className="text-xs text-dim text-center text-pretty">
-              マップで全体を確認してからクイズに挑戦しよう。範囲を絞って段階的に覚えるのがおすすめ!
+              下の練習範囲で弦・フレット・音名を絞ると、練習でもその範囲だけを出題します。
             </p>
           </>
         )}
 
         {/* ===== 練習ビュー ===== */}
         {view === 'practice' && !result && (
-          <details open={!(practiceMode === 'basic' && started)} className="group rounded-xl bg-surface border border-hair">
+          <details open={!(practiceMode === 'basic' && started)} className="group rounded-lg border border-hair">
             <summary className="min-h-12 cursor-pointer list-none px-4 py-3 text-sm text-dim hover:text-ink flex items-center justify-between gap-3">
               <span>練習メニュー · <span className="text-ink">{PRACTICE_MODE_GROUPS.flatMap((group) => group.modes).find((mode) => mode.v === practiceMode)?.l}</span></span>
               <span className="text-xs group-open:rotate-180" aria-hidden="true">▾</span>
@@ -633,8 +631,8 @@ function App() {
                       aria-pressed={practiceMode === m.v}
                       className={`min-h-12 px-4 py-3 rounded-lg text-sm border ${
                         practiceMode === m.v
-                          ? 'bg-accent text-bg border-accent font-medium'
-                          : 'bg-panel text-dim border-hair hover:bg-accent-soft'
+                          ? 'bg-accent-soft text-accent border-accent font-medium'
+                          : 'bg-panel text-ink border-hair hover:border-dim'
                       }`}
                     >
                       {m.l}
@@ -684,8 +682,8 @@ function App() {
           />
         )}
         {view === 'practice' && practiceMode === 'basic' && !result && (
-          <div className="max-w-[1152px] mx-auto w-full flex flex-col gap-4 sm:gap-6">
-            <details open={!started} className="group rounded-xl bg-panel">
+          <div className="max-w-screen-xl mx-auto w-full flex flex-col gap-3 sm:gap-4">
+            <details open={!started} className="group rounded-lg border border-hair">
               <summary className="min-h-12 cursor-pointer list-none px-4 py-3 text-sm text-dim hover:text-ink flex items-center justify-between gap-3">
                 <span>出題モード · <span className="text-ink">{quiz.mode === 'position-to-note' ? '位置→音名' : quiz.mode === 'note-to-position' ? '音名→位置' : '度数'}</span></span>
                 <span className="text-xs group-open:rotate-180" aria-hidden="true">▾</span>
@@ -706,47 +704,83 @@ function App() {
               </div>
             </details>
 
-            <section aria-label="問題と指板" className="rounded-xl bg-surface border border-hair p-4 sm:p-6 flex flex-col gap-3 sm:gap-4">
+            {/* 筐体: 読み取り → 指板の窓 → 12音のフットスイッチ (docs/design-system/README.md「構成」) */}
+            <section aria-label="問題と指板" className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
 
-            {started && <ScoreBoard score={score} />}
-
-            {started && sessionTarget != null && (
-              <div className="flex justify-center">
-                <span className="inline-flex flex-wrap items-center justify-center gap-2 text-xs text-accent bg-accent-soft border border-accent rounded-full px-3 py-1">
-                  {sessionKind === 'daily' ? '今日の練習（弱点優先）' : 'チャレンジ'}{' '}
-                  <span className="font-mono tabular-nums">{session.count}/{sessionTarget}</span>
-                </span>
-              </div>
-            )}
-
-            {started && (
-              <div className="text-center" role="status" aria-live="polite">
-                <p className="text-ink text-lg font-semibold">{getPrompt()}</p>
+            {started ? (
+              <PracticeReadout
+                big={
+                  quiz.mode === 'note-to-position'
+                    ? quiz.currentNote
+                    : quiz.feedback && quiz.currentPosition
+                      ? quiz.mode === 'interval'
+                        ? getIntervalAt(quiz.currentPosition.string, quiz.currentPosition.fret, quiz.rootNote)
+                        : getNoteAt(quiz.currentPosition.string, quiz.currentPosition.fret, accidental)
+                      : null
+                }
+                feedback={quiz.feedback}
+                prompt={getPrompt()}
+                lastMs={session.count > 0 ? msLog[msLog.length - 1] ?? null : null}
+                avgMs={
+                  session.count > 0 && msLog.length > 0
+                    ? msLog.slice(-session.count).reduce((sum, ms) => sum + ms, 0) / Math.min(session.count, msLog.length)
+                    : null
+                }
+                correct={score.correct}
+                total={score.total}
+                progressLabel={sessionTarget != null ? (sessionKind === 'daily' ? '今日の練習' : 'チャレンジ') : '連続'}
+                progress={sessionTarget != null ? `${session.count}/${sessionTarget}` : String(score.streak)}
+              >
                 {quiz.feedback && (
-                  <p className={`text-lg font-bold mt-1 ${
-                    quiz.feedback === 'correct' ? 'text-correct' : 'text-wrong'
-                  }`}>
+                  <p className={`text-sm font-semibold ${quiz.feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
                     {/* 記号で色に依存せず正誤を伝える */}
                     <span aria-hidden="true">{quiz.feedback === 'correct' ? '✓ ' : '✕ '}</span>
                     {getFeedbackMsg()}
                   </p>
                 )}
                 {quiz.mode === 'interval' && quiz.feedback && (
-                  <p className="text-xs text-dim mt-1 font-mono text-pretty">{getIntervalWhy()}</p>
+                  <p className="text-xs text-dim font-mono text-pretty">{getIntervalWhy()}</p>
+                )}
+                {!quiz.feedback && (quiz.mode === 'position-to-note' || quiz.mode === 'interval') && (
+                  <div>
+                    <button onClick={toggleHint} className="min-h-12 text-sm text-dim hover:text-ink underline">
+                      {showHint ? 'ヒントを隠す' : 'ヒントを見る'}
+                    </button>
+                    {showHint && <p className="text-xs text-dim">{getHintText()}</p>}
+                  </div>
+                )}
+              </PracticeReadout>
+            ) : (
+              <div className="flex flex-col items-center gap-4 rounded-lg bg-glass p-4 sm:p-6">
+                <div className="flex flex-wrap justify-center items-center gap-3">
+                  <span className="text-sm text-dim">問題数</span>
+                  <Segmented
+                    size="large"
+                    value={challengeLength ?? 0}
+                    onChange={(v) => setChallengeLength(v === 0 ? null : (v as number))}
+                    options={[
+                      { label: '10', value: 10 },
+                      { label: '20', value: 20 },
+                      { label: '50', value: 50 },
+                      { label: '∞', value: 0 },
+                    ]}
+                  />
+                </div>
+                <button
+                  onClick={handleStart}
+                  className="min-h-12 px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80"
+                >
+                  チャレンジ開始
+                </button>
+                {quiz.mode === 'interval' && (
+                  <button onClick={() => goToLearn()} className="min-h-12 px-4 text-sm text-dim hover:text-ink underline">
+                    度数がわからない？ まず学ぶ →
+                  </button>
                 )}
               </div>
             )}
 
-            {started && !quiz.feedback && (quiz.mode === 'position-to-note' || quiz.mode === 'interval') && (
-              <div className="text-center">
-                <button onClick={toggleHint} className="min-h-12 px-4 text-sm text-accent hover:opacity-80 underline">
-                  {showHint ? 'ヒントを隠す' : 'ヒントを見る'}
-                </button>
-                {showHint && <p className="text-xs text-dim mt-1">{getHintText()}</p>}
-              </div>
-            )}
-
-            <div className="relative bg-bg rounded-lg border border-hair">
+            <div className="relative bg-glass rounded-lg">
               <div ref={fretboardScrollRef} className="overflow-x-auto p-2">
                 <Fretboard
                   maxFret={maxFret}
@@ -777,48 +811,18 @@ function App() {
                 次へ →
               </button>
             )}
+            </section>
 
             {started && (
               <button
                 onClick={handleEnd}
-                className="min-h-12 mx-auto px-6 py-3 text-sm bg-panel text-dim border border-hair rounded-lg hover:bg-accent-soft"
+                className="min-h-12 mx-auto px-6 py-3 text-sm bg-panel text-ink border border-hair rounded-lg hover:border-dim"
               >
                 終了して結果を見る
               </button>
             )}
-            </section>
 
-            {!started && (
-              <div className="flex flex-col items-center gap-4 rounded-xl bg-panel p-4">
-                <div className="flex flex-wrap justify-center items-center gap-3">
-                  <span className="text-sm text-dim">問題数</span>
-                  <Segmented
-                    size="large"
-                    value={challengeLength ?? 0}
-                    onChange={(v) => setChallengeLength(v === 0 ? null : (v as number))}
-                    options={[
-                      { label: '10', value: 10 },
-                      { label: '20', value: 20 },
-                      { label: '50', value: 50 },
-                      { label: '∞', value: 0 },
-                    ]}
-                  />
-                </div>
-                <button
-                  onClick={handleStart}
-                  className="min-h-12 px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80"
-                >
-                  チャレンジ開始
-                </button>
-                {quiz.mode === 'interval' && (
-                  <button onClick={() => goToLearn()} className="min-h-12 px-4 text-sm text-accent hover:opacity-80 underline">
-                    度数がわからない？ まず学ぶ →
-                  </button>
-                )}
-              </div>
-            )}
-
-            <details className="group border border-hair rounded-xl bg-panel">
+            <details className="group border border-hair rounded-lg">
               <summary className="min-h-12 cursor-pointer list-none px-4 py-3 text-sm text-dim hover:text-ink flex items-center justify-between gap-3">
                 <span className="group-open:hidden min-w-0">
                   {started ? (
@@ -867,7 +871,7 @@ function App() {
                   <button
                     key={s}
                     onClick={() => { setScaleName(s); setSelectedBox(null); }}
-                    style={selected ? { background: sc.bg, color: '#fff', borderColor: sc.border } : {}}
+                    style={selected ? { background: sc.bg, color: 'var(--ink)', borderColor: sc.border } : {}}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium border-2 transition-opacity ${
                       selected ? '' : 'bg-panel text-dim border-hair'
                     }`}
@@ -888,8 +892,8 @@ function App() {
                   <span className="text-sm text-dim">ポジション:</span>
                   <button
                     onClick={() => setSelectedBox(null)}
-                    className={`px-3 py-1 rounded text-sm font-medium ${
-                      selectedBox === null ? 'bg-accent-soft text-accent' : 'bg-panel text-dim'
+                    className={`min-h-12 px-3 rounded-lg border text-sm font-medium ${
+                      selectedBox === null ? 'bg-accent-soft text-accent border-accent' : 'bg-panel text-dim border-hair'
                     }`}
                   >
                     全体
@@ -898,8 +902,8 @@ function App() {
                     <button
                       key={i}
                       onClick={() => setSelectedBox(i)}
-                      className={`px-3 py-1 rounded text-sm font-medium ${
-                        selectedBox === i ? 'bg-accent-soft text-accent' : 'bg-panel text-dim'
+                      className={`min-h-12 px-3 rounded-lg border text-sm font-medium ${
+                        selectedBox === i ? 'bg-accent-soft text-accent border-accent' : 'bg-panel text-dim border-hair'
                       }`}
                     >
                       {i + 1}
@@ -922,7 +926,7 @@ function App() {
                 </div>
 
                 {/* スケールマップ */}
-                <div className="overflow-x-auto bg-surface rounded-xl border border-hair p-2">
+                <div className="overflow-x-auto bg-glass rounded-lg p-2">
                   <ScaleMap
                     maxFret={maxFret}
                     rootNote={scaleRoot}
@@ -1000,7 +1004,7 @@ function App() {
                 </div>
 
                 {/* CAGED指板マップ */}
-                <div className="overflow-x-auto bg-surface rounded-xl border border-hair p-2">
+                <div className="overflow-x-auto bg-glass rounded-lg p-2">
                   <CagedMap
                     maxFret={maxFret}
                     rootNote={cagedRoot}
@@ -1104,7 +1108,7 @@ const NAV_ITEMS: { key: AppView; label: string }[] = [
 ];
 
 const VIEW_HEADINGS: Record<Exclude<AppView, 'home'>, { label: string; title: string; description: string }> = {
-  practice: { label: 'PRACTICE', title: '指板で確かめる', description: '音名・度数・コードを、ひとつずつ反射で使えるように。' },
+  practice: { label: 'PRACTICE', title: '指板で確かめる', description: '音名・度数・コード・耳の7種類の練習。1問ごとに反応時間を記録します。' },
   theory: { label: 'LEARN & REFERENCE', title: '音楽の仕組みをつかむ', description: 'レッスンで学び、指板で響きと形を確かめる。' },
   stats: { label: 'PROGRESS', title: '練習の成果を見る', description: '正確さと反応時間から、次に練習する場所を見つける。' },
   settings: { label: 'SETTINGS', title: '練習環境を整える', description: '音名の表記、指板の範囲、目標を自分に合わせる。' },
@@ -1113,9 +1117,9 @@ const VIEW_HEADINGS: Record<Exclude<AppView, 'home'>, { label: string; title: st
 function SideNav({ view, onChange }: { view: AppView; onChange: (v: AppView) => void }) {
   return (
     <aside className="hidden lg:flex fixed inset-y-0 left-0 w-48 flex-col border-r border-hair bg-surface px-4 py-8">
-      <div className="font-mono text-sm text-ink space-y-2 px-3 pb-8">
-        <span className="block text-accent">GFT / STUDIO</span>
-        <span className="block text-xs text-dim">毎日の指板トレーニング</span>
+      <div className="text-sm font-semibold text-ink space-y-2 px-3 pb-8">
+        <span className="block text-ink">Guitar Fretboard Trainer</span>
+        <span className="block text-xs font-normal text-dim">毎日の指板トレーニング</span>
       </div>
       <nav aria-label="メインナビゲーション" className="space-y-2">
         {NAV_ITEMS.map((item) => (
@@ -1126,7 +1130,6 @@ function SideNav({ view, onChange }: { view: AppView; onChange: (v: AppView) => 
           </button>
         ))}
       </nav>
-      <p className="mt-auto px-3 text-xs leading-relaxed text-dim">音を見つける。<br />指板を自由に使う。</p>
     </aside>
   );
 }

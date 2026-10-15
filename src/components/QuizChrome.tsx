@@ -21,7 +21,7 @@ export function QuizFooter({ started, onStart, onStop, onLearn, hint }: QuizFoot
         <div className="flex flex-col items-center gap-2">
           <button
             onClick={onStart}
-            className="px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
+            className="px-8 min-h-12 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80"
           >
             スタート
           </button>
@@ -34,7 +34,7 @@ export function QuizFooter({ started, onStart, onStop, onLearn, hint }: QuizFoot
       ) : (
         <button
           onClick={onStop}
-          className="mx-auto px-6 py-2 text-sm bg-panel text-dim border border-hair rounded-lg hover:bg-accent-soft transition-colors"
+          className="mx-auto px-6 min-h-12 text-sm bg-panel text-ink border border-hair rounded-lg hover:border-dim"
         >
           終了
         </button>
@@ -49,7 +49,7 @@ export function QuizScore({ correct, total }: { correct: number; total: number }
     <div className="flex justify-center gap-6 text-sm">
       <div className="text-center">
         <div className="text-dim text-xs">正解</div>
-        <div className="text-lg font-bold font-mono tabular-nums text-ink">
+        <div className="text-xl font-semibold font-mono tabular-nums text-ink">
           {correct}/{total}
         </div>
       </div>

@@ -29,3 +29,7 @@ temp/
 
 # Wrangler local state
 .wrangler/
+
+# Pinterest の参考画像（公開リポジトリには載せない）
+docs/design-system/pinterest-directions.jpg
+docs/design-system/directions.png

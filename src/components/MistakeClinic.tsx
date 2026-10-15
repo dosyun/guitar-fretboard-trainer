@@ -14,8 +14,8 @@ export function MistakeClinic({ accidental, onDrill, onDrillString, onDrillFret 
   if (diags.length === 0) return null;
 
   return (
-    <div className="bg-surface border border-hair rounded-2xl p-4 space-y-3">
-      <h2 className="text-sm font-medium text-ink">弱点診断</h2>
+    <div className="border-t border-hair pt-4 space-y-3">
+      <h2 className="text-sm font-semibold text-ink">弱点診断</h2>
       <ul className="space-y-2">
         {diags.map((d) => (
           <li key={d.id} className="flex items-center justify-between gap-3 text-sm">

@@ -62,11 +62,11 @@ export function VoicingDiagram({
   return (
     <div
       onClick={onClick}
-      className={`flex flex-col items-center cursor-pointer rounded-xl p-2 transition-all ${
-        selected ? 'bg-accent-soft ring-2 ring-accent' : 'bg-surface hover:bg-panel'
+      className={`flex flex-col items-center cursor-pointer rounded-lg border p-2 transition-colors ${
+        selected ? 'bg-accent-soft border-accent' : 'border-transparent hover:bg-panel'
       }`}
     >
-      <div className="text-lg font-bold text-ink mb-1">{voicing.label}</div>
+      <div className="text-base font-semibold text-ink mb-1">{voicing.label}</div>
 
       <svg viewBox={`0 0 ${totalWidth} ${totalHeight}`} className="w-full h-auto">
         {/* フレット番号 */}
@@ -133,23 +133,23 @@ export function VoicingDiagram({
 
           return (
             <g key={`dot-${strIdx}`}>
-              <circle cx={cx} cy={cy} r={DOT_R} fill={isRoot ? 'var(--accent)' : '#3a3a42'} />
+              <circle cx={cx} cy={cy} r={DOT_R} fill={isRoot ? 'var(--accent)' : 'var(--panel)'} />
               {displayMode === 'both' ? (
                 <>
                   <text x={cx} y={cy - 10} textAnchor="middle" dominantBaseline="central"
-                    fontSize={17} fill={isRoot ? '#1b1813' : '#fff'} fontWeight={700}
+                    fontSize={17} fill={isRoot ? 'var(--bg)' : 'var(--ink)'} fontWeight={700}
                     style={{ pointerEvents: 'none', userSelect: 'none' }}>
                     {noteName}
                   </text>
                   <text x={cx} y={cy + 10} textAnchor="middle" dominantBaseline="central"
-                    fontSize={17} fill={isRoot ? '#5b3d09' : '#cbd5e1'}
+                    fontSize={17} fill={isRoot ? 'var(--bg)' : 'var(--dim)'}
                     style={{ pointerEvents: 'none', userSelect: 'none' }}>
                     {degreeName}
                   </text>
                 </>
               ) : (
                 <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
-                  fontSize={18} fill={isRoot ? '#1b1813' : '#fff'} fontWeight={700}
+                  fontSize={18} fill={isRoot ? 'var(--bg)' : 'var(--ink)'} fontWeight={700}
                   style={{ pointerEvents: 'none', userSelect: 'none' }}>
                   {displayMode === 'degree' ? degreeName : noteName}
                 </text>

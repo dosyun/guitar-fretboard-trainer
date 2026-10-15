@@ -3,12 +3,14 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      // ダーク・スタジオ系トークン (CSS変数経由) — docs/adr/0003 参照。
+      // 機材の操作盤トークン (CSS変数経由) — docs/design-system/README.md が正。
       // 既存の gray/blue 等は壊さないよう、衝突しない名前で追加する。
       colors: {
         bg: 'var(--bg)',
         surface: 'var(--surface)',
         panel: 'var(--panel)',
+        glass: 'var(--glass)',
+        'case-edge': 'var(--case-edge)',
         hair: 'var(--hair)',
         ink: 'var(--ink)',
         dim: 'var(--dim)',

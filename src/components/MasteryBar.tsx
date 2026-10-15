@@ -12,14 +12,14 @@ export function MasteryBar({ maxFret, accidental, compact = false }: MasteryBarP
   const m = getMasterySummary(maxFret, accidental);
 
   return (
-    <div className="bg-surface border border-hair rounded-xl p-4 space-y-2">
+    <div className="border-t border-hair pt-4 space-y-2">
       <div className="flex items-end justify-between">
         <span className="text-sm text-dim">指板習熟度</span>
-        <span className="font-mono tabular-nums text-2xl font-medium text-ink">{m.overall}%</span>
+        <span className="font-mono tabular-nums text-3xl font-medium text-ink">{m.overall}%</span>
       </div>
-      <div className="h-2 rounded-full bg-bg overflow-hidden">
+      <div className="h-2 bg-panel overflow-hidden">
         <div
-          className="h-full rounded-full"
+          className="h-full"
           style={{ width: `${m.overall}%`, background: 'var(--correct)' }}
         />
       </div>

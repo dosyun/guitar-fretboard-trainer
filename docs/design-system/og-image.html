@@ -1,0 +1,126 @@
+<!doctype html>
+<!--
+  OG画像（1200×630）の版下。色は src/index.css の :root と src/data/boardPalette.ts の BOARD と同じ値。
+  撮り直し: 開発サーバー（npm run dev）を起動し、
+    playwright-cli -s=og open http://localhost:<port>/fretboard/docs/design-system/og-image.html
+    playwright-cli -s=og resize 1200 630
+    playwright-cli -s=og screenshot --filename=public/og-image.png
+    playwright-cli -s=og goto http://localhost:<port>/fretboard/docs/design-system/og-image.html?lang=en
+    playwright-cli -s=og screenshot --filename=public/og-image-en.png
+    playwright-cli -s=og close
+-->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>OG画像の版下</title>
+<link rel="stylesheet" href="../../node_modules/@fontsource/dm-mono/400.css">
+<link rel="stylesheet" href="../../node_modules/@fontsource/dm-mono/500.css">
+<style>
+  :root {
+    --bg: #121315;
+    --surface: #1f2124;
+    --panel: #2a2d31;
+    --glass: #0a0b0c;
+    --hair: #34373c;
+    --case-edge: #3d4147;
+    --ink: #ebe7df;
+    --dim: #979aa0;
+    --accent: #ffb02e;
+    --correct: #5fd394;
+    --wrong: #ef6a4f;
+    --sans: system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', Meiryo, sans-serif;
+    --mono: 'DM Mono', ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    padding: 48px 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 32px; }
+  .brand { font-size: 40px; font-weight: 600; letter-spacing: -.01em; }
+  .lead { font-size: 24px; color: var(--dim); }
+  .case {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-top-color: var(--case-edge);
+    border-radius: 16px;
+  }
+  .window { background: var(--glass); border-radius: 8px; padding: 24px; display: flex; align-items: center; }
+  .readout { background: var(--glass); border-radius: 8px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
+  .label { font-size: 20px; color: var(--dim); }
+  .big { font-family: var(--mono); font-weight: 500; font-size: 168px; line-height: 1; color: var(--accent); }
+  .meter { display: grid; grid-template-columns: 1fr 1fr 1fr; height: 8px; position: relative; }
+  .meter span:nth-child(1) { background: var(--correct); }
+  .meter span:nth-child(2) { background: var(--accent); }
+  .meter span:nth-child(3) { background: var(--wrong); }
+  .needle { position: absolute; top: -8px; left: 27%; width: 3px; height: 24px; background: var(--ink); }
+  dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  dt { font-size: 20px; color: var(--dim); }
+  dd { font-family: var(--mono); font-size: 40px; color: var(--ink); white-space: nowrap; }
+  dd small { font-family: var(--sans); font-size: 20px; color: var(--dim); margin-left: 6px; }
+</style>
+</head>
+<body>
+  <header>
+    <p class="brand">Guitar Fretboard Trainer</p>
+    <p class="lead" data-ja="指板の音名・度数を、反応時間つきで練習" data-en="Fretboard notes and intervals, timed">指板の音名・度数を、反応時間つきで練習</p>
+  </header>
+
+  <section class="case">
+    <div class="window">
+      <!-- 指板 0〜7フレット。上が1弦。5弦3フレット（C）に出題の琥珀マーカー -->
+      <svg viewBox="0 0 620 250" width="100%" aria-hidden="true">
+        <rect x="24" y="10" width="596" height="230" fill="#241d14" />
+        <rect x="18" y="10" width="10" height="230" fill="#cdbf9e" />
+        <g fill="#b8ad93">
+          <circle cx="213" cy="125" r="8" /><circle cx="361" cy="125" r="8" /><circle cx="509" cy="125" r="8" />
+        </g>
+        <g stroke="#5f636b" stroke-width="4">
+          <line x1="102" y1="10" x2="102" y2="240" /><line x1="176" y1="10" x2="176" y2="240" />
+          <line x1="250" y1="10" x2="250" y2="240" /><line x1="324" y1="10" x2="324" y2="240" />
+          <line x1="398" y1="10" x2="398" y2="240" /><line x1="472" y1="10" x2="472" y2="240" />
+          <line x1="546" y1="10" x2="546" y2="240" />
+        </g>
+        <g stroke="#8b8f98">
+          <line x1="24" y1="27" x2="620" y2="27" stroke-width="1.5" />
+          <line x1="24" y1="66" x2="620" y2="66" stroke-width="1.8" />
+          <line x1="24" y1="105" x2="620" y2="105" stroke-width="2.2" />
+          <line x1="24" y1="145" x2="620" y2="145" stroke-width="2.6" />
+          <line x1="24" y1="184" x2="620" y2="184" stroke-width="3" />
+          <line x1="24" y1="223" x2="620" y2="223" stroke-width="3.4" />
+        </g>
+        <circle cx="213" cy="184" r="22" fill="#ffb02e" stroke="#d08a17" stroke-width="2" />
+      </svg>
+    </div>
+    <div class="readout">
+      <p class="label" data-ja="5弦 3フレット" data-en="String 5, fret 3">5弦 3フレット</p>
+      <p class="big">C</p>
+      <div class="meter" aria-hidden="true"><span></span><span></span><span></span><i class="needle"></i></div>
+    </div>
+  </section>
+
+  <dl>
+    <div><dt data-ja="練習" data-en="Drills">練習</dt><dd>7<small data-ja="種類" data-en="modes">種類</small></dd></div>
+    <div><dt data-ja="レッスン" data-en="Lessons">レッスン</dt><dd>21</dd></div>
+    <div><dt data-ja="記録" data-en="Tracked">記録</dt><dd><small style="margin:0;font-size:32px;color:var(--ink)" data-ja="1問ごとの反応時間" data-en="Every response time">1問ごとの反応時間</small></dd></div>
+  </dl>
+
+  <script>
+    if (new URLSearchParams(location.search).get('lang') === 'en') {
+      document.documentElement.lang = 'en';
+      document.querySelectorAll('[data-en]').forEach((el) => { el.textContent = el.dataset.en; });
+    }
+  </script>
+</body>
+</html>

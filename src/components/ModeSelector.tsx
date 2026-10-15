@@ -22,7 +22,7 @@ export function ModeSelector({ current, onChange }: ModeSelectorProps) {
           className={`min-h-12 px-4 rounded-lg text-sm font-medium border ${
             current === mode.value
               ? 'bg-accent-soft text-accent border-accent'
-              : 'bg-bg text-dim border-hair hover:text-ink hover:bg-panel'
+              : 'bg-panel text-ink border-hair hover:border-dim'
           }`}
         >
           {mode.label}

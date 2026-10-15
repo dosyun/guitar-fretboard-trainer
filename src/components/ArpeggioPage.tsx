@@ -82,8 +82,8 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
   const posX = (f: number) => f === 0 ? PADDING_LEFT - MARKER_R - 2 : fretX(f) - FRET_WIDTH / 2;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="bg-surface rounded-xl shadow-sm p-4">
+    <div className="flex flex-col gap-6 sm:gap-8">
+      <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6">
         {/* ルート選択 */}
         <RootSelector current={root} accidental={accidental} onChange={setRoot} />
 
@@ -91,10 +91,10 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
         <div className="flex gap-2 justify-center flex-wrap mt-3">
           {CHORD_TYPES.map((ct, i) => (
             <button key={ct.key} onClick={() => setChordTypeIdx(i)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium border-2 transition-all ${
+              className={`min-h-12 px-3 rounded-lg text-sm border transition-colors ${
                 chordTypeIdx === i
-                  ? 'bg-accent text-bg border-accent'
-                  : 'bg-panel text-dim border-hair hover:border-accent'
+                  ? 'bg-accent-soft text-accent border-accent'
+                  : 'bg-panel text-dim border-hair hover:border-dim'
               }`}>
               {root}{ct.label}
             </button>
@@ -105,10 +105,10 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
         <div className="flex gap-2 justify-center flex-wrap mt-3">
           {FRET_RANGES.map((r, i) => (
             <button key={r.label} onClick={() => setRangeIdx(i)}
-              className={`px-3 py-1 rounded-lg text-sm font-medium border-2 transition-all ${
+              className={`min-h-12 px-3 rounded-lg text-sm border transition-colors ${
                 rangeIdx === i
                   ? 'bg-accent-soft text-accent border-accent'
-                  : 'bg-panel text-dim border-hair hover:border-accent'
+                  : 'bg-panel text-dim border-hair hover:border-dim'
               }`}>
               {r.label}
             </button>
@@ -131,7 +131,7 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
         </div>
 
         {/* フレットボード */}
-        <div className="overflow-x-auto mt-4 bg-surface rounded-xl">
+        <div className="overflow-x-auto mt-4 bg-glass rounded-lg">
           <svg viewBox={`0 0 ${totalWidth} ${totalHeight}`}
             className="w-full" style={{ minWidth: `${maxFret * 50}px` }}>
 
@@ -190,7 +190,7 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
             {rangeIdx !== 0 && outOfRange.map(p => (
               <circle key={`dim-${p.string}-${p.fret}`}
                 cx={posX(p.fret)} cy={stringY(p.string)}
-                r={MARKER_R - 4} fill="#94a3b8" opacity={0.25} />
+                r={MARKER_R - 4} fill="var(--dim)" opacity={0.25} />
             ))}
 
             {/* 範囲内ドット */}
@@ -205,24 +205,24 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
               return (
                 <g key={`${p.string}-${p.fret}`}>
                   <circle cx={cx} cy={cy} r={r}
-                    fill={isRoot ? 'var(--accent)' : '#3a3a42'}
+                    fill={isRoot ? 'var(--accent)' : 'var(--panel)'}
                     strokeWidth={0} />
                   {labelMode === 'both' ? (
                     <>
                       <text x={cx} y={cy - 5} textAnchor="middle" dominantBaseline="central"
-                        fontSize={7} fontWeight={700} fill={isRoot ? '#1b1813' : '#fff'}
+                        fontSize={7} fontWeight={700} fill={isRoot ? 'var(--bg)' : 'var(--ink)'}
                         style={{ pointerEvents: 'none', userSelect: 'none' }}>
                         {noteName}
                       </text>
                       <text x={cx} y={cy + 5} textAnchor="middle" dominantBaseline="central"
-                        fontSize={7} fontWeight={600} fill={isRoot ? '#5b3d09' : '#cbd5e1'}
+                        fontSize={7} fontWeight={600} fill={isRoot ? 'var(--bg)' : 'var(--dim)'}
                         style={{ pointerEvents: 'none', userSelect: 'none' }}>
                         {degreeName}
                       </text>
                     </>
                   ) : (
                     <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
-                      fontSize={11} fontWeight={700} fill={isRoot ? '#1b1813' : '#fff'}
+                      fontSize={11} fontWeight={700} fill={isRoot ? 'var(--bg)' : 'var(--ink)'}
                       style={{ pointerEvents: 'none', userSelect: 'none' }}>
                       {labelMode === 'number' ? String(p.num) :
                        labelMode === 'degree' ? degreeName : noteName}
@@ -236,7 +236,7 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
       </div>
 
       {/* 説明 */}
-      <div className="bg-surface rounded-xl shadow-sm p-4 text-xs text-dim flex flex-col gap-1">
+      <div className="border-t border-hair pt-4 text-xs text-dim flex flex-col gap-1">
         <p>番号 = 低い音から高い音へのアルペジオ順。</p>
         <p>フレット範囲を絞ると、そのポジション内での練習に使えます。</p>
         <div className="flex gap-3 mt-1">
@@ -244,7 +244,7 @@ export function ArpeggioPage({ accidental }: ArpeggioPageProps) {
             <span className="inline-block w-4 h-4 rounded-full bg-accent" />ルート音
           </span>
           <span className="flex items-center gap-1">
-            <span className="inline-block w-4 h-4 rounded-full" style={{ background: '#3a3a42' }} />コードトーン
+            <span className="inline-block w-4 h-4 rounded-full bg-panel" />コードトーン
           </span>
         </div>
       </div>

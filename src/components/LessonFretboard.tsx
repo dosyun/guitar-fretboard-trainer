@@ -1,6 +1,6 @@
 import { getNoteAt, getNoteIndex } from '../data/fretboard';
 import { playArpeggio, playChord } from '../data/audio';
-import { BOARD } from '../data/boardPalette';
+import { BOARD, MARKER } from '../data/boardPalette';
 
 export interface DemoTone {
   st: number; // ルートからの半音
@@ -45,14 +45,14 @@ export function LessonFretboard({ root, tones, maxFret = 7 }: LessonFretboardPro
       <div className="flex items-center gap-2">
         <button
           onClick={() => playArpeggio(midis)}
-          className="px-3 py-1.5 rounded-lg text-xs font-mono bg-panel text-accent border border-hair hover:bg-accent-soft transition-colors"
+          className="min-h-12 px-3 rounded-lg text-sm bg-panel text-ink border border-hair hover:border-dim transition-colors"
         >
           ▶ 聴く（1音ずつ）
         </button>
         {isChord && (
           <button
             onClick={() => playChord(midis)}
-            className="px-3 py-1.5 rounded-lg text-xs font-mono bg-panel text-accent border border-hair hover:bg-accent-soft transition-colors"
+            className="min-h-12 px-3 rounded-lg text-sm bg-panel text-ink border border-hair hover:border-dim transition-colors"
           >
             ♪ 同時
           </button>
@@ -103,8 +103,8 @@ export function LessonFretboard({ root, tones, maxFret = 7 }: LessonFretboardPro
                 cx={posX(f)}
                 cy={stringY(s)}
                 r={MARKER_R}
-                fill={isRoot ? 'var(--accent)' : '#3f566b'}
-                stroke={isRoot ? '#c9821a' : '#2c3e50'}
+                fill={isRoot ? 'var(--accent)' : 'var(--dim)'}
+                stroke={isRoot ? MARKER.highlightBorder : 'var(--hair)'}
                 strokeWidth={1.5}
               />
               <text
@@ -114,7 +114,7 @@ export function LessonFretboard({ root, tones, maxFret = 7 }: LessonFretboardPro
                 dominantBaseline="central"
                 fontSize={9}
                 fontWeight={700}
-                fill={isRoot ? '#1b1813' : '#ffffff'}
+                fill={isRoot ? MARKER.highlightText : 'var(--bg)'}
                 style={{ pointerEvents: 'none', userSelect: 'none' }}
               >
                 {t.label}

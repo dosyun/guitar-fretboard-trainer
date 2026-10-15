@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { getNoteNames, sameNote } from '../data/fretboard';
 import type { Accidental, Feedback } from '../types';
+import { FootSwitch } from './FootSwitch';
 
 interface NoteSelectorProps {
   accidental: Accidental;
@@ -8,33 +10,29 @@ interface NoteSelectorProps {
   onSelect: (note: string) => void;
 }
 
-// 回答ボタンは単色（1ビュー1色の規律）。音高カラーは指板マップ等の「見る」画面に限定。
+// 12音のフットスイッチ。回答ボタンは単色（1ビュー1色の規律）。音高カラーは指板マップ等の「見る」画面に限定。
 export function NoteSelector({ accidental, feedback, correctAnswer, onSelect }: NoteSelectorProps) {
   const notes = getNoteNames(accidental);
+  // 押したスイッチ。回答後(feedback あり)の間だけランプに使う
+  const [pressed, setPressed] = useState<string | null>(null);
 
   return (
-    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-w-xl w-full mx-auto">
+    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3 w-full">
       {notes.map((note) => {
-        const isCorrectHighlight =
-          feedback === 'wrong' && correctAnswer !== null && sameNote(note, correctAnswer);
+        const isAnswer =
+          (feedback === 'wrong' && correctAnswer !== null && sameNote(note, correctAnswer)) ||
+          (feedback === 'correct' && pressed !== null && sameNote(note, pressed));
+        const isWrongPick = feedback === 'wrong' && pressed !== null && sameNote(note, pressed) && !isAnswer;
         return (
-          <button
+          <FootSwitch
             key={note}
-            onClick={() => onSelect(note)}
+            label={note}
+            lamp={isAnswer ? 'correct' : isWrongPick ? 'wrong' : 'off'}
+            dimmed={feedback !== null && !isAnswer && !isWrongPick}
             disabled={feedback !== null}
-            aria-label={isCorrectHighlight ? `${note}（正解）` : note}
-            className={`
-              min-h-12 py-3 px-2 rounded-lg text-base font-semibold font-mono shadow-sm
-              ${isCorrectHighlight
-                ? 'bg-correct text-bg'
-                : 'bg-panel hover:bg-accent-soft active:opacity-80 text-ink border border-hair'
-              }
-              disabled:opacity-60 disabled:cursor-not-allowed
-            `}
-          >
-            {isCorrectHighlight && <span aria-hidden="true">✓ </span>}
-            {note}
-          </button>
+            ariaLabel={feedback === 'wrong' && isAnswer ? `${note}（正解）` : note}
+            onClick={() => { setPressed(note); onSelect(note); }}
+          />
         );
       })}
     </div>

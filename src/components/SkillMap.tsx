@@ -10,9 +10,9 @@ export function SkillMap() {
   if (!anyData) return null;
 
   return (
-    <div className="bg-surface border border-hair rounded-2xl p-4 space-y-3">
+    <div className="border-t border-hair pt-4 space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-ink">スキルマップ</h2>
+        <h2 className="text-sm font-semibold text-ink">スキルマップ</h2>
         <span className="text-xs text-dim">種類別の正答率</span>
       </div>
       <div className="space-y-2">
@@ -29,9 +29,9 @@ export function SkillMap() {
                   {s.n > 0 && <span className="text-dim ml-1">({s.n})</span>}
                 </span>
               </div>
-              <div className="h-2 rounded-full bg-panel overflow-hidden">
+              <div className="h-2 bg-panel overflow-hidden">
                 <div
-                  className="h-full rounded-full"
+                  className="h-full"
                   style={{ width: `${s.n === 0 ? 0 : Math.max(4, pct)}%`, background: color }}
                 />
               </div>

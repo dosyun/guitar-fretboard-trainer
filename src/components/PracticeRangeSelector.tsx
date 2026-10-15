@@ -16,8 +16,8 @@ interface PracticeRangeSelectorProps {
 const STRING_LABELS = ['6弦(E)', '5弦(A)', '4弦(D)', '3弦(G)', '2弦(B)', '1弦(E)'];
 
 const PRESET_BTN =
-  'px-2 py-0.5 rounded text-xs bg-panel text-dim hover:bg-accent-soft border border-hair transition-colors';
-const SELECT_CLS = 'text-xs bg-panel text-ink border border-hair rounded px-2 py-1 font-mono';
+  'px-2 py-0.5 rounded-lg text-xs bg-panel text-ink hover:border-dim border border-hair';
+const SELECT_CLS = 'text-xs bg-panel text-ink border border-hair rounded-lg px-2 py-1 font-mono';
 
 export function PracticeRangeSelector({
   selectedStrings,
@@ -65,8 +65,8 @@ export function PracticeRangeSelector({
     selectedNotes === null || selectedNotes.includes(note);
 
   return (
-    <div className={`space-y-3 p-3 ${embedded ? '' : 'bg-surface rounded-lg border border-hair'}`}>
-      <div className="text-sm font-medium text-dim">練習範囲</div>
+    <div className={`space-y-3 p-3 ${embedded ? '' : 'border-t border-hair'}`}>
+      <div className="text-sm font-semibold text-ink">練習範囲</div>
 
       {/* 弦の選択 */}
       <div className="flex items-center gap-1 flex-wrap">
@@ -76,7 +76,7 @@ export function PracticeRangeSelector({
             key={i}
             onClick={() => toggleString(i)}
             className={`
-              px-2 py-1 rounded text-xs font-medium transition-colors border
+              px-2 py-1 rounded-lg text-xs font-medium border
               ${selectedStrings.includes(i)
                 ? 'bg-accent-soft text-accent border-accent'
                 : 'bg-panel text-dim border-hair'
@@ -88,7 +88,7 @@ export function PracticeRangeSelector({
         ))}
         <button
           onClick={() => onStringsChange([0, 1, 2, 3, 4, 5])}
-          className="px-2 py-1 rounded text-xs text-dim hover:bg-panel"
+          className="px-2 py-1 rounded-lg text-xs text-dim hover:text-ink"
         >
           全弦
         </button>
@@ -135,7 +135,7 @@ export function PracticeRangeSelector({
               onClick={() => toggleNote(note)}
               style={selected ? { background: color.bg, color: color.text, borderColor: color.border } : {}}
               className={`
-                size-7 rounded text-xs font-semibold font-mono transition-opacity border
+                size-7 rounded-lg text-xs font-semibold font-mono border
                 ${selected
                   ? 'opacity-100'
                   : 'bg-panel text-dim border-hair opacity-60'
@@ -148,7 +148,7 @@ export function PracticeRangeSelector({
         })}
         <button
           onClick={() => onNotesChange(null)}
-          className="px-2 py-1 rounded text-xs text-dim hover:bg-panel"
+          className="px-2 py-1 rounded-lg text-xs text-dim hover:text-ink"
         >
           全音
         </button>

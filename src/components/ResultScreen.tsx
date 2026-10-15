@@ -54,16 +54,17 @@ export function ResultScreen({
   const weakNote = weakest ? getNoteAt(weakest.pos.string, weakest.pos.fret, accidental) : null;
 
   return (
-    <div className="mx-auto w-full max-w-2xl bg-surface border border-hair rounded-2xl p-6 sm:p-8 space-y-8">
+    <div className="mx-auto w-full max-w-2xl bg-surface border border-hair border-t-case-edge rounded-2xl p-3 sm:p-6 space-y-6 sm:space-y-8">
       <div
         className="text-sm font-medium flex items-center gap-2"
-        style={{ color: cleared ? 'var(--correct)' : 'var(--accent)' }}
+        style={{ color: cleared ? 'var(--correct)' : 'var(--ink)' }}
       >
-        <span
-          className="inline-block size-1.5 rounded-full"
-          style={{ background: cleared ? 'var(--correct)' : 'var(--accent)' }}
-          aria-hidden="true"
-        />
+        {cleared && (
+          <span
+            className="inline-block size-2 rounded-full bg-correct"
+            aria-hidden="true"
+          />
+        )}
         {challenge ? (cleared ? 'チャレンジ クリア' : 'チャレンジ結果') : '練習の結果'}
       </div>
 
@@ -71,15 +72,15 @@ export function ResultScreen({
       {challenge && (
         cleared ? (
           <div className="text-center py-4">
-            <div className="text-2xl font-semibold" style={{ color: 'var(--correct)' }}>✓ クリア！</div>
+            <div className="text-xl font-semibold" style={{ color: 'var(--correct)' }}>✓ クリア！</div>
             <div className="text-dim text-sm mt-1 font-mono tabular-nums">{summary.count}問 全問正解</div>
           </div>
         ) : (
           <div className="text-center py-4">
-            <div className="text-2xl font-bold text-ink font-mono tabular-nums">
+            <div className="text-3xl font-semibold text-ink font-mono tabular-nums">
               {summary.correct}/{summary.count}
             </div>
-            <div className="text-dim text-sm mt-1">100%でクリア。もう一度挑戦しよう</div>
+            <div className="text-dim text-sm mt-1">全問正解でクリアです。</div>
           </div>
         )
       )}
@@ -93,7 +94,7 @@ export function ResultScreen({
 
       {/* 中央値・前回比（十分な問題数のときだけ。少数だと誤差が大きいため出さない） */}
       {summary.count >= MIN_COMPARE ? (
-        <div className="space-y-4 rounded-xl bg-panel p-4 text-sm">
+        <div className="space-y-4 border-t border-hair pt-6 text-sm">
           <Row label="中央値">
             <span className="font-mono tabular-nums text-ink">{sec(summary.medianMs)}</span>
           </Row>
@@ -127,7 +128,7 @@ export function ResultScreen({
           </Row>
           <button
             onClick={() => onDrill?.(weakNote)}
-            className="min-h-12 w-full px-4 py-3 bg-accent text-bg text-sm font-semibold rounded-xl hover:opacity-90 active:opacity-80"
+            className="min-h-12 w-full px-4 bg-accent text-bg text-sm font-semibold rounded-lg hover:opacity-90 active:opacity-80"
           >
             {`「${weakNote}」を10問だけ練習`}
           </button>
@@ -138,9 +139,9 @@ export function ResultScreen({
       <div className="flex flex-wrap gap-3">
         <button
           onClick={onRestart}
-          className={`min-h-12 flex-1 px-4 py-3 rounded-xl text-sm ${
+          className={`min-h-12 flex-1 px-4 rounded-lg text-sm ${
             showDrill && weakest
-              ? 'bg-panel text-ink border border-hair hover:bg-accent-soft'
+              ? 'bg-panel text-ink border border-hair hover:border-dim'
               : 'bg-accent text-bg font-semibold hover:opacity-90 active:opacity-80'
           }`}
         >
@@ -148,7 +149,7 @@ export function ResultScreen({
         </button>
         <button
           onClick={onClose}
-          className="min-h-12 px-6 py-3 text-sm text-dim rounded-xl hover:bg-panel hover:text-ink"
+          className="min-h-12 px-6 text-sm text-dim rounded-lg hover:text-ink"
         >
           終了
         </button>
@@ -159,8 +160,8 @@ export function ResultScreen({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-panel rounded-xl px-2 py-6 sm:px-4">
-      <div className="font-mono tabular-nums text-2xl sm:text-4xl font-medium text-ink text-balance">{value}</div>
+    <div className="bg-glass rounded-lg px-2 py-6 sm:px-4">
+      <div className="font-mono tabular-nums text-3xl font-medium text-ink text-balance">{value}</div>
       <div className="text-dim text-xs mt-3">{label}</div>
     </div>
   );

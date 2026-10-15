@@ -21,15 +21,15 @@ export function PwaReloadPrompt({ deferReload = false }: PwaReloadPromptProps) {
       role="status"
       aria-live="polite"
     >
-      <div className="flex items-center gap-3 bg-surface border border-accent rounded-xl px-4 py-3 shadow-lg max-w-md w-full">
+      <div className="flex items-center gap-3 bg-surface border border-hair border-t-case-edge rounded-lg px-4 py-3 max-w-md w-full">
         <span className="flex-1 text-sm text-ink">新しい版があります。</span>
         <button
           onClick={() => updateServiceWorker(true)}
-          className="px-3 py-1.5 bg-accent text-bg text-sm font-semibold rounded-lg hover:opacity-90 active:opacity-80 transition-opacity"
+          className="px-3 min-h-12 bg-accent text-bg text-sm font-semibold rounded-lg hover:opacity-90 active:opacity-80"
         >
           更新
         </button>
-        <button onClick={() => setNeedRefresh(false)} className="text-dim text-sm hover:text-ink transition-colors">
+        <button onClick={() => setNeedRefresh(false)} className="text-dim text-sm hover:text-ink">
           後で
         </button>
       </div>

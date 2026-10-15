@@ -1,5 +1,6 @@
 import { Fretboard } from './Fretboard';
 import { ScoreBoard } from './ScoreBoard';
+import { FootSwitch } from './FootSwitch';
 import { SCALE_COLORS } from '../data/scales';
 import type { ScaleName } from '../data/scales';
 import type { ScaleQuizMode } from '../hooks/useScaleQuiz';
@@ -53,8 +54,8 @@ export function ScaleQuiz({
           <button
             key={value}
             onClick={() => onSetMode(value)}
-            className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-              quiz.mode === value ? 'bg-surface text-ink shadow-sm' : 'text-dim'
+            className={`flex-1 min-h-12 px-3 rounded-lg border text-sm font-semibold transition-colors ${
+              quiz.mode === value ? 'bg-accent-soft text-accent border-accent' : 'text-dim border-transparent hover:text-ink'
             }`}
           >
             {label}
@@ -66,9 +67,9 @@ export function ScaleQuiz({
 
       {started && (
         <div className="text-center">
-          <p className="text-ink font-medium">{getPrompt()}</p>
+          <p className="text-ink font-semibold">{getPrompt()}</p>
           {quiz.feedback && (
-            <p className={`text-lg font-bold mt-1 ${
+            <p className={`text-xl font-semibold mt-1 ${
               quiz.feedback === 'correct' ? 'text-correct' : 'text-wrong'
             }`}>
               {quiz.feedback === 'correct' ? '正解!' : `不正解... ${quiz.correctAnswer ? `正解: ${quiz.correctAnswer}` : ''}`}
@@ -96,7 +97,7 @@ export function ScaleQuiz({
             onClick={() => onAnswerInOrOut('in')}
             disabled={quiz.feedback !== null}
             style={{ background: color.bg, borderColor: color.border }}
-            className="px-6 py-3 rounded-lg text-base font-bold text-white border-2
+            className="min-h-12 px-6 py-3 rounded-lg text-base font-semibold text-ink border-2
                        hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             スケール内
@@ -104,8 +105,8 @@ export function ScaleQuiz({
           <button
             onClick={() => onAnswerInOrOut('out')}
             disabled={quiz.feedback !== null}
-            className="px-6 py-3 rounded-lg text-base font-bold text-ink bg-panel border-2 border-hair
-                       hover:bg-accent-soft disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-12 px-6 py-3 rounded-lg text-base font-semibold text-ink bg-panel border border-hair
+                       hover:border-dim disabled:opacity-50 disabled:cursor-not-allowed"
           >
             スケール外
           </button>
@@ -118,18 +119,13 @@ export function ScaleQuiz({
           {degreeLabels.map((deg) => {
             const isCorrectHighlight = quiz.feedback === 'wrong' && deg === quiz.correctAnswer;
             return (
-              <button
+              <FootSwitch
                 key={deg}
+                label={deg}
+                lamp={isCorrectHighlight ? 'correct' : 'off'}
                 onClick={() => onAnswerDegree(deg)}
                 disabled={quiz.feedback !== null}
-                style={isCorrectHighlight ? { background: 'var(--correct)', color: '#0e0f12' } : { borderColor: color.border }}
-                className={`px-4 py-3 rounded-lg text-base font-bold border-2 transition-colors
-                  ${isCorrectHighlight ? '' : 'bg-panel text-ink hover:bg-accent-soft'}
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                `}
-              >
-                {deg}
-              </button>
+              />
             );
           })}
         </div>
@@ -138,7 +134,7 @@ export function ScaleQuiz({
       {!started && (
         <button
           onClick={() => onStart(quiz.mode)}
-          className="mx-auto px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 transition-opacity"
+          className="mx-auto min-h-12 px-8 py-3 bg-accent text-bg font-semibold rounded-lg hover:opacity-90 transition-opacity"
         >
           スタート
         </button>

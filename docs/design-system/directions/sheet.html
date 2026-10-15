@@ -1,0 +1,66 @@
+<!doctype html>
+<!-- 3案の比較シート（pinterest-design-system 手順5）。撮影: 1800幅で全体を directions.png に保存 -->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>3案の比較</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1800px; padding: 32px; background: #ececec; color: #222; font: 15px/1.6 system-ui, sans-serif; }
+  h1 { font-size: 22px; margin-bottom: 20px; }
+  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .col { background: #fff; padding: 16px; }
+  .col h2 { font-size: 20px; margin-bottom: 4px; }
+  .col .origin { color: #666; margin-bottom: 12px; }
+  .shot { width: 100%; border: 1px solid #ccc; display: block; }
+  .shot.mobile { width: 46%; margin-top: 8px; }
+  dl { display: grid; grid-template-columns: 4.5em 1fr; gap: 4px 8px; margin: 14px 0; }
+  dt { font-weight: 700; }
+  .board { margin-top: 24px; background: #fff; padding: 16px; }
+  .board img { width: 100%; display: block; }
+  .rec { display: inline-block; background: #222; color: #fff; font-size: 13px; padding: 0 8px; margin-left: 8px; vertical-align: 3px; }
+</style>
+</head>
+<body>
+  <h1>指板トレーナーの代表画面（練習中・位置→音名の回答直後）を、3つの構成で組んだラフ</h1>
+  <div class="cols">
+    <section class="col">
+      <h2>A 機材の操作盤<span class="rec">推奨</span></h2>
+      <p class="origin">出発点: チューナーとエフェクターの筐体（ピン 4・9・73・72）</p>
+      <img class="shot" src="a.png" alt="">
+      <img class="shot mobile" src="a-375.png" alt="">
+      <dl>
+        <dt>主役</dt><dd>チューナーのように巨大な音名と、反応時間のメーター（0〜3秒、1秒未満が「反射」の帯）</dd>
+        <dt>並び順</dt><dd>読み取り表示（音名・反応・前回比）→ 指板の表示窓 → 12音のフットスイッチ</dd>
+        <dt>合う理由</dt><dd>ギターを抱えたまま目を落とす使い方に合う。暗い画面は夜の練習でまぶしくない。今のダーク・スタジオ系の判断（ADR-0003）を引き継げる</dd>
+        <dt>弱点</dt><dd>今の配色と近く、変化が「カードの格子→1台の筐体」という構成の差に留まる。機材のコスプレになりすぎない加減が要る</dd>
+      </dl>
+    </section>
+    <section class="col">
+      <h2>B 色面ポスター</h2>
+      <p class="origin">出発点: 単色の面に弦だけを引いたギターのポスター（ピン 16・14・19・61）</p>
+      <img class="shot" src="b.png" alt="">
+      <img class="shot mobile" src="b-375.png" alt="">
+      <dl>
+        <dt>主役</dt><dd>画面いっぱいの橙の面と、そこに引いた指板そのもの。スマホではネックを縦に置き、画面の高さを指板に使う</dd>
+        <dt>並び順</dt><dd>問題（5弦7フレット）と反応時間を面の上に大きく → 指板 → 紺の帯に12音</dd>
+        <dt>合う理由</dt><dd>一目で他のどのサイトとも違う。縦置きの指板はコード図と同じ向きで、スマホでフレットが大きく取れる</dd>
+        <dt>弱点</dt><dd>指板を縦にするには全クイズの指板描画を作り直す必要がある。橙の面は長時間だと疲れ、成績や理論ページへの展開が難しい</dd>
+      </dl>
+    </section>
+    <section class="col">
+      <h2>C 教則本・カタログ</h2>
+      <p class="origin">出発点: 1950〜60年代のギターカタログと教則本の図版（ピン 28・34・35・53）</p>
+      <img class="shot" src="c.png" alt="">
+      <img class="shot mobile" src="c-375.png" alt="">
+      <dl>
+        <dt>主役</dt><dd>木目の指板の図版と、番号付きの注記（なぜ E なのか、同じ E はどこにあるか）</dd>
+        <dt>並び順</dt><dd>問題の見出し → 図1（指板）→ 注記①〜③ → 右欄に記録表と「回答票」</dd>
+        <dt>合う理由</dt><dd>理論レッスンや「なぜ」を見せる画面と相性がよい。成績を仕様表の形で読ませられる</dd>
+        <dt>弱点</dt><dd>明るい紙面は夜の練習でまぶしい。読ませる構成なので、反射で答える練習の速さとは逆向き。生成りの紙など2番目の定番に寄りやすい</dd>
+      </dl>
+    </section>
+  </div>
+  <section class="board"><h2>参考にしたピン（上から A・B・C）</h2><img src="../pinterest-directions.jpg" alt=""></section>
+</body>
+</html>

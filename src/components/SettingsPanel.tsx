@@ -64,10 +64,10 @@ export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, on
   return (
     <div className="mx-auto w-full max-w-3xl space-y-8 text-sm">
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight text-ink">練習の設定</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-ink">練習の設定</h1>
         <p className="text-sm leading-relaxed text-dim">自分のペースに合わせて、回答方法や指板の表示を調整できます。</p>
       </div>
-      <section className="grid gap-6 rounded-2xl border border-hair bg-surface p-6 sm:grid-cols-2 sm:p-8">
+      <section className="grid gap-6 rounded-2xl border border-hair border-t-case-edge bg-surface p-3 sm:grid-cols-2 sm:p-6">
         <div className="flex flex-col items-start gap-3">
           <span className="text-dim">回答方法</span>
           <div className="flex flex-wrap gap-2">
@@ -75,8 +75,8 @@ export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, on
               <button
                 key={label}
                 onClick={() => { setManualTempo(val); setManual(val); }}
-                className={`min-h-12 px-4 py-3 rounded-xl text-sm font-medium border ${
-                  manual === val ? 'bg-accent-soft text-accent border-accent' : 'bg-panel text-dim border-hair hover:bg-accent-soft'
+                className={`min-h-12 px-4 rounded-lg text-sm font-medium border ${
+                  manual === val ? 'bg-accent-soft text-accent border-accent' : 'bg-panel text-dim border-hair hover:border-dim'
                 }`}
               >
                 {label}
@@ -88,17 +88,17 @@ export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, on
           <span className="text-dim">練習の目標</span>
           <button
             onClick={onChangeGoal}
-            className="min-h-12 px-4 py-3 rounded-xl text-left text-sm font-medium bg-panel text-ink border border-hair hover:bg-accent-soft"
+            className="min-h-12 px-4 rounded-lg text-left text-sm font-medium bg-panel text-ink border border-hair hover:border-dim"
           >
-            {goalLabel ?? '未設定'} <span className="text-accent">変更</span>
+            {goalLabel ?? '未設定'} <span className="text-ink underline">変更</span>
           </button>
         </div>
         <div className="flex flex-col items-start gap-3">
           <span className="text-dim">音の再生</span>
           <button
             onClick={() => { const next = !sound; setSoundEnabled(next); setSound(next); }}
-            className={`min-h-12 min-w-24 px-4 py-3 rounded-xl text-sm font-medium font-mono border ${
-              sound ? 'bg-accent-soft text-accent border-accent' : 'bg-panel text-dim border-hair hover:bg-accent-soft'
+            className={`min-h-12 min-w-24 px-4 rounded-lg text-sm font-medium border ${
+              sound ? 'bg-accent-soft text-accent border-accent' : 'bg-panel text-dim border-hair hover:border-dim'
             }`}
           >
             {sound ? '♪ ON' : 'OFF'}
@@ -111,10 +111,10 @@ export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, on
               <button
                 key={val}
                 onClick={() => onAccidentalChange(val)}
-                className={`min-h-12 min-w-12 px-4 py-3 rounded-xl text-sm font-medium font-mono ${
+                className={`min-h-12 min-w-12 px-4 rounded-lg text-sm font-medium font-mono ${
                   accidental === val
                     ? 'bg-accent-soft text-accent border border-accent'
-                    : 'bg-panel hover:bg-accent-soft text-dim border border-hair'
+                    : 'bg-panel hover:border-dim text-dim border border-hair'
                 }`}
               >
                 {label}
@@ -127,7 +127,7 @@ export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, on
           <select
             value={maxFret}
             onChange={(e) => onMaxFretChange(Number(e.target.value))}
-            className="min-h-12 min-w-32 px-4 py-3 rounded-xl bg-panel border border-hair text-ink font-medium font-mono text-sm"
+            className="min-h-12 min-w-32 px-4 rounded-lg bg-panel border border-hair text-ink font-medium font-mono text-sm"
           >
             {FRET_OPTIONS.map((f) => (
               <option key={f} value={f}>{f}F</option>
@@ -135,18 +135,18 @@ export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, on
           </select>
         </div>
       </section>
-      <section className="space-y-4 rounded-2xl border border-hair bg-surface p-6 sm:p-8">
-        <h3 className="text-lg font-semibold text-ink">データのバックアップ</h3>
+      <section className="space-y-4 border-t border-hair pt-6">
+        <h3 className="text-sm font-semibold text-ink">データのバックアップ</h3>
         <div className="flex flex-wrap gap-3">
           <button
             onClick={handleExport}
-            className="min-h-12 px-4 py-3 rounded-xl bg-panel hover:bg-accent-soft text-ink border border-hair"
+            className="min-h-12 px-4 rounded-lg bg-panel hover:border-dim text-ink border border-hair"
           >
             データを書き出す
           </button>
           <button
             onClick={() => fileRef.current?.click()}
-            className="min-h-12 px-4 py-3 rounded-xl bg-panel hover:bg-accent-soft text-ink border border-hair"
+            className="min-h-12 px-4 rounded-lg bg-panel hover:border-dim text-ink border border-hair"
           >
             読み込む
           </button>
@@ -159,18 +159,18 @@ export function SettingsPanel({ accidental, maxFret, goalLabel, onChangeGoal, on
           />
         </div>
       </section>
-      <section className="space-y-4 rounded-2xl border border-hair bg-surface p-6 sm:p-8">
-        <h3 className="text-lg font-semibold text-ink">記録のリセット</h3>
+      <section className="space-y-4 border-t border-hair pt-6">
+        <h3 className="text-sm font-semibold text-ink">記録のリセット</h3>
         <div className="flex flex-wrap gap-3">
           <button
             onClick={onReset}
-            className="min-h-12 px-4 py-3 rounded-xl bg-panel hover:bg-accent-soft text-dim border border-hair"
+            className="min-h-12 px-4 rounded-lg bg-panel hover:border-dim text-dim border border-hair"
           >
             今回のスコアをリセット
           </button>
           <button
             onClick={onClearHistory}
-            className="min-h-12 px-4 py-3 rounded-xl text-wrong hover:bg-panel"
+            className="min-h-12 px-4 rounded-lg text-wrong hover:border-dim border border-hair bg-panel"
           >
             練習履歴を削除
           </button>

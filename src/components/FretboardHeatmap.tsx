@@ -132,7 +132,7 @@ export function FretboardHeatmap({ maxFret, accidental, metric = 'weakness' }: F
                 dominantBaseline="central"
                 fontSize={8}
                 fontWeight={600}
-                fill="#0e0f12"
+                fill="var(--bg)"
                 style={{ pointerEvents: 'none', userSelect: 'none' }}
               >
                 {getNoteLabel(s, f, accidental)}

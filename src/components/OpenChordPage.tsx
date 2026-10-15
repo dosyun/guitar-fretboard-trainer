@@ -16,16 +16,16 @@ export function OpenChordPage() {
     : OPEN_CHORDS.filter(c => c.category === selectedCategory);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="bg-surface rounded-xl shadow-sm p-4">
+    <div className="flex flex-col gap-6 sm:gap-8">
+      <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6">
         {/* カテゴリフィルタ */}
         <div className="flex gap-1.5 flex-wrap justify-center mb-3">
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1 rounded-lg text-sm font-medium border-2 transition-all ${
+            className={`min-h-12 px-3 rounded-lg text-sm border transition-colors ${
               selectedCategory === 'all'
                 ? 'bg-accent-soft text-accent border-accent'
-                : 'bg-panel text-dim border-hair hover:border-accent'
+                : 'bg-panel text-dim border-hair hover:border-dim'
             }`}
           >
             全て
@@ -34,10 +34,10 @@ export function OpenChordPage() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1 rounded-lg text-sm font-medium border-2 transition-all ${
+              className={`min-h-12 px-3 rounded-lg text-sm border transition-colors ${
                 selectedCategory === cat
-                  ? 'bg-accent text-bg border-accent'
-                  : 'bg-panel text-dim border-hair hover:border-accent'
+                  ? 'bg-accent-soft text-accent border-accent'
+                  : 'bg-panel text-dim border-hair hover:border-dim'
               }`}
             >
               {OPEN_CHORD_CATEGORY_LABELS[cat]}
@@ -60,7 +60,7 @@ export function OpenChordPage() {
         </div>
 
         {/* コードグリッド */}
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-2 rounded-lg bg-glass p-3">
           {filtered.map(chord => (
             <VoicingDiagram
               key={chord.name}
@@ -74,23 +74,23 @@ export function OpenChordPage() {
       </div>
 
       {/* 凡例 */}
-      <div className="bg-surface rounded-xl shadow-sm p-4">
-        <h3 className="text-sm font-bold text-ink mb-2">構成音の見方</h3>
+      <div className="border-t border-hair pt-4">
+        <h3 className="text-sm font-semibold text-ink mb-2">構成音の見方</h3>
         <div className="flex gap-4 text-xs text-dim flex-wrap">
           <div className="flex items-center gap-1.5">
             <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center">
-              <span className="text-bg text-[9px] font-bold">R</span>
+              <span className="text-bg text-xs font-semibold">R</span>
             </div>
             <span>ルート音</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: '#3a3a42' }}>
-              <span className="text-white text-[9px] font-bold">3</span>
+            <div className="w-6 h-6 rounded-full flex items-center justify-center bg-panel">
+              <span className="text-ink text-xs font-semibold">3</span>
             </div>
             <span>その他の構成音</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-wrong font-bold text-sm">×</span>
+            <span className="text-wrong font-semibold text-sm">×</span>
             <span>ミュート</span>
           </div>
           <div className="flex items-center gap-1.5">

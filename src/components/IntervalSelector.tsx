@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { intervalLabel } from '../i18n';
 import { INTERVAL_NAMES } from '../data/fretboard';
 import type { Feedback } from '../types';
+import { FootSwitch } from './FootSwitch';
 
 interface IntervalSelectorProps {
   feedback: Feedback;
@@ -8,29 +10,26 @@ interface IntervalSelectorProps {
   onSelect: (interval: string) => void;
 }
 
+// 12度数のフットスイッチ (NoteSelector と同じ並びと状態ランプ)
 export function IntervalSelector({ feedback, correctAnswer, onSelect }: IntervalSelectorProps) {
+  const [pressed, setPressed] = useState<string | null>(null);
+
   return (
-    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-w-xl w-full mx-auto">
+    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3 w-full">
       {INTERVAL_NAMES.map((interval) => {
-        const isCorrectHighlight = feedback === 'wrong' && interval === correctAnswer;
+        const isAnswer =
+          (feedback === 'wrong' && interval === correctAnswer) || (feedback === 'correct' && interval === pressed);
+        const isWrongPick = feedback === 'wrong' && interval === pressed && !isAnswer;
         return (
-          <button
+          <FootSwitch
             key={interval}
-            onClick={() => onSelect(interval)}
+            label={intervalLabel(interval)}
+            lamp={isAnswer ? 'correct' : isWrongPick ? 'wrong' : 'off'}
+            dimmed={feedback !== null && !isAnswer && !isWrongPick}
             disabled={feedback !== null}
-            aria-label={isCorrectHighlight ? `${intervalLabel(interval)}（正解）` : intervalLabel(interval)}
-            className={`
-              min-h-12 py-3 px-2 rounded-lg text-base font-semibold font-mono shadow-sm
-              ${isCorrectHighlight
-                ? 'bg-correct text-bg'
-                : 'bg-panel hover:bg-accent-soft active:opacity-80 text-ink border border-hair'
-              }
-              disabled:opacity-60 disabled:cursor-not-allowed
-            `}
-          >
-            {isCorrectHighlight && <span aria-hidden="true">✓ </span>}
-            {intervalLabel(interval)}
-          </button>
+            ariaLabel={feedback === 'wrong' && isAnswer ? `${intervalLabel(interval)}（正解）` : intervalLabel(interval)}
+            onClick={() => { setPressed(interval); onSelect(interval); }}
+          />
         );
       })}
     </div>

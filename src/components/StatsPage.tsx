@@ -51,18 +51,17 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
   return (
     <div className="mx-auto w-full max-w-5xl min-w-0 space-y-8">
       <div className="text-xs font-medium text-dim flex items-center gap-2">
-        <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true" />
         練習の記録
       </div>
 
       <div className="space-y-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-ink">成績と弱点</h1>
-        <p className="text-sm leading-relaxed text-dim">練習の手応えを確かめて、次に練習する音を見つけましょう。</p>
+        <h1 className="text-xl font-semibold tracking-tight text-ink">成績と弱点</h1>
+        <p className="text-sm leading-relaxed text-dim">正答率と反応時間を、指板の場所ごと・度数ごとに集計しています。</p>
       </div>
 
       {!hasData ? (
-        <div className="bg-surface border border-hair rounded-2xl p-8 text-center space-y-3">
-          <p className="text-lg text-ink font-semibold text-balance">まだ練習記録がありません</p>
+        <div className="border-t border-hair pt-6 text-center space-y-3">
+          <p className="text-base text-ink font-semibold text-balance">まだ練習記録がありません</p>
           <p className="text-dim text-sm leading-relaxed text-pretty">
             クイズで音名を練習すると、ここに正答率・反応速度・指板の弱点ヒートマップが表示されます。
           </p>
@@ -70,18 +69,21 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
       ) : (
         <>
           {unfinalizedCount > 0 && (
-            <div className="bg-accent-soft border border-accent rounded-xl px-4 py-3 text-sm text-pretty">
-              <span className="text-accent font-medium">結果にまとめていない回答が{unfinalizedCount}問あります。</span>
+            <div className="bg-glass rounded-lg p-3 text-sm text-pretty">
+              <span className="inline-block size-2 rounded-full bg-accent mr-2" aria-hidden="true" />
+              <span className="text-ink font-medium">結果にまとめていない回答が{unfinalizedCount}問あります。</span>
               <span className="text-dim"> 累計と弱点分析には反映済みです。</span>
             </div>
           )}
 
           {/* サマリ readout（回答ログ基準。途中で閉じた回答も「解いた1問」に含める） */}
           {overall.count > 0 && (
-            <div className="grid grid-cols-3 gap-3 sm:gap-4 text-center">
-              <Stat label="累計問題数" value={`${overall.count}`} />
-              <Stat label="総合正答率" value={`${accuracy}%`} />
-              <Stat label="平均反応" value={sec(overall.avgMs)} />
+            <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6">
+              <div className="grid grid-cols-3 gap-3 sm:gap-4 text-center">
+                <Stat label="累計問題数" value={`${overall.count}`} />
+                <Stat label="総合正答率" value={`${accuracy}%`} />
+                <Stat label="平均反応" value={sec(overall.avgMs)} />
+              </div>
             </div>
           )}
 
@@ -100,9 +102,9 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
           {sessions.length > 0 && <ProgressChart sessions={sessions} />}
 
           {/* ヒートマップ（総合/誤答/遅さ 切替） */}
-          <div className="space-y-4">
+          <div className="space-y-4 border-t border-hair pt-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <h2 className="text-lg font-semibold text-ink">指板ヒートマップ</h2>
+              <h2 className="text-sm font-semibold text-ink">指板ヒートマップ</h2>
               <Segmented
                 size="small"
                 value={heatMetric}
@@ -118,24 +120,24 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
               <span className="text-pretty">{HEAT_HINT[heatMetric]}</span>
               <Legend />
             </div>
-            <div className="min-w-0 bg-surface rounded-2xl border border-hair p-4 overflow-x-auto">
+            <div className="min-w-0 bg-glass rounded-lg p-4 overflow-x-auto">
               <div className="min-w-[640px]"><FretboardHeatmap maxFret={maxFret} accidental={accidental} metric={heatMetric} /></div>
             </div>
           </div>
 
           {/* 度数の弱点（度数モード） */}
           {degreeWorst.length > 0 && (
-            <div className="space-y-4 rounded-2xl border border-hair bg-surface p-6">
-              <h2 className="text-lg font-semibold text-ink">度数の弱点（度数モード）</h2>
+            <div className="space-y-4 border-t border-hair pt-6">
+              <h2 className="text-sm font-semibold text-ink">度数の弱点（度数モード）</h2>
               <ul className="space-y-4">
                 {degreeWorst.map((d) => {
                   const w = degreeWeak(d);
                   return (
                     <li key={d.degree} className="flex items-center gap-3 text-sm">
                       <span className="font-mono text-ink w-12 shrink-0" title={intervalLabel(d.degree)}>{d.degree}</span>
-                      <div className="flex-1 h-2 rounded-full bg-panel overflow-hidden">
+                      <div className="flex-1 h-2 bg-panel overflow-hidden">
                         <div
-                          className="h-full rounded-full"
+                          className="h-full"
                           style={{ width: `${Math.max(4, Math.round(w * 100))}%`, background: heatColor(w) }}
                         />
                       </div>
@@ -156,8 +158,8 @@ export function StatsPage({ maxFret, accidental, onDrill, onDrillString, onDrill
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-surface rounded-2xl px-2 py-6 sm:px-6 border border-hair">
-      <div className="font-mono tabular-nums text-2xl sm:text-4xl font-medium text-ink">{value}</div>
+    <div className="bg-glass rounded-lg px-2 py-6 sm:px-6">
+      <div className="font-mono tabular-nums text-3xl font-medium text-ink">{value}</div>
       <div className="text-dim text-xs mt-3">{label}</div>
     </div>
   );

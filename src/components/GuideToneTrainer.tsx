@@ -191,15 +191,16 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
           <div
             key={i}
             className={`px-3 py-1.5 rounded-lg border text-sm font-mono ${
-              started && i === step ? 'bg-accent text-bg border-accent font-bold' : 'bg-panel text-dim border-hair'
+              started && i === step ? 'bg-accent-soft text-accent border-accent font-semibold' : 'bg-panel text-dim border-hair'
             }`}
           >
-            <span className="text-[10px] opacity-70 mr-1">{c.roman}</span>
+            <span className="text-xs opacity-70 mr-1">{c.roman}</span>
             {c.symbol}
           </div>
         ))}
       </div>
 
+      <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
       {started && (
         <>
           <QuizScore correct={score.correct} total={score.total} />
@@ -207,26 +208,26 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
           <div className="text-center space-y-2">
             <button
               onClick={() => playChordAt(chords[step].rootIdx, chords[step].ct)}
-              className="mx-auto px-5 py-2 bg-panel text-accent border border-hair rounded-lg hover:bg-accent-soft transition-colors font-mono text-sm"
+              className="mx-auto px-5 min-h-12 bg-panel text-ink border border-hair rounded-lg hover:border-dim text-sm"
             >
               ▶ コードを聴く
             </button>
             <p className="text-ink font-medium">
               {phrase('{0} の {1}（ガイド音）を弾け', [
                 <span key="chord" className="font-mono text-accent">{chords[step].symbol}</span>,
-                <span key="degree" className="font-mono text-lg">{intervalLabel(guideLabel)}</span>,
+                <span key="degree" className="font-mono text-xl">{intervalLabel(guideLabel)}</span>,
               ])}
             </p>
             {feedback && (
-              <p className={`text-lg font-bold ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
+              <p className={`text-base font-semibold ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
                 {feedback === 'correct' ? '正解!' : `不正解... 正解の音: ${target?.note}`}
               </p>
             )}
             {feedback === 'wrong' && wrongPick && (
-              <p className="text-xs text-wrong font-mono">{`選んだ ${wrongPick.note} は ${intervalLabel(wrongPick.deg)}`}</p>
+              <p className="text-xs text-wrong">{`選んだ ${wrongPick.note} は ${intervalLabel(wrongPick.deg)}`}</p>
             )}
             {feedback && (
-              <p className="text-xs text-dim text-pretty font-mono">
+              <p className="text-xs text-dim text-pretty">
                 {isSeventh ? '7th は次コードの3rdへ半音で解決＝滑らかなライン' : '3rd がコードの明暗を決める'}
               </p>
             )}
@@ -234,7 +235,7 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
         </>
       )}
 
-      <div className="bg-surface rounded-xl border border-hair p-2 overflow-x-auto">
+      <div className="bg-glass rounded-lg p-2 overflow-x-auto">
         <Fretboard
           maxFret={maxFret}
           accidental={accidental}
@@ -244,6 +245,7 @@ export function GuideToneTrainer({ accidental, maxFret, onLearn }: GuideToneTrai
           showLabelAt={showLabelAt}
           onPositionClick={started ? onTap : undefined}
         />
+      </div>
       </div>
 
       <QuizFooter

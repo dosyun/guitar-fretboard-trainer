@@ -12,16 +12,16 @@ export function RootSelector({ current, accidental, onChange }: RootSelectorProp
 
   return (
     <div className="flex items-center gap-2 flex-wrap justify-center">
-      <span className="text-sm text-dim font-medium">ルート:</span>
+      <span className="text-sm text-dim font-semibold">ルート:</span>
       {notes.map((note) => (
         <button
           key={note}
           onClick={() => onChange(note as NoteName)}
           className={`
-            size-9 rounded-full text-xs font-semibold font-mono transition-colors
+            size-9 rounded-lg border text-xs font-semibold font-mono transition-colors
             ${current === note
-              ? 'bg-accent text-bg'
-              : 'bg-panel text-dim hover:bg-accent-soft'
+              ? 'bg-accent-soft text-accent border-accent'
+              : 'bg-panel text-dim border-hair hover:border-dim'
             }
           `}
         >

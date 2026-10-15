@@ -27,7 +27,7 @@ export const GOALS: Goal[] = [
     basicMode: 'position-to-note',
     lessonId: 'notes',
     cta: '音名の練習をはじめる',
-    hint: 'まずは指板の地図から。6弦・5弦→全弦へ。',
+    hint: '6弦・5弦の音名から始め、全弦へ広げます。',
   },
   {
     id: 'chord',

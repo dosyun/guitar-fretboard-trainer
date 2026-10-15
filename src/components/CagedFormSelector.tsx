@@ -27,9 +27,9 @@ export function CagedFormSelector({ selectedForms, onChange }: CagedFormSelector
           <button
             key={form}
             onClick={() => toggle(form)}
-            style={selected ? { background: color.bg, color: '#fff', borderColor: color.border } : {}}
+            style={selected ? { background: color.bg, color: 'var(--ink)', borderColor: color.border } : {}}
             className={`
-              w-10 h-10 rounded-lg text-base font-bold transition-opacity border-2
+              w-10 h-10 rounded-lg text-base font-semibold transition-opacity border-2
               ${selected ? '' : 'bg-panel text-dim border-hair opacity-50'}
             `}
           >
@@ -39,7 +39,7 @@ export function CagedFormSelector({ selectedForms, onChange }: CagedFormSelector
       })}
       <button
         onClick={() => onChange([...CAGED_ORDER])}
-        className="px-3 py-2 rounded text-xs text-dim hover:bg-accent-soft"
+        className="px-3 py-2 rounded-lg text-xs text-dim hover:text-ink"
       >
         全表示
       </button>

@@ -70,15 +70,15 @@ export function InstallPrompt() {
   };
 
   return (
-    <div className="bg-accent-soft border border-accent rounded-xl px-4 py-3 flex items-start gap-3">
-      <span className="inline-block size-1.5 rounded-full bg-accent mt-1.5 shrink-0" aria-hidden="true" />
+    <div className="bg-glass rounded-lg p-3 flex items-start gap-3">
+      <span className="inline-block size-2 rounded-full bg-accent mt-1.5 shrink-0" aria-hidden="true" />
       <div className="flex-1 text-sm">
         {deferred ? (
           <>
             <p className="text-ink">ホーム画面に追加してアプリとして使えます。</p>
             <button
               onClick={install}
-              className="mt-2 px-4 py-1.5 bg-accent text-bg font-semibold rounded-lg text-sm hover:opacity-90 active:opacity-80 transition-opacity"
+              className="mt-2 px-4 min-h-12 bg-accent text-bg font-semibold rounded-lg text-sm hover:opacity-90 active:opacity-80"
             >
               アプリとして追加
             </button>
@@ -87,7 +87,7 @@ export function InstallPrompt() {
           <p className="text-ink text-pretty">
             {phrase('Safariの共有ボタン {0} →「{1}」でアプリになります。', [
               <span key="share" className="font-mono">□↑</span>,
-              <span key="install" className="text-accent">ホーム画面に追加</span>,
+              <span key="install" className="text-ink font-semibold">ホーム画面に追加</span>,
             ])}
           </p>
         )}
@@ -95,7 +95,7 @@ export function InstallPrompt() {
       <button
         onClick={dismiss}
         aria-label="閉じる"
-        className="text-dim hover:text-ink text-lg leading-none shrink-0"
+        className="text-dim hover:text-ink text-xl leading-none shrink-0"
       >
         ×
       </button>

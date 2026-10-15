@@ -179,13 +179,13 @@ export function ScaleMap({ maxFret, rootNote, scaleName, selectedBox, displayMod
               <>
                 <text x={posX(pos.fret)} y={stringY(pos.string) - 4}
                   textAnchor="middle" dominantBaseline="central"
-                  fontSize={6} fontWeight={700} fill={isRoot ? '#fff' : color.bg}
+                  fontSize={6} fontWeight={700} fill={isRoot ? 'var(--ink)' : color.bg}
                   style={{ pointerEvents: 'none', userSelect: 'none' }}>
                   {noteName}
                 </text>
                 <text x={posX(pos.fret)} y={stringY(pos.string) + 4}
                   textAnchor="middle" dominantBaseline="central"
-                  fontSize={6} fontWeight={600} fill={isRoot ? '#bfdbfe' : color.bg}
+                  fontSize={6} fontWeight={600} fill={isRoot ? 'var(--ink)' : color.bg}
                   style={{ pointerEvents: 'none', userSelect: 'none' }}>
                   {degree}
                 </text>
@@ -198,7 +198,7 @@ export function ScaleMap({ maxFret, rootNote, scaleName, selectedBox, displayMod
                 dominantBaseline="central"
                 fontSize={isRoot ? 10 : 8}
                 fontWeight={700}
-                fill={isRoot ? '#fff' : color.bg}
+                fill={isRoot ? 'var(--ink)' : color.bg}
                 style={{ pointerEvents: 'none', userSelect: 'none' }}
               >
                 {displayMode === 'note' ? noteName : degree}

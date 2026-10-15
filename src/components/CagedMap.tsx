@@ -174,7 +174,7 @@ export function CagedMap({
         const cy = stringY(pos.string);
 
         const noteName = getNoteAt(pos.string, pos.fret, accidental);
-        const textFill = isChord ? '#fff' : color.bg;
+        const textFill = isChord ? 'var(--ink)' : color.bg;
 
         return (
           <g key={`${formName}-${i}`}>

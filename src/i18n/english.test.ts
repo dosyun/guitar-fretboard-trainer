@@ -125,7 +125,7 @@ describe('real transformed English presentation', () => {
       const html = renderToStaticMarkup(createElement(component, props));
       expect(html, file).not.toMatch(japanese);
     }
-  });
+  }, 60000); // 全練習モードを実際に描画する。単体で約7秒だが、全体実行や他プロセスの負荷で40秒台まで延びる
 
   it('translates all 21 lesson bodies, examples, questions, and explanations while preserving IDs and answers', () => {
     useLanguage();

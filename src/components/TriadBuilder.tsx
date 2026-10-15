@@ -135,12 +135,13 @@ export function TriadBuilder({ accidental, maxFret, onLearn }: TriadBuilderProps
         />
       </div>
 
+      <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
       {started && (
         <>
           <div className="flex justify-center text-sm">
             <div className="text-center">
               <div className="text-dim text-xs">完成</div>
-              <div className="text-lg font-bold font-mono tabular-nums text-ink">{score}</div>
+              <div className="text-xl font-semibold font-mono tabular-nums text-ink">{score}</div>
             </div>
           </div>
 
@@ -150,15 +151,15 @@ export function TriadBuilder({ accidental, maxFret, onLearn }: TriadBuilderProps
                 <span key="chord" className="font-mono text-accent">{symbol}</span>, qual.label,
               ])}
             </p>
-            <p className="text-xs text-dim font-mono">{symbol} = {spelling.join(' · ')}</p>
+            <p className="text-xs text-dim">{symbol} = {spelling.join(' · ')}</p>
             <div className="flex justify-center gap-2 pt-1">
               {qual.degs.map((d, i) => {
                 const got = collectedSts.has(qual.sts[i]);
                 return (
                   <span
                     key={d}
-                    className={`px-3 py-1 rounded-lg text-sm font-mono border ${
-                      got ? 'bg-correct text-bg border-correct' : 'bg-panel text-dim border-hair'
+                    className={`px-2 py-1 rounded text-sm font-mono border ${
+                      got ? 'bg-panel text-correct border-correct' : 'bg-panel text-dim border-hair'
                     }`}
                   >
                     {got ? '✓ ' : ''}{d}
@@ -166,13 +167,13 @@ export function TriadBuilder({ accidental, maxFret, onLearn }: TriadBuilderProps
                 );
               })}
             </div>
-            {done && <p className="text-correct font-bold mt-1">✓ {symbol} 完成！</p>}
-            {wrongMsg && <p className="text-wrong text-sm mt-1 font-mono">{wrongMsg}</p>}
+            {done && <p className="text-correct font-semibold mt-1">✓ {symbol} 完成！</p>}
+            {wrongMsg && <p className="text-wrong text-sm mt-1">{wrongMsg}</p>}
           </div>
         </>
       )}
 
-      <div className="bg-surface rounded-xl border border-hair p-2 overflow-x-auto">
+      <div className="bg-glass rounded-lg p-2 overflow-x-auto">
         <Fretboard
           maxFret={maxFret}
           accidental={accidental}
@@ -182,13 +183,14 @@ export function TriadBuilder({ accidental, maxFret, onLearn }: TriadBuilderProps
           onPositionClick={started && !done ? onTap : undefined}
         />
       </div>
+      </div>
 
       <QuizFooter
         started={started}
         onStart={start}
         onStop={stop}
         onLearn={onLearn}
-        hint="コードは“覚える”より“作る”。R・3・5を指板から集めよう。メジャー↔マイナーで3度が変わり、明るさが切り替わる。完成したら別の場所でも作ってみよう。"
+        hint="R・3・5を指板から集めてコードを組み立てます。メジャーとマイナーは3度だけが半音違います。"
       />
     </>
   );

@@ -19,7 +19,7 @@ import { ResultScreen } from './ResultScreen';
 const ALL_STRINGS = [0, 1, 2, 3, 4, 5];
 const DEFAULT_RANGE: [number, number] = [0, 12];
 const NOTE_STEP_MS = 550;
-const BUTTON = 'px-4 py-2 rounded-lg bg-panel text-ink border border-hair hover:bg-accent-soft disabled:opacity-50 font-mono';
+const BUTTON = 'px-4 min-h-12 rounded-lg bg-panel text-ink border border-hair hover:border-dim disabled:opacity-50';
 const MOTION = { up: '↑', down: '↓', same: '→' };
 
 function noteCountLabel(min: number, max: number) {
@@ -235,7 +235,7 @@ export function EarPhraseQuiz({
   return (
     <section className="space-y-6" aria-label={t('フレーズ再現')}>
       <p className="text-sm text-dim text-center text-pretty">
-        {t('キーを聴いて、短いフレーズを指板で再現しよう。')}
+        {t('キーを聴いたあと、短いフレーズを指板で再現します。')}
       </p>
       <fieldset disabled={started && question !== null} className="space-y-3">
         <legend className="text-sm text-dim mb-2">{t('出題設定')}</legend>
@@ -247,7 +247,7 @@ export function EarPhraseQuiz({
             </button>
           ))}
         </div>
-        <p className="text-xs text-dim text-center font-mono tabular-nums">
+        <p className="text-xs text-dim text-center tabular-nums">
           {t('{0}・{1}', noteCountLabel(PHRASE_LEVELS[level].minNotes, PHRASE_LEVELS[level].maxNotes), motionLabel(PHRASE_LEVELS[level].maxScaleStep))}
         </p>
         <PracticeRangeSelector selectedStrings={selectedStrings} fretRange={range.fretRange}
@@ -259,20 +259,20 @@ export function EarPhraseQuiz({
           onChange={(event) => setAllowOctave(event.target.checked)} />
         {t('オクターブ違いも正解')}
       </label>
-      {notice && <p role="alert" className="text-sm text-accent text-center text-pretty">{notice}</p>}
+      {notice && <p role="alert" className="text-sm text-ink text-center text-pretty">{notice}</p>}
       {started && !question && <button className={BUTTON} onClick={nextQuestion}>{t('この範囲で再出題')}</button>}
       {started && question && (
-        <>
+        <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
           <QuizScore correct={sessionCorrect} total={count} />
           <div className="text-center space-y-3">
             <p className="font-mono tabular-nums text-ink">
               {t('キー: {0} {1}', noteNames[question.key.root], t(question.key.mode === 'minor' ? 'マイナー' : 'メジャー'))}
             </p>
             <button disabled={playing} onClick={() => playSequence(question.midis, question, true)}
-              className="w-full sm:w-auto px-8 py-4 rounded-lg bg-accent text-bg font-semibold disabled:opacity-50">
+              className="w-full sm:w-auto px-8 min-h-12 rounded-lg bg-accent text-bg font-semibold disabled:opacity-50">
               {t('▶ フレーズを聴く')}
             </button>
-            <p role="status" aria-live="polite" className="text-sm text-dim font-mono tabular-nums">
+            <p role="status" aria-live="polite" className="text-sm text-dim tabular-nums">
               {playing ? t('再生中…') : t('{0}/{1}音入力・再生{2}回', answer.length, question.midis.length, playCount)}
             </p>
             <p className="text-xs text-dim">{t('Space: 再生 / Backspace: 1音取り消し / Enter: 判定・次へ')}</p>
@@ -284,16 +284,16 @@ export function EarPhraseQuiz({
               </button>
             </div>
             {hintLevel >= 1 && (
-              <p className="font-mono text-accent" aria-label={t('音の動き')}>
+              <p className="font-mono text-ink" aria-label={t('音の動き')}>
                 {getPhraseMotion(question.midis).map((motion) => MOTION[motion]).join(' ')}
               </p>
             )}
-            {shownMidi !== undefined && <p className="text-sm text-accent font-mono">{t('次の音: {0}', midiLabel(shownMidi))}</p>}
+            {shownMidi !== undefined && <p className="text-sm text-ink font-mono">{t('次の音: {0}', midiLabel(shownMidi))}</p>}
             <p className="font-mono text-ink tabular-nums" aria-label={t('入力した音')}>
               {answer.map(midiLabel).join(' – ') || '—'}
             </p>
           </div>
-          <div className="overflow-x-auto rounded-lg border border-hair bg-surface p-3"
+          <div className="overflow-x-auto rounded-lg bg-glass p-3"
             role="group" aria-label={t('ギター指板（弦とフレットを選んで解答）')}>
             <div className="inline-flex min-w-full flex-col gap-2">
               <div className="flex gap-2 font-mono text-xs text-dim tabular-nums" aria-hidden="true">
@@ -304,7 +304,7 @@ export function EarPhraseQuiz({
               </div>
               {[...range.strings].sort((a, b) => b - a).map((string) => (
                 <div key={string} className="flex items-center gap-2">
-                  <span className="w-12 shrink-0 text-xs text-dim font-mono">{t('{0}弦', 6 - string)}</span>
+                  <span className="w-12 shrink-0 text-xs text-dim">{t('{0}弦', 6 - string)}</span>
                   {Array.from({ length: range.fretRange[1] - range.fretRange[0] + 1 }, (_, index) => {
                     const fret = index + range.fretRange[0];
                     const midi = getMidiAt(string, fret);
@@ -315,7 +315,7 @@ export function EarPhraseQuiz({
                       <button key={fret} disabled={!allowed || playing || correct !== null}
                         aria-label={t('{0}弦 {1}フレット', 6 - string, fret)}
                         onClick={() => tap(string, fret)}
-                        className={'size-12 shrink-0 rounded border font-mono text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent ' +
+                        className={'size-12 shrink-0 rounded-lg border font-mono text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent ' +
                           (shown ? 'bg-accent-soft border-accent text-accent' : scale ? 'bg-panel border-hair text-dim' : 'bg-bg border-hair text-ink') +
                           (!allowed ? ' opacity-40' : '')}>
                         {shown || scale ? midiLabel(midi) : '·'}
@@ -327,7 +327,7 @@ export function EarPhraseQuiz({
             </div>
           </div>
           {correct !== null && (
-            <div className="space-y-3 rounded-lg border border-hair bg-surface p-4 text-center" aria-live="polite">
+            <div className="space-y-3 border-t border-hair pt-3 text-center" aria-live="polite">
               <p className={'font-semibold ' + (correct ? 'text-correct' : 'text-wrong')}>{t(correct ? '正解!' : '不正解...')}</p>
               {hintLevel > 0 && <p className="text-xs text-dim">{t('ヒント使用として記録しました。')}</p>}
               <p className="font-mono text-ink">{t('正解の音: {0}', question.midis.map(midiLabel).join(' – '))}</p>
@@ -340,7 +340,7 @@ export function EarPhraseQuiz({
               </div>
             </div>
           )}
-        </>
+        </div>
       )}
       <QuizFooter started={started} onStart={start} onStop={stop} onLearn={onLearn} />
     </section>

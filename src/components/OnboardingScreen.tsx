@@ -15,12 +15,11 @@ export function OnboardingScreen({ onDone }: OnboardingScreenProps) {
   return (
     <div className="mx-auto w-full max-w-3xl space-y-8">
       <div className="text-xs font-medium text-dim flex items-center gap-2">
-        <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true" />
         練習の目標
       </div>
 
       <div className="space-y-3">
-        <h1 className="text-2xl font-semibold tracking-tight text-ink text-balance">何ができるようになりたい？</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-ink text-balance">何ができるようになりたい？</h1>
         <p className="text-dim text-sm leading-relaxed text-pretty">目的に合わせて、最初の練習とレッスンをおすすめします。</p>
       </div>
 
@@ -29,9 +28,9 @@ export function OnboardingScreen({ onDone }: OnboardingScreenProps) {
           <button
             key={g.id}
             onClick={() => choose(g.id)}
-            className="flex min-h-32 w-full flex-col justify-between gap-4 text-left bg-surface border border-hair rounded-2xl p-6 hover:bg-panel hover:border-accent"
+            className="flex min-h-32 w-full flex-col justify-between gap-4 text-left bg-panel border border-hair rounded-lg p-4 hover:border-dim"
           >
-            <div className="text-lg text-ink font-semibold">{g.label}</div>
+            <div className="text-base text-ink font-semibold">{g.label}</div>
             <div className="text-sm leading-relaxed text-dim text-pretty">{g.desc}</div>
           </button>
         ))}
@@ -39,7 +38,7 @@ export function OnboardingScreen({ onDone }: OnboardingScreenProps) {
 
       <button
         onClick={() => choose('skip')}
-        className="min-h-12 w-full rounded-xl bg-panel px-4 py-3 text-sm text-dim hover:text-ink"
+        className="min-h-12 w-full rounded-lg bg-panel border border-hair px-4 text-sm text-ink hover:border-dim"
       >
         あとで決める（スキップ）
       </button>

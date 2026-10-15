@@ -4,6 +4,7 @@ import { INTERVAL_NAMES } from '../data/fretboard';
 import { playMidi } from '../data/audio';
 import { useSession } from '../hooks/useSession';
 import { getLastSession } from '../data/practiceStore';
+import { FootSwitch } from './FootSwitch';
 import { QuizFooter, QuizScore } from './QuizChrome';
 import { recordSkill } from '../data/skillStore';
 import { ResultScreen } from './ResultScreen';
@@ -193,47 +194,43 @@ export function EarTrainingQuiz({ accidental, onLearn, strings, fretRange, maxFr
       ) : (
         <>
       {started && q && (
-        <>
+        <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
           <QuizScore correct={score.correct} total={score.total} />
 
           <div className="text-center space-y-3">
             <button
               onClick={() => playQuestion(q.midis)}
-              className="mx-auto px-6 py-3 bg-panel text-accent border border-hair rounded-lg hover:bg-accent-soft transition-colors font-mono"
+              className="mx-auto px-6 min-h-12 bg-panel text-ink border border-hair rounded-lg hover:border-dim"
             >
               ▶ もう一度聴く
             </button>
 
             <p className="text-sm text-dim">聴こえた響きは？</p>
 
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3 w-full">
               {choices.map((c) => {
-                let cls = 'bg-panel text-ink border-hair hover:bg-accent-soft';
-                if (feedback) {
-                  if (c.key === q.answer) cls = 'bg-correct text-bg border-correct';
-                  else if (c.key === picked) cls = 'bg-wrong text-white border-wrong';
-                  else cls = 'bg-panel text-dim border-hair opacity-60';
-                }
+                const isAnswer = !!feedback && c.key === q.answer;
+                const isWrongPick = !!feedback && c.key === picked && !isAnswer;
                 return (
-                  <button
+                  <FootSwitch
                     key={c.key}
+                    label={c.label}
+                    lamp={isAnswer ? 'correct' : isWrongPick ? 'wrong' : 'off'}
+                    dimmed={!!feedback && !isAnswer && !isWrongPick}
                     disabled={!!feedback}
                     onClick={() => answer(c.key)}
-                    className={`px-4 py-2 rounded-lg text-sm font-mono border transition-colors ${cls}`}
-                  >
-                    {c.label}
-                  </button>
+                  />
                 );
               })}
             </div>
 
             {feedback && (
-              <p className={`font-bold ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
+              <p className={`font-semibold ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
                 {feedback === 'correct' ? '正解!' : '不正解...'} <span className="font-mono text-ink">{q.reveal}</span>
               </p>
             )}
           </div>
-        </>
+        </div>
       )}
 
       <QuizFooter

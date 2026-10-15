@@ -14,7 +14,7 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
   const recent = sessions.slice(-MAX_POINTS);
   if (recent.length < 2) {
     return (
-      <div className="bg-surface border border-hair rounded-xl px-4 py-3 text-xs text-dim text-pretty">
+      <div className="border-t border-hair pt-4 text-xs text-dim text-pretty">
         セッションを2回以上こなすと、ここに正答率・反応速度の推移が出ます。
       </div>
     );
@@ -24,8 +24,8 @@ export function ProgressChart({ sessions }: ProgressChartProps) {
   const time = recent.map((s) => s.avgMs / 1000);
 
   return (
-    <div className="space-y-2">
-      <h2 className="text-sm font-medium text-ink">{`推移（直近${recent.length}セッション）`}</h2>
+    <div className="space-y-2 border-t border-hair pt-4">
+      <h2 className="text-sm font-semibold text-ink">{`推移（直近${recent.length}セッション）`}</h2>
       <Sparkline
         label="正答率"
         values={acc}
@@ -75,7 +75,7 @@ function Sparkline({ label, values, higherBetter, fmtValue, fmtDelta }: Sparklin
   const improved = higherBetter ? delta >= 0 : delta <= 0;
 
   return (
-    <div className="bg-surface border border-hair rounded-xl p-3">
+    <div className="bg-glass rounded-lg p-3">
       <div className="flex items-center justify-between mb-1">
         <span className="text-xs text-dim">{label}</span>
         <span className="text-sm font-mono tabular-nums text-ink">

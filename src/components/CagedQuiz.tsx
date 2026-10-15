@@ -1,5 +1,6 @@
 import { Fretboard } from './Fretboard';
 import { ScoreBoard } from './ScoreBoard';
+import { FootSwitch } from './FootSwitch';
 import { CAGED_COLORS, CAGED_ORDER } from '../data/caged';
 import type { CagedQuizMode, CagedFormName, NoteName, Accidental, FretPosition, ScoreState } from '../types';
 
@@ -77,10 +78,10 @@ export function CagedQuiz({
           <button
             key={value}
             onClick={() => onSetMode(value)}
-            className={`flex-1 py-2 px-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex-1 min-h-12 px-2 rounded-lg border text-sm font-semibold transition-colors ${
               quiz.mode === value
-                ? 'bg-surface text-ink shadow-sm'
-                : 'text-dim hover:text-ink'
+                ? 'bg-accent-soft text-accent border-accent'
+                : 'text-dim border-transparent hover:text-ink'
             }`}
           >
             {label}
@@ -94,9 +95,9 @@ export function CagedQuiz({
       {/* 問題文 */}
       {started && (
         <div className="text-center">
-          <p className="text-ink font-medium">{getPrompt()}</p>
+          <p className="text-ink font-semibold">{getPrompt()}</p>
           {quiz.feedback && (
-            <p className={`text-lg font-bold mt-1 ${
+            <p className={`text-xl font-semibold mt-1 ${
               quiz.feedback === 'correct' ? 'text-correct' : 'text-wrong'
             }`}>
               {getFeedbackMsg()}
@@ -134,10 +135,10 @@ export function CagedQuiz({
                 onClick={() => onAnswerForm(form)}
                 disabled={quiz.feedback !== null}
                 style={isCorrectHighlight
-                  ? { background: 'var(--correct)', color: '#0e0f12' }
-                  : { background: color.bg, color: '#fff', borderColor: color.border }
+                  ? { background: 'var(--correct)', color: 'var(--bg)' }
+                  : { background: color.bg, color: 'var(--ink)', borderColor: color.border }
                 }
-                className="w-14 h-14 rounded-lg text-xl font-bold border-2 transition-opacity
+                className="w-14 h-14 rounded-lg text-xl font-semibold border-2 transition-opacity
                            hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {form}
@@ -152,20 +153,13 @@ export function CagedQuiz({
           {(['R', '3', '5'] as const).map((tone) => {
             const isCorrectHighlight = quiz.feedback === 'wrong' && tone === quiz.correctAnswer;
             return (
-              <button
+              <FootSwitch
                 key={tone}
+                label={tone}
+                lamp={isCorrectHighlight ? 'correct' : 'off'}
                 onClick={() => onAnswerChordTone(tone)}
                 disabled={quiz.feedback !== null}
-                className={`w-16 h-14 rounded-lg text-xl font-bold border-2 transition-colors
-                  ${isCorrectHighlight
-                    ? 'bg-correct text-bg border-correct'
-                    : 'bg-panel text-ink border-hair hover:bg-accent-soft'
-                  }
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                `}
-              >
-                {tone}
-              </button>
+              />
             );
           })}
         </div>
@@ -175,7 +169,7 @@ export function CagedQuiz({
       {!started && (
         <button
           onClick={() => onStart(quiz.mode)}
-          className="mx-auto px-8 py-3 bg-accent text-bg font-semibold rounded-lg
+          className="mx-auto min-h-12 px-8 py-3 bg-accent text-bg font-semibold rounded-lg
                      hover:opacity-90 active:opacity-80 transition-opacity"
         >
           スタート

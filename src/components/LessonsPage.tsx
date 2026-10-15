@@ -4,6 +4,7 @@ import { LESSONS, LESSON_CHAPTERS, CHAPTER_LEVEL } from '../data/lessons';
 import type { LessonCheckQ, LessonLevel } from '../data/lessons';
 import { getCompletedLessons, markLessonComplete } from '../data/lessonProgress';
 import { LessonFretboard } from './LessonFretboard';
+import { FootSwitch } from './FootSwitch';
 
 interface LessonsPageProps {
   onGoto: (target: string) => void;
@@ -12,15 +13,9 @@ interface LessonsPageProps {
   onConsumeOpen?: () => void;
 }
 
-const LEVEL_STYLE: Record<LessonLevel, string> = {
-  初級: 'text-correct',
-  中級: 'text-accent',
-  上級: 'text-wrong',
-};
-
 function LevelBadge({ level }: { level: LessonLevel }) {
   return (
-    <span className={`px-2 py-1 rounded-lg text-xs font-mono border border-hair bg-panel ${LEVEL_STYLE[level]}`}>
+    <span className="rounded border border-hair px-2 text-xs text-dim">
       {t(level)}
     </span>
   );
@@ -32,32 +27,24 @@ function LessonCheck({ check }: { check: LessonCheckQ[] }) {
 
   return (
     <div className="space-y-6 border-t border-hair pt-6">
-      <h3 className="text-lg font-semibold text-ink">理解度チェック</h3>
+      <h3 className="text-sm font-semibold text-ink">理解度チェック</h3>
       {check.map((q, qi) => {
         const sel = answers[qi];
         const answered = sel !== undefined;
         return (
           <div key={qi} className="space-y-3">
             <p className="text-sm leading-relaxed text-ink text-pretty">{q.q}</p>
-            <div className="flex flex-wrap gap-2">
-              {q.choices.map((c, ci) => {
-                let cls = 'bg-panel text-ink border-hair hover:bg-accent-soft';
-                if (answered) {
-                  if (ci === q.answer) cls = 'bg-correct text-bg border-correct';
-                  else if (ci === sel) cls = 'bg-wrong text-white border-wrong';
-                  else cls = 'bg-panel text-dim border-hair opacity-60';
-                }
-                return (
-                  <button
-                    key={ci}
-                    disabled={answered}
-                    onClick={() => setAnswers((a) => ({ ...a, [qi]: ci }))}
-                    className={`min-h-12 px-4 py-3 rounded-xl text-sm font-mono border ${cls}`}
-                  >
-                    {c}
-                  </button>
-                );
-              })}
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {q.choices.map((c, ci) => (
+                <FootSwitch
+                  key={ci}
+                  label={c}
+                  disabled={answered}
+                  lamp={answered ? (ci === q.answer ? 'correct' : ci === sel ? 'wrong' : 'off') : 'off'}
+                  dimmed={answered && ci !== q.answer && ci !== sel}
+                  onClick={() => setAnswers((a) => ({ ...a, [qi]: ci }))}
+                />
+              ))}
             </div>
             {answered && q.why && <p className="text-sm leading-relaxed text-dim text-pretty">{q.why}</p>}
           </div>
@@ -91,26 +78,26 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
     return (
       <div className="mx-auto w-full max-w-5xl min-w-0 space-y-8">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-medium text-dim flex items-center gap-2">
-            <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true" />
+          <div className="text-xs font-semibold text-dim">
             理論を学ぶ
           </div>
           <span className="text-xs text-dim">
             <span className="font-mono tabular-nums text-ink">{done}</span>/{LESSONS.length} 完了
           </span>
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight text-ink">音楽理論のレッスン</h1>
-        <div className="h-2 rounded-full bg-panel overflow-hidden">
+        <h1 className="text-xl font-semibold tracking-tight text-ink">音楽理論のレッスン</h1>
+        <div className="h-2 bg-panel overflow-hidden">
           <div
-            className="h-full rounded-full"
+            className="h-full"
             style={{ width: `${Math.round((done / LESSONS.length) * 100)}%`, background: 'var(--correct)' }}
           />
         </div>
 
         {allDone ? (
-          <div className="bg-accent-soft border border-accent rounded-xl px-4 py-3 text-center">
-            <p className="text-accent font-semibold">{`🎉 全${LESSONS.length}レッスン制覇！`}</p>
-            <p className="text-xs text-dim mt-1">理論コースを完走しました。練習で実戦に活かそう。</p>
+          <div className="bg-glass rounded-lg p-3 text-sm">
+            <span className="mb-2 block size-2 rounded-full bg-correct" aria-hidden="true" />
+            <p className="text-ink font-semibold">{`🎉 全${LESSONS.length}レッスン制覇！`}</p>
+            <p className="text-xs text-dim mt-1">一覧から各レッスンを復習できます。</p>
           </div>
         ) : (
           <p className="text-sm leading-relaxed text-dim text-pretty">
@@ -121,10 +108,10 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
         {nextLesson && (
           <button
             onClick={() => setIdx(nextIdx)}
-            className="min-h-12 w-full text-left bg-surface border border-hair rounded-2xl p-6 hover:bg-panel"
+            className="min-h-12 w-full text-left bg-panel border border-hair rounded-lg p-3 hover:border-dim"
           >
             <div className="text-xs text-dim">続きから</div>
-            <div className="text-lg text-ink font-semibold mt-2">{nextLesson.title} →</div>
+            <div className="text-base text-ink font-semibold mt-2">{nextLesson.title} →</div>
           </button>
         )}
 
@@ -134,10 +121,10 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
             const chDone = chLessons.filter((x) => completed.has(x.l.id)).length;
             const cleared = chDone === chLessons.length;
             return (
-              <details key={ch} open={ch === nextLesson?.chapter} className="group min-w-0 border border-hair rounded-2xl bg-surface">
+              <details key={ch} open={ch === nextLesson?.chapter} className="group min-w-0 border-t border-hair">
                 <summary
                   aria-label={`${ch}（${cleared ? 'クリア済み' : `${chDone}/${chLessons.length}完了`}）章を開閉`}
-                  className="min-h-16 cursor-pointer list-none p-4 flex flex-wrap items-center gap-3 text-sm text-dim"
+                  className="min-h-16 cursor-pointer list-none py-4 flex flex-wrap items-center gap-3 text-sm text-dim"
                 >
                   <span className="text-ink">{ch}</span>
                   <LevelBadge level={CHAPTER_LEVEL[ch]} />
@@ -148,20 +135,20 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
                   )}
                   <span className="ml-auto group-open:rotate-180">▾</span>
                 </summary>
-                <ul className="space-y-3 px-4 pb-4">
+                <ul className="space-y-3 pb-4">
                   {chLessons.map(({ l, i }) => (
                     <li key={l.id}>
                       <button
                         onClick={() => setIdx(i)}
-                        className="min-h-12 w-full text-left bg-panel rounded-xl p-4 hover:bg-accent-soft"
+                        className="min-h-12 w-full text-left bg-panel border border-hair rounded-lg p-3 hover:border-dim"
                       >
                         <div className="flex items-center gap-3">
                           {completed.has(l.id) ? (
-                            <span className="text-correct font-bold">✓</span>
+                            <span className="text-correct font-semibold">✓</span>
                           ) : (
                             <span className="font-mono text-dim">{i + 1}</span>
                           )}
-                          <span className="text-ink font-medium">{l.title}</span>
+                          <span className="text-ink font-semibold">{l.title}</span>
                         </div>
                         <p className="text-sm leading-relaxed text-dim mt-2 line-clamp-2">{l.body[0]}</p>
                       </button>
@@ -185,14 +172,14 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
         ← レッスン一覧へ
       </button>
 
-      <div className="bg-surface border border-hair rounded-2xl p-6 sm:p-8 space-y-6">
+      <div className="space-y-6">
         <div>
-          <div className="font-mono text-xs text-dim flex flex-wrap items-center gap-3">
-            <span>LESSON {idx + 1} / {LESSONS.length}</span>
+          <div className="text-xs text-dim flex flex-wrap items-center gap-3">
+            <span>レッスン {idx + 1} / {LESSONS.length}</span>
             <LevelBadge level={CHAPTER_LEVEL[l.chapter]} />
             {isDone && <span className="text-correct">✓ 学習済み</span>}
           </div>
-          <h2 className="text-2xl font-semibold text-ink text-balance mt-3">{l.title}</h2>
+          <h2 className="text-xl font-semibold text-ink text-balance mt-3">{l.title}</h2>
         </div>
 
         <div className="max-w-3xl space-y-4 text-sm text-ink leading-relaxed text-pretty">
@@ -202,13 +189,13 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
         </div>
 
         {l.example && (
-          <div className="bg-panel border border-hair rounded-xl p-4 font-mono text-sm text-ink overflow-x-auto">
+          <div className="bg-panel border border-hair rounded-lg p-3 font-mono text-sm text-ink overflow-x-auto">
             {l.example}
           </div>
         )}
 
         {l.demo && (
-          <div className="bg-bg border border-hair rounded-xl p-4 overflow-x-auto">
+          <div className="bg-glass rounded-lg p-3 sm:p-4 overflow-x-auto">
             <LessonFretboard root={l.demo.root} tones={l.demo.tones} maxFret={l.demo.maxFret} />
           </div>
         )}
@@ -218,7 +205,7 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
         {l.link && (
           <button
             onClick={() => onGoto(l.link!.target)}
-            className="min-h-12 w-full px-4 py-3 bg-panel text-sm text-ink border border-hair rounded-xl hover:bg-accent-soft"
+            className="min-h-12 w-full px-4 py-3 bg-panel text-sm text-ink border border-hair rounded-lg hover:border-dim"
           >
             {l.link.label} →
           </button>
@@ -229,7 +216,7 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
         <button
           disabled={idx === 0}
           onClick={() => setIdx(idx - 1)}
-          className="min-h-12 px-6 py-3 bg-panel text-sm text-dim border border-hair rounded-xl disabled:opacity-40 hover:bg-accent-soft"
+          className="min-h-12 px-6 py-3 bg-panel text-sm text-dim border border-hair rounded-lg disabled:opacity-40 hover:border-dim"
         >
           ← 前
         </button>
@@ -238,7 +225,7 @@ export function LessonsPage({ onGoto, openLessonId, onConsumeOpen }: LessonsPage
             markLessonComplete(l.id);
             setIdx(idx < LESSONS.length - 1 ? idx + 1 : null);
           }}
-          className="min-h-12 flex-1 px-4 py-3 bg-accent text-sm text-bg font-semibold rounded-xl hover:opacity-90 active:opacity-80"
+          className="min-h-12 flex-1 px-4 py-3 bg-accent text-sm text-bg font-semibold rounded-lg hover:opacity-90 active:opacity-80"
         >
           {idx < LESSONS.length - 1 ? '学んだ → 次へ' : '学んだ → 完了'}
         </button>

@@ -23,15 +23,17 @@ createRoot(document.getElementById('root')!).render(
         locale={getLanguage() === 'en' ? enUS : jaJP}
         theme={{
           algorithm: theme.darkAlgorithm,
+          // antd は派生色を計算するため CSS変数ではなく実値が要る。値は src/index.css の :root と同じ
+          // （docs/design-system/README.md のトークン表）。
           token: {
-            colorPrimary: '#f5a623',
-            colorBgBase: '#0e0f12',
-            colorBgContainer: '#1b1813',
-            colorBgElevated: '#232019',
-            colorBorder: '#322c22',
-            colorText: '#ece5d6',
-            colorTextSecondary: '#9c9384',
-            borderRadius: 10,
+            colorPrimary: '#ffb02e',
+            colorBgBase: '#121315',
+            colorBgContainer: '#1f2124',
+            colorBgElevated: '#2a2d31',
+            colorBorder: '#34373c',
+            colorText: '#ebe7df',
+            colorTextSecondary: '#979aa0',
+            borderRadius: 8,
             fontFamily:
               "system-ui, -apple-system, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', Meiryo, sans-serif",
           },

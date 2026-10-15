@@ -159,16 +159,17 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
             key={i}
             className={`px-3 py-1.5 rounded-lg border text-sm font-mono ${
               started && i === step
-                ? 'bg-accent text-bg border-accent font-bold'
+                ? 'bg-accent-soft text-accent border-accent font-semibold'
                 : 'bg-panel text-dim border-hair'
             }`}
           >
-            <span className="text-[10px] opacity-70 mr-1">{c.roman}</span>
+            <span className="text-xs opacity-70 mr-1">{c.roman}</span>
             {c.symbol}
           </div>
         ))}
       </div>
 
+      <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
       {started && (
         <>
           <QuizScore correct={score.correct} total={score.total} />
@@ -177,27 +178,27 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
             <p className="text-ink font-medium">
               {phrase('{0} の {1} を弾け', [
                 <span key="chord" className="font-mono text-accent">{chords[step].symbol}</span>,
-                <span key="degree" className="font-mono text-lg">{intervalLabel(target?.deg)}</span>,
+                <span key="degree" className="font-mono text-xl">{intervalLabel(target?.deg)}</span>,
               ])}
             </p>
             {feedback && (
-              <p className={`text-lg font-bold mt-1 ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
+              <p className={`text-base font-semibold mt-1 ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
                 {feedback === 'correct' ? '正解!' : `不正解... 正解の音: ${target?.note}`}
               </p>
             )}
             {feedback === 'wrong' && wrongPick && (
-              <p className="text-xs text-wrong mt-0.5 font-mono">
+              <p className="text-xs text-wrong mt-0.5">
                 {`選んだ ${wrongPick.note} は ${intervalLabel(wrongPick.deg)}（このコードの構成音ではない）`}
               </p>
             )}
             {feedback && target && (
-              <p className="text-xs text-dim mt-1 text-pretty font-mono">{toneWhy(target.deg, target.st, target.root, target.note)}</p>
+              <p className="text-xs text-dim mt-1 text-pretty">{toneWhy(target.deg, target.st, target.root, target.note)}</p>
             )}
           </div>
         </>
       )}
 
-      <div className="bg-surface rounded-xl border border-hair p-2 overflow-x-auto">
+      <div className="bg-glass rounded-lg p-2 overflow-x-auto">
         <Fretboard
           maxFret={maxFret}
           accidental={accidental}
@@ -207,6 +208,7 @@ export function ChordProgressionQuiz({ accidental, maxFret, onLearn }: ChordProg
           showLabelAt={showLabelAt}
           onPositionClick={started ? onTap : undefined}
         />
+      </div>
       </div>
 
       <QuizFooter

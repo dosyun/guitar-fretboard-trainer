@@ -30,10 +30,10 @@ export function VoicingPage({ accidental }: VoicingPageProps) {
   const voicing4 = VOICINGS_4TH.find((v) => v.type === selectedType)!;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6 sm:gap-8">
       {/* バレーコードセクション */}
-      <div className="bg-surface rounded-xl shadow-sm p-4">
-        <h2 className="text-sm font-bold text-ink mb-3">バレーコード</h2>
+      <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6">
+        <h2 className="text-sm font-semibold text-ink mb-3">バレーコード</h2>
 
         {/* ルート音・コードタイプ・表示切替 */}
         <RootSelector current={rootNote} accidental={accidental} onChange={setRootNote} />
@@ -43,10 +43,10 @@ export function VoicingPage({ accidental }: VoicingPageProps) {
             <button
               key={type}
               onClick={() => setSelectedType(type)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium border-2 transition-all ${
+              className={`min-h-12 px-3 rounded-lg text-sm border transition-colors ${
                 selectedType === type
-                  ? 'bg-accent text-bg border-accent'
-                  : 'bg-panel text-dim border-hair hover:border-accent'
+                  ? 'bg-accent-soft text-accent border-accent'
+                  : 'bg-panel text-dim border-hair hover:border-dim'
               }`}
             >
               {TYPE_LABELS[type]}
@@ -68,19 +68,19 @@ export function VoicingPage({ accidental }: VoicingPageProps) {
         </div>
 
         {/* 3列グリッド */}
-        <div className="grid grid-cols-3 gap-3 mt-4">
+        <div className="grid grid-cols-3 gap-3 mt-4 rounded-lg bg-glass p-3">
           <div className="flex flex-col items-center">
-            <div className="text-xs font-bold text-dim mb-2">6弦ルート</div>
+            <div className="text-xs font-semibold text-dim mb-2">6弦ルート</div>
             <VoicingDiagram voicing={voicing6} rootNote={rootNote} displayMode={displayMode} />
             <div className="text-xs text-dim mt-1 text-center">Eフォーム系</div>
           </div>
           <div className="flex flex-col items-center">
-            <div className="text-xs font-bold text-dim mb-2">5弦ルート</div>
+            <div className="text-xs font-semibold text-dim mb-2">5弦ルート</div>
             <VoicingDiagram voicing={voicing5} rootNote={rootNote} displayMode={displayMode} />
             <div className="text-xs text-dim mt-1 text-center">Aフォーム系</div>
           </div>
           <div className="flex flex-col items-center">
-            <div className="text-xs font-bold text-dim mb-2">4弦ルート</div>
+            <div className="text-xs font-semibold text-dim mb-2">4弦ルート</div>
             <VoicingDiagram voicing={voicing4} rootNote={rootNote} displayMode={displayMode} />
             <div className="text-xs text-dim mt-1 text-center">Dフォーム系</div>
           </div>
@@ -88,23 +88,23 @@ export function VoicingPage({ accidental }: VoicingPageProps) {
       </div>
 
       {/* 凡例 */}
-      <div className="bg-surface rounded-xl shadow-sm p-4">
-        <h3 className="text-sm font-bold text-ink mb-2">構成音の見方</h3>
+      <div className="border-t border-hair pt-4">
+        <h3 className="text-sm font-semibold text-ink mb-2">構成音の見方</h3>
         <div className="flex gap-4 text-xs text-dim flex-wrap">
           <div className="flex items-center gap-1.5">
             <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center">
-              <span className="text-bg text-[9px] font-bold">R</span>
+              <span className="text-bg text-xs font-semibold">R</span>
             </div>
             <span>ルート音</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#3a3a42' }}>
-              <span className="text-white text-[9px] font-bold">3</span>
+            <div className="w-5 h-5 rounded-full flex items-center justify-center bg-panel">
+              <span className="text-ink text-xs font-semibold">3</span>
             </div>
             <span>その他の構成音</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-wrong font-bold text-sm">×</span>
+            <span className="text-wrong font-semibold text-sm">×</span>
             <span>ミュート</span>
           </div>
           <div className="flex items-center gap-1.5">

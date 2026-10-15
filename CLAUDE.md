@@ -5,7 +5,8 @@
 ギター指板の音名・度数を**反射で使えるようにする練習トレーナー**(React Web/PWA)。
 単なる理論ビューアではなく、1問ごとに回答時間を計測し、弱点をヒートマップで可視化する
 「練習エンジン」が中核（方針は [CONTEXT.md] と `docs/adr/`、経緯は [docs/history.md]）。
-UIは**ダーク・スタジオ系**（エボニー指板＋白蝶貝インレイ＋琥珀アクセント、等幅データ表示）。
+UIは**機材の操作盤**（灰の筐体＋暗い読み取りの窓＋木の指板＋琥珀の読み取り数字、等幅データ表示）。
+**UI作業の前に `docs/design-system/README.md` を読む**（トークン・部品のルール・使わないもの・構成の正）。
 Cloudflare Pages で自動デプロイ（GitHub master push → 即反映）。
 
 ## コマンド
@@ -218,15 +219,17 @@ const startFret = hasOpenString ? 1 : minFret; // ナット表示
   `theme.darkAlgorithm` ＋ 琥珀primary。撤去せずトークンで上書き（[docs/adr/0003]）。
 - **SVG指板の色は `boardPalette.ts` に集約**（BOARD/MARKER）。各指板SVGはここを参照。
 
-## デザイントークン (ダーク・スタジオ系)
+## デザイントークン (機材の操作盤)
 
-`src/index.css` の CSS変数 ＝ `tailwind.config.js` のカスタムカラー。**素材メタファ**で命名:
-- `--bg #0e0f12`(背景) / `--surface #1b1813`(エボニー指板=カード面) / `--panel #232019`(一段上)
-- `--hair #322c22`(境界) / `--ink #ece5d6`(白蝶貝=主テキスト) / `--dim #9c9384`(副次)
-- `--accent #f5a623`(アンプ琥珀=唯一のアクセント) / `--accent-soft #3a2c12`(選択背景)
-- `--correct #46c98b` / `--wrong #ef5350`(状態色)
+正は `docs/design-system/README.md`（2026-10-15 改訂）。`src/index.css` の CSS変数 ＝ `tailwind.config.js` のカスタムカラー:
+- `--bg #121315`(部屋) / `--surface #1f2124`(筐体) / `--panel #2a2d31`(筐体の上の部品) / `--glass #0a0b0c`(読み取り・指板の窓)
+- `--hair #34373c`(境界) / `--case-edge #3d4147`(筐体上辺の縁=影の代わり) / `--ink #ebe7df`(主テキスト) / `--dim #979aa0`(副次)
+- `--accent #ffb02e`(琥珀=読み取りの主な数字・主ボタン・選択中だけ) / `--accent-soft #3a2e17`(選択背景)
+- `--correct #5fd394` / `--wrong #ef6a4f`(状態色)
+- antd の色 (`src/main.tsx`)・PWA の theme_color・`boardPalette.ts` の MARKER は CSS変数を読めないため実値を持つ。トークンを変えたらそろえる。
+- 主な部品: 筐体 `rounded-2xl bg-surface border-hair border-t-case-edge`、選択肢は `FootSwitch`、練習中の読み取りは `PracticeReadout`。影は使わない。
 
-Tailwindクラス: `bg-surface bg-panel bg-bg border-hair text-ink text-dim text-accent bg-accent bg-accent-soft text-bg text-correct text-wrong` 等。
+Tailwindクラス: `bg-surface bg-panel bg-glass bg-bg border-hair border-t-case-edge text-ink text-dim text-accent bg-accent bg-accent-soft text-bg text-correct text-wrong` 等。
 
 ### 規律 (frontend-design / baseline-ui)
 - **署名**: スタジオ機材の読み取り表示風。データ(音名/度数/数値/回答時間)は等幅 `font-mono`(DM Mono)＋`tabular-nums`。

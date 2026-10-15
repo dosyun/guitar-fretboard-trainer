@@ -54,8 +54,8 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
   );
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="bg-surface rounded-xl shadow-sm p-4">
+    <div className="flex flex-col gap-6 sm:gap-8">
+      <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6">
         {/* キー選択 */}
         <RootSelector current={key} accidental={accidental} onChange={setKey} />
 
@@ -85,14 +85,14 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
               />
             </div>
             {controls}
-            <div className="flex flex-wrap justify-center gap-3 mt-4">
+            <div className="flex flex-wrap justify-center gap-3 mt-4 rounded-lg bg-glass p-3">
               {degrees.map((degree) => {
                 const rootNote = getDegreeRoot(keyIndex, degree.semitones) as NoteName;
                 const chordName = getChordName(keyIndex, degree);
                 const voicing = voicings.find(v => v.type === degree.type)!;
                 return (
                   <div key={degree.roman} className="flex flex-col items-center w-[22%] sm:w-auto">
-                    <div className="text-xs font-bold text-accent mb-0.5">{degree.roman}</div>
+                    <div className="text-xs font-semibold text-ink mb-0.5">{degree.roman}</div>
                     <VoicingDiagram
                       voicing={{ ...voicing, label: chordName }}
                       rootNote={rootNote}
@@ -114,10 +114,10 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
                 <button
                   key={i}
                   onClick={() => setSelectedProgIdx(i)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border-2 transition-all ${
+                  className={`min-h-12 px-3 rounded-lg text-sm border transition-colors ${
                     selectedProgIdx === i
-                      ? 'bg-accent text-bg border-accent'
-                      : 'bg-panel text-dim border-hair hover:border-accent'
+                      ? 'bg-accent-soft text-accent border-accent'
+                      : 'bg-panel text-dim border-hair hover:border-dim'
                   }`}
                 >
                   {prog.name}
@@ -135,7 +135,7 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
             {controls}
 
             {/* コードダイアグラム */}
-            <div className="flex flex-wrap justify-center gap-3 mt-4">
+            <div className="flex flex-wrap justify-center gap-3 mt-4 rounded-lg bg-glass p-3">
               {selectedProg.degrees.map((degreeIdx, i) => {
                 const degree = progDegrees[degreeIdx];
                 const rootNote = getDegreeRoot(keyIndex, degree.semitones) as NoteName;
@@ -143,7 +143,7 @@ export function DiatonicPage({ accidental }: DiatonicPageProps) {
                 const voicing = voicings.find(v => v.type === degree.type)!;
                 return (
                   <div key={i} className="flex flex-col items-center w-[22%] sm:w-auto">
-                    <div className="text-xs font-bold text-accent mb-0.5">{degree.roman}</div>
+                    <div className="text-xs font-semibold text-ink mb-0.5">{degree.roman}</div>
                     <VoicingDiagram
                       voicing={{ ...voicing, label: chordName }}
                       rootNote={rootNote}

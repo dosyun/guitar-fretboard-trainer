@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>C 教則本カタログ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap">
+<script src="board.js"></script>
+<style>
+  :root { --paper:#efe3c8; --paper-2:#e6d6b4; --ink:#3d2a1c; --dim:#6e5b49; --sunburst:#b8561c; --teal:#2f6f7e; --ok:#2f7d4f; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--paper); color:var(--ink); font:15px/1.65 system-ui,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif; min-height:100dvh; display:flex; }
+  .mono { font-family:'DM Mono',ui-monospace,monospace; font-feature-settings:'tnum' 1; }
+  nav { width:184px; flex:none; padding:20px 12px; border-right:2px solid var(--ink); }
+  nav b { display:block; font-size:14px; padding:0 10px 18px; }
+  nav a { display:block; padding:9px 10px; color:var(--dim); font-size:14px; }
+  nav a.on { color:var(--paper); background:var(--ink); border-radius:4px; }
+  main { flex:1; padding:26px 36px; display:grid; grid-template-columns:1fr 300px; gap:0 32px; max-width:1180px; }
+  .plate { grid-column:1; }
+  .plate h1 { font-size:30px; font-weight:800; line-height:1.2; }
+  .plate h1 span { color:var(--sunburst); }
+  .plate p.cap { color:var(--dim); font-size:14px; margin:2px 0 8px; }
+  /* 図版: カタログの写真の代わりに、木目の指板を大きく置き、引き出し線で注記する */
+  .fig { position:relative; }
+  .notes { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:6px; }
+  .notes div { border-top:3px solid var(--teal); padding-top:6px; font-size:14px; }
+  .notes b { color:var(--teal); font-family:'DM Mono',monospace; margin-right:6px; }
+  aside { grid-column:2; grid-row:1 / span 2; }
+  .spec { background:var(--teal); color:#f3ead6; padding:14px 16px; margin-bottom:16px; }
+  .spec dd.big { color:#ffd9a8 !important; }
+  .spec h2 { font-size:13px; letter-spacing:.04em; border-bottom:1px solid #a9cbd2; padding-bottom:4px; margin-bottom:6px; }
+  .spec dl { display:grid; grid-template-columns:1fr auto; gap:3px 8px; font-size:14px; }
+  .spec dd { font-family:'DM Mono',monospace; text-align:right; }
+  .spec dd.big { font-size:30px; color:var(--sunburst); line-height:1.1; }
+  .order h2 { font-size:13px; margin-bottom:6px; }
+  /* 注文票の書式で12音を並べる。チェック欄＝回答ボタン */
+  .order ul { list-style:none; display:grid; grid-template-columns:1fr 1fr; border-top:2px solid var(--ink); }
+  .order li { display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid #b9a682; font-size:19px; }
+  .order li::before { content:''; width:18px; height:18px; border:2px solid var(--ink); flex:none; }
+  .order li.ok::before { background:var(--ok); border-color:var(--ok); }
+  .order li.ok { color:var(--ok); font-weight:600; }
+  .bottom { display:none; }
+  @media (max-width:640px) {
+    body { display:block; padding-bottom:60px; }
+    nav { display:none; }
+    main { display:block; padding:14px 14px; }
+    .plate h1 { font-size:23px; }
+    .notes { grid-template-columns:1fr; gap:6px; }
+    aside { margin-top:14px; }
+    .spec dl { grid-template-columns:repeat(2,1fr auto); }
+    .spec dd.big { font-size:22px; }
+    .order ul { grid-template-columns:repeat(3,1fr); }
+    .order li { font-size:17px; padding:8px 2px; gap:6px; }
+    .bottom { display:flex; position:fixed; bottom:0; left:0; right:0; height:58px; background:var(--paper-2); border-top:2px solid var(--ink); justify-content:space-around; align-items:center; font-size:12px; color:var(--dim); }
+    .bottom .on { color:var(--ink); font-weight:700; }
+  }
+</style></head>
+<body>
+<nav><b>指板トレーナー</b><a>ホーム</a><a class="on">練習</a><a>理論</a><a>成績</a><a>設定</a></nav>
+<main>
+  <section class="plate">
+    <h1>第8問　<span>5弦 7フレット</span> の音名</h1>
+    <p class="cap">図1 ― 印の位置の音を、右の票から選ぶ。正解は E。</p>
+    <div class="fig" id="board"></div>
+    <div class="notes">
+      <div><b>①</b>5弦の開放は A。7フレット上がると半音7つ上の E になる。</div>
+      <div><b>②</b>同じ E は 4弦2フレット、6弦12フレットにもある（オクターブ）。</div>
+      <div><b>③</b>7フレットのインレイが目印。5弦7F＝6弦開放と同じ音名。</div>
+    </div>
+  </section>
+  <aside>
+    <div class="spec"><h2>今回の記録</h2>
+      <dl><dt>反応時間</dt><dd class="big">0.86秒</dd><dt>このセルの前回</dt><dd>1.42秒</dd><dt>正答</dt><dd>7 / 7</dd><dt>進み</dt><dd>8 / 15問</dd></dl>
+    </div>
+    <div class="order"><h2>音名の回答票</h2>
+      <ul class="mono"><li>C</li><li>C♯</li><li>D</li><li>D♯</li><li class="ok">E</li><li>F</li><li>F♯</li><li>G</li><li>G♯</li><li>A</li><li>A♯</li><li>B</li></ul>
+    </div>
+  </aside>
+</main>
+<div class="bottom"><span>ホーム</span><span class="on">練習</span><span>理論</span><span>成績</span><span>設定</span></div>
+<script>
+  drawBoard(document.getElementById('board'), { target:{s:4,f:7}, label:'E', len:1000,
+    c:{ wood:'#7a4a24', fret:'#d9c9a8', nut:'#f3ead6', string:'#e8dcc2', inlay:'#efe3c8', mark:'#b8561c', markText:'#fff', ring:'#2f6f7e', label:'#6e5b49' } });
+</script>
+</body></html>

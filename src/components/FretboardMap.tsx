@@ -182,18 +182,18 @@ export function FretboardMap({
           const noteDisplay = displayMode === 'notes' ? getNoteLabel(s, f, accidental) : '';
           const interval = getIntervalAt(s, f, rootNote);
           const label = displayMode === 'notes' ? noteDisplay : interval;
-          const noteColor = NOTE_COLORS[noteKey] || { bg: '#6b7280', text: '#fff', border: '#4b5563' };
+          const noteColor = NOTE_COLORS[noteKey] || { bg: 'var(--dim)', text: 'var(--bg)', border: 'var(--hair)' };
           const intervalColor = INTERVAL_COLORS[interval] || '#6b7280';
 
           const circleFill = displayMode === 'notes'
             ? noteColor.bg
-            : interval === 'R' ? '#dc2626' : (inRange ? '#fff' : '#f3f4f6');
+            : interval === 'R' ? '#dc2626' : 'var(--ink)';
           const circleStroke = displayMode === 'notes'
             ? noteColor.border
-            : (inRange ? intervalColor : '#d1d5db');
+            : (inRange ? intervalColor : 'var(--dim)');
           const textFill = displayMode === 'notes'
             ? noteColor.text
-            : interval === 'R' ? '#fff' : intervalColor;
+            : interval === 'R' ? 'var(--ink)' : intervalColor;
 
           return (
             <g key={`n-${s}-${f}`} opacity={inRange ? 1 : 0.15}>

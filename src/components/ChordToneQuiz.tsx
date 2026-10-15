@@ -131,6 +131,7 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
         />
       </div>
 
+      <div className="rounded-2xl bg-surface border border-hair border-t-case-edge p-3 sm:p-6 flex flex-col gap-3 sm:gap-4">
       {started && (
         <>
           <QuizScore correct={score.correct} total={score.total} />
@@ -139,30 +140,30 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
             <p className="text-ink font-medium">
               {phrase('{0} の {1} を選べ', [
                 <span key="chord" className="font-mono text-accent">{chordSymbol}</span>,
-                <span key="degree" className="font-mono text-lg">{intervalLabel(target?.deg)}</span>,
+                <span key="degree" className="font-mono text-xl">{intervalLabel(target?.deg)}</span>,
               ])}
             </p>
-            <p className="text-xs text-dim mt-1 font-mono">
+            <p className="text-xs text-dim mt-1">
               {chordSymbol} = {spelling.join(' · ')}
             </p>
             {feedback && (
-              <p className={`text-lg font-bold mt-1 ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
+              <p className={`text-base font-semibold mt-1 ${feedback === 'correct' ? 'text-correct' : 'text-wrong'}`}>
                 {feedback === 'correct' ? '正解!' : `不正解... 正解の音: ${target?.note}`}
               </p>
             )}
             {feedback === 'wrong' && wrongPick && (
-              <p className="text-xs text-wrong mt-0.5 font-mono">
+              <p className="text-xs text-wrong mt-0.5">
                 {`選んだ ${wrongPick.note} は ${intervalLabel(wrongPick.deg)}（このコードの構成音ではない）`}
               </p>
             )}
             {feedback && target && (
-              <p className="text-xs text-dim mt-1 text-pretty font-mono">{toneWhy(target.deg, target.st, target.root, target.note)}</p>
+              <p className="text-xs text-dim mt-1 text-pretty">{toneWhy(target.deg, target.st, target.root, target.note)}</p>
             )}
           </div>
         </>
       )}
 
-      <div className="bg-surface rounded-xl border border-hair p-2 overflow-x-auto">
+      <div className="bg-glass rounded-lg p-2 overflow-x-auto">
         <Fretboard
           maxFret={maxFret}
           accidental={accidental}
@@ -173,13 +174,14 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
           onPositionClick={started ? onTap : undefined}
         />
       </div>
+      </div>
 
       <QuizFooter
         started={started}
         onStart={start}
         onStop={stop}
         onLearn={onLearn}
-        hint="コードの構成音を指板で見つける練習。ルートとコードタイプを選んで、指定の度数の音をタップしよう。"
+        hint="コードの構成音を指板で見つける練習。ルートとコードタイプを選んで、指定の度数の音をタップします。"
       />
     </>
   );
