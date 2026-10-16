@@ -494,7 +494,7 @@ function App() {
         className="border-b border-hair px-4 py-4 sm:px-8"
         style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top))' }}
       >
-        <div className="max-w-screen-xl mx-auto flex flex-wrap items-center justify-between gap-x-8 gap-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2">
           <p className="text-base font-semibold text-ink">
             Guitar Fretboard Trainer
           </p>
@@ -502,7 +502,7 @@ function App() {
       </header>
 
       {/* 主ナビは画面下部（モバイルの親指リーチ）。BottomNav は末尾に固定配置 */}
-      <main className="flex-1 flex flex-col gap-4 px-4 pt-6 pb-24 sm:gap-6 sm:px-8 lg:pb-8 max-w-screen-xl mx-auto w-full min-w-0">
+      <main className="flex-1 flex flex-col gap-4 px-4 pt-6 pb-24 sm:gap-6 sm:px-8 lg:pb-8 w-full min-w-0">
         {(view === 'practice' || (view === 'theory' && theoryTab !== 'learn')) && (
           <div className={view === 'practice' && practiceMode === 'basic' && started ? 'sr-only' : 'space-y-2'}>
             <h1 className="text-xl font-semibold text-ink">{VIEW_HEADINGS[view].title}</h1>
@@ -694,7 +694,7 @@ function App() {
           />
         )}
         {view === 'practice' && practiceMode === 'basic' && !result && (
-          <div className="max-w-screen-xl mx-auto w-full flex flex-col gap-3 sm:gap-4">
+          <div className="w-full flex flex-col gap-3 sm:gap-4">
             <details open={!started} className="group rounded-lg border border-hair">
               <summary className="min-h-12 cursor-pointer list-none px-4 py-3 text-sm text-dim hover:text-ink flex items-center justify-between gap-3">
                 <span>出題モード · <span className="text-ink">{quiz.mode === 'position-to-note' ? '位置→音名' : quiz.mode === 'note-to-position' ? '音名→位置' : '度数'}</span></span>

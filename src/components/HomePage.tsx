@@ -72,7 +72,7 @@ export function HomePage({ accidental, maxFret, dailyLength, goal, onStartGoal, 
   const nextLesson = LESSONS.find((l) => !doneLessons.has(l.id)) ?? null;
 
   return (
-    <div className="mx-auto w-full max-w-screen-xl space-y-6 sm:space-y-8">
+    <div className="w-full space-y-6 sm:space-y-8">
       <InstallPrompt />
 
       {/* 筐体: 今日の練習。読み取りの窓 (習熟度・連続・反応) と、問題数・開始のスイッチ */}
