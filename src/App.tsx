@@ -47,6 +47,9 @@ import { recordSkill, clearSkills } from './data/skillStore';
 import { isManualTempo } from './data/tempo';
 import type { SessionSummary } from './types/practice';
 import type { Phase } from './data/phases';
+import { PHASES } from './data/phases';
+import { getNextStage } from './data/stageTutorial';
+import { StageTutorial } from './components/StageTutorial';
 import { useCagedQuiz } from './hooks/useCagedQuiz';
 import { useScaleQuiz } from './hooks/useScaleQuiz';
 import { getNoteAt, getIntervalAt, getAllPositionsForNote, INTERVAL_NAMES } from './data/fretboard';
@@ -114,6 +117,7 @@ function App() {
     /\/ear-training\/?$/.test(window.location.pathname) ? 'practice' : 'home');
   const [theoryTab, setTheoryTab] = useState<TheoryTab>('learn');
   const [learnOpenId, setLearnOpenId] = useState<string | undefined>(undefined);
+  const [activeStage, setActiveStage] = useState<Phase | null>(null);
   const [settingsShowHelp, setSettingsShowHelp] = useState(false);
   const [settingsShowAbout, setSettingsShowAbout] = useState(false);
   const [mapDisplay, setMapDisplay] = useState<'notes' | 'intervals'>('notes');
@@ -354,6 +358,10 @@ function App() {
 
   // 目的に合ったおすすめ練習モードへ
   const handleStartGoal = (g: Goal) => {
+    if (g.id === 'note') {
+      handleStartPhase(getNextStage('note') ?? PHASES[0]);
+      return;
+    }
     setResult(null);
     setPracticeMode(g.practiceMode);
     if (g.practiceMode === 'basic' && g.basicMode) setMode(g.basicMode);
@@ -376,18 +384,19 @@ function App() {
     else setTheoryTab(target as TheoryTab);
   };
 
-  // フェーズ起動: 範囲をフェーズのスコープに設定（範囲内は弱点優先）。
+  // 段階の範囲はチュートリアル内で扱い、自由練習の設定は引き継ぐ。
   const handleStartPhase = (p: Phase) => {
-    setSelectedStrings(p.strings);
-    setFretRange(p.fretRange);
-    setSelectedNotes(p.notes);
+    stop();
+    setSessionTarget(null);
     setResult(null);
-    resetScore();
-    setSessionKind('challenge');
-    setSessionTarget(challengeLength);
-    session.startSession('free');
+    setPracticeMode('basic');
+    setActiveStage(p);
     setView('practice');
-    start(p.mode, quiz.rootNote, { strings: p.strings, fretRange: p.fretRange, noteFilter: p.notes }, true);
+  };
+
+  const changeView = (nextView: AppView) => {
+    setActiveStage(null);
+    setView(nextView);
   };
 
   // 弱点ドリル: 指定した音だけを N問(既定10)・ノート→位置で集中練習（ループを閉じる導線）。
@@ -494,7 +503,7 @@ function App() {
   return (
     <div className="min-h-dvh flex flex-col bg-bg lg:pl-48">
       <PwaReloadPrompt deferReload={view === 'practice'} />
-      <SideNav view={view} onChange={setView} />
+      <SideNav view={view} onChange={changeView} />
       <header
         className="border-b border-hair px-4 py-4 sm:px-8"
         style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top))' }}
@@ -508,7 +517,7 @@ function App() {
 
       {/* 主ナビは画面下部（モバイルの親指リーチ）。BottomNav は末尾に固定配置 */}
       <main className="flex-1 flex flex-col gap-4 px-4 pt-6 pb-24 sm:gap-6 sm:px-8 lg:pb-8 w-full min-w-0">
-        {(view === 'practice' || (view === 'theory' && theoryTab !== 'learn')) && (
+        {((view === 'practice' && !activeStage) || (view === 'theory' && theoryTab !== 'learn')) && (
           <div className={view === 'practice' && practiceMode === 'basic' && started ? 'sr-only' : 'space-y-2'}>
             <h1 className="text-xl font-semibold text-ink">{VIEW_HEADINGS[view].title}</h1>
             {!(view === 'practice' && practiceMode === 'basic' && started) && (
@@ -630,7 +639,7 @@ function App() {
         )}
 
         {/* ===== 練習ビュー ===== */}
-        {view === 'practice' && !result && (
+        {view === 'practice' && !result && !activeStage && (
           <details open={!(practiceMode === 'basic' && started)} className="group rounded-lg border border-hair">
             <summary className="min-h-12 cursor-pointer list-none px-4 py-3 text-sm text-dim hover:text-ink flex items-center justify-between gap-3">
               <span>練習メニュー · <span className="text-ink">{PRACTICE_MODE_GROUPS.flatMap((group) => group.modes).find((mode) => mode.v === practiceMode)?.l}</span></span>
@@ -686,7 +695,17 @@ function App() {
           <ChordProgressionQuiz accidental={accidental} maxFret={maxFret} onLearn={goToLearn} />
         )}
 
-        {view === 'practice' && practiceMode === 'basic' && result && (
+        {view === 'practice' && activeStage && (
+          <StageTutorial
+            key={activeStage.id}
+            stage={activeStage}
+            accidental={accidental}
+            onClose={() => changeView('home')}
+            onNext={handleStartPhase}
+            onLearn={(id) => { setActiveStage(null); goToLearn(id); }}
+          />
+        )}
+        {view === 'practice' && practiceMode === 'basic' && !activeStage && result && (
           <ResultScreen
             summary={result.summary}
             prev={result.prev}
@@ -698,7 +717,7 @@ function App() {
             onClose={() => setResult(null)}
           />
         )}
-        {view === 'practice' && practiceMode === 'basic' && !result && (
+        {view === 'practice' && practiceMode === 'basic' && !activeStage && !result && (
           <div className="w-full flex flex-col gap-3 sm:gap-4">
             <details open={!started} className="group rounded-lg border border-hair">
               <summary className="min-h-12 cursor-pointer list-none px-4 py-3 text-sm text-dim hover:text-ink flex items-center justify-between gap-3">
@@ -1111,7 +1130,7 @@ function App() {
         </Suspense>
       </main>
 
-      <BottomNav view={view} onChange={setView} />
+      <BottomNav view={view} onChange={changeView} />
     </div>
   );
 }

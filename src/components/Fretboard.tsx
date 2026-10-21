@@ -11,6 +11,10 @@ interface FretboardProps {
   highlightPosition: FretPosition | null;
   feedback: Feedback;
   correctPositions?: FretPosition[];
+  rootPosition?: FretPosition;
+  ghostLabels?: { position: FretPosition; label: string }[];
+  /** 出題位置が無いときに、横スクロールで中央に寄せるフレット */
+  focusFret?: number;
   showLabelAt?: (stringIndex: number, fret: number) => string | undefined;
   onPositionClick?: (pos: FretPosition) => void;
   scrollContainerRef?: RefObject<HTMLElement | null>;
@@ -63,6 +67,9 @@ export function Fretboard({
   highlightPosition,
   feedback,
   correctPositions,
+  rootPosition,
+  ghostLabels,
+  focusFret,
   showLabelAt,
   onPositionClick,
   scrollContainerRef,
@@ -84,7 +91,7 @@ export function Fretboard({
   // スマホの横スクロール指板で、出題セルが画面外なら中央へ自動スクロール
   const svgRef = useRef<SVGSVGElement>(null);
   const hlString = highlightPosition?.string;
-  const hlFret = highlightPosition?.fret;
+  const hlFret = highlightPosition?.fret ?? focusFret;
   useEffect(() => {
     if (hlFret == null || !svgRef.current) return;
     const frame = window.requestAnimationFrame(() => {
@@ -224,12 +231,25 @@ export function Fretboard({
         </text>
       ))}
 
+      {ghostLabels?.map(({ position, label }) => (
+        <text
+          key={`ghost-${position.string}-${position.fret}`}
+          x={posX(position.fret)} y={stringY(position.string)}
+          textAnchor="middle" dominantBaseline="central" fontSize={12}
+          fill={BOARD.stringLabel} opacity={0.9} fontWeight={600} className="font-mono"
+          style={{ pointerEvents: 'none', userSelect: 'none' }} aria-hidden="true"
+        >
+          {label}
+        </text>
+      ))}
+
       {/* フレットマーカー (インタラクティブ) */}
       {Array.from({ length: 6 }, (_, s) =>
         Array.from({ length: maxFret + 1 }, (_, f) => {
           const highlighted = isHighlighted(s, f);
           const isCorrect = isCorrectPos(s, f);
-          const label = showLabelAt?.(s, f);
+          const isRoot = rootPosition?.string === s && rootPosition?.fret === f;
+          const label = isRoot ? 'R' : showLabelAt?.(s, f);
           const note = getNoteAt(s, f, accidental);
           // 不正解時に正解位置を緑で表示
           const markerFeedback = highlighted
@@ -242,11 +262,11 @@ export function Fretboard({
               key={`m-${s}-${f}`}
               cx={posX(f)}
               cy={stringY(s)}
-              highlighted={highlighted || isCorrect}
+              highlighted={highlighted || isCorrect || isRoot}
               feedback={markerFeedback}
               showLabel={label}
               // 出題位置のハイライトは中立色(琥珀)。音高カラーは答え/正解表示(label)のときだけ。
-              noteColor={label ? note : undefined}
+              noteColor={label && !isRoot ? note : undefined}
               ariaLabel={`${6 - s}弦 ${f === 0 ? '開放' : `${f}フレット`}`}
               onClick={onPositionClick ? () => { playMidi(getMidiAt(s, f)); onPositionClick({ string: s, fret: f }); } : undefined}
             />

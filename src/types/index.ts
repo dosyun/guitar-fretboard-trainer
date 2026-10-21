@@ -26,6 +26,7 @@ export interface QuizState {
   currentPosition: FretPosition | null;   // Mode1, Mode3: ハイライト位置
   currentNote: string | null;              // Mode2: 表示する音名
   rootNote: NoteName;                      // Mode3: ルート音
+  rootPosition?: FretPosition;            // 段階の度数問題で示すルート
   feedback: Feedback;
   correctAnswer: string | null;            // 不正解時に正解を表示
 }
