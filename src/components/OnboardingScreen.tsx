@@ -14,13 +14,14 @@ export function OnboardingScreen({ onDone }: OnboardingScreenProps) {
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-8">
-      <div className="text-xs font-medium text-dim flex items-center gap-2">
-        練習の目標
+      <div className="space-y-2">
+        <h1 className="text-xl font-semibold tracking-tight text-ink text-balance">ギターの指板を覚える練習アプリ</h1>
+        <p className="text-dim text-sm leading-relaxed text-pretty">音名や度数のクイズで、弱点を見つけながら指板を覚えます。まず目的を選ぶと、最初の練習をすすめます。</p>
       </div>
 
-      <div className="space-y-3">
-        <h1 className="text-xl font-semibold tracking-tight text-ink text-balance">何ができるようになりたい？</h1>
-        <p className="text-dim text-sm leading-relaxed text-pretty">目的に合わせて、最初の練習とレッスンをおすすめします。</p>
+      <div className="space-y-1 border-t border-hair pt-6">
+        <h2 className="text-base font-semibold text-ink">何ができるようになりたい？</h2>
+        <p className="text-dim text-sm leading-relaxed text-pretty">目的に合わせて、最初のレッスンもおすすめします。</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
