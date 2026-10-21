@@ -252,18 +252,23 @@ function App() {
     if (quiz.mode === 'position-to-note' || quiz.mode === 'interval') {
       hints.push(`${openNote}弦の${f}フレット = ${openNote}から半音${f}つ上`);
 
-      if (f === 5 && s > 0 && s !== 4) {
-        const nextOpen = getNoteAt(s - 1, 0, accidental);
-        hints.push(`5フレット = 隣の弦(${nextOpen})の開放音`);
+      // 弦の index は 0 = 6弦（太い）… 5 = 1弦（細い）。細い隣の弦は s + 1
+      if (f === 5 && s < 5 && s !== 3) {
+        const nextOpen = getNoteAt(s + 1, 0, accidental);
+        hints.push(`5フレット = 細い隣の弦(${5 - s}弦)の開放音(${nextOpen})`);
       }
-      if (f === 4 && s === 4) {
-        hints.push(`2弦の4フレット = 1弦の開放音(E)`);
+      if (f === 4 && s === 3) {
+        hints.push(`3弦の4フレット = 2弦の開放音(${getNoteAt(4, 0, accidental)})`);
       }
       if (f === 12) {
         hints.push(`12フレット = 開放弦と同じ音(${openNote})`);
       }
-      if (f >= 2 && s >= 2) {
-        hints.push(`2フレット上・2弦低い = 同じ音(オクターブ)`);
+      // オクターブは2本細い弦の2フレット先。3弦と2弦の間をまたぐと3フレット先
+      if (s <= 3) {
+        const octaveFret = f + (s <= 1 ? 2 : 3);
+        hints.push(`オクターブ上の同じ音 = ${4 - s}弦の${octaveFret}フレット`);
+      } else if (f >= 3) {
+        hints.push(`オクターブ下の同じ音 = ${8 - s}弦の${f - 3}フレット`);
       }
     }
 
