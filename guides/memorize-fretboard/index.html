@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="指板の音名は、開放弦と6弦・5弦のナチュラル音から順に覚えると迷いません。11段階それぞれの覚え方と、次へ進む目安の正解数・回答時間を、指板トレーナーの設定値で示します。" />
+    <meta name="theme-color" content="#0e0f12" />
+    <link rel="canonical" href="https://guitartoolbox.site/fretboard/guides/memorize-fretboard/" />
+    <meta property="og:url" content="https://guitartoolbox.site/fretboard/guides/memorize-fretboard/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Guitar Toolbox" />
+    <meta property="og:title" content="ギター指板の覚え方｜開放弦から11段階で進める目安と目標の回答時間" />
+    <meta property="og:description" content="指板の音名は、開放弦と6弦・5弦のナチュラル音から順に覚えると迷いません。11段階それぞれの覚え方と、次へ進む目安の正解数・回答時間を、指板トレーナーの設定値で示します。" />
+    <meta property="og:image" content="https://guitartoolbox.site%BASE_URL%og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "ギター指板の音の覚え方：開放弦から11段階で進める目安",
+        "description": "指板の音名は、開放弦と6弦・5弦のナチュラル音から順に覚えると迷いません。11段階それぞれの覚え方と、次へ進む目安の正解数・回答時間を、指板トレーナーの設定値で示します。",
+        "inLanguage": "ja",
+        "url": "https://guitartoolbox.site/fretboard/guides/memorize-fretboard/",
+        "mainEntityOfPage": "https://guitartoolbox.site/fretboard/guides/memorize-fretboard/",
+        "image": "https://guitartoolbox.site/fretboard/og-image.png",
+        "datePublished": "2026-10-22",
+        "dateModified": "2026-10-22",
+        "author": { "@type": "Organization", "name": "Guitar Toolbox", "url": "https://guitartoolbox.site/" },
+        "publisher": { "@type": "Organization", "name": "Guitar Toolbox", "url": "https://guitartoolbox.site/" }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Guitar Toolbox", "item": "https://guitartoolbox.site/" },
+          { "@type": "ListItem", "position": 2, "name": "指板トレーナー", "item": "https://guitartoolbox.site/fretboard/" },
+          { "@type": "ListItem", "position": 3, "name": "指板の音の覚え方", "item": "https://guitartoolbox.site/fretboard/guides/memorize-fretboard/" }
+        ]
+      }
+    </script>
+    <style>
+      /* 値は docs/design-system/README.md のトークンと同じ。アプリを読み込まない静的ページなので、使う分だけ写す */
+      :root {
+        color-scheme: dark;
+        --bg: #121315;
+        --surface: #1f2124;
+        --panel: #2a2d31;
+        --hair: #34373c;
+        --case-edge: #3d4147;
+        --ink: #ebe7df;
+        --dim: #979aa0;
+        --accent: #ffb02e;
+      }
+      body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif; font-size: 16px; line-height: 1.8; }
+      .guide { max-width: 46rem; margin: 0 auto; padding: 24px 24px 48px; }
+      .crumbs { font-size: 12px; color: var(--dim); }
+      .crumbs ol { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+      .crumbs li + li::before { content: "›"; margin-right: 8px; }
+      .crumbs a { color: var(--dim); }
+      .guide a { color: var(--accent); text-underline-offset: 3px; }
+      .crumbs a { color: var(--dim); }
+      h1 { font-size: 20px; font-weight: 600; line-height: 1.5; margin: 24px 0 16px; }
+      h2 { font-size: 16px; font-weight: 600; line-height: 1.5; margin: 32px 0 12px; padding-top: 24px; border-top: 1px solid var(--hair); }
+      h3 { font-size: 16px; font-weight: 600; margin: 24px 0 8px; }
+      p, li, dd, td { overflow-wrap: anywhere; }
+      p { margin: 0 0 16px; }
+      ol, ul { margin: 0 0 16px; padding-left: 1.5em; }
+      li + li { margin-top: 8px; }
+      .cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 24px 0; }
+      .cta a.button { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; border-radius: 8px; background: var(--accent); color: var(--bg); font-weight: 600; text-decoration: none; }
+      .cta span { font-size: 14px; color: var(--dim); }
+      .table-wrap { overflow-x: auto; margin: 0 0 16px; border: 1px solid var(--hair); border-radius: 8px; }
+      table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.6; }
+      th, td { padding: 8px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--hair); }
+      thead th { background: var(--surface); color: var(--dim); font-weight: 600; font-size: 12px; white-space: nowrap; }
+      tbody tr:last-child td { border-bottom: 0; }
+      td.num { white-space: nowrap; font-variant-numeric: tabular-nums; }
+      td.name { min-width: 8em; font-weight: 600; }
+      tr.group td { background: var(--surface); color: var(--dim); font-size: 12px; font-weight: 600; }
+      .note { font-size: 14px; color: var(--dim); }
+      dl { margin: 0; }
+      dt { font-weight: 600; margin-top: 16px; }
+      dd { margin: 4px 0 0; }
+      .next { margin-top: 48px; padding: 16px 24px; background: var(--surface); border: 1px solid var(--hair); border-top-color: var(--case-edge); border-radius: 16px; }
+      .next h2 { margin-top: 0; padding-top: 0; border-top: 0; }
+      .next ul { margin-bottom: 0; }
+      .site-footer { max-width: 46rem; margin: 0 auto; padding: 24px; font-size: 12px; color: var(--dim); border-top: 1px solid var(--hair); }
+      .site-footer a { color: var(--dim); }
+      @media (max-width: 480px) {
+        .guide { padding: 16px 16px 32px; }
+        .next { padding: 16px; }
+        .site-footer { padding: 16px; }
+        th, td { padding: 8px; }
+      }
+      /* 狭い幅では列を並べず、1段階を「名前と目標の時間」「範囲」「覚え方」の縦積みにする */
+      @media (max-width: 560px) {
+        thead { display: none; }
+        tbody tr:not(.group) { display: grid; grid-template-columns: 1fr auto; column-gap: 12px; padding: 8px 12px; border-bottom: 1px solid var(--hair); }
+        tbody tr:not(.group):last-child { border-bottom: 0; }
+        tbody tr:not(.group) td { padding: 0; border-bottom: 0; }
+        td.name { min-width: 0; grid-row: 1; grid-column: 1; }
+        td.num { grid-row: 1; grid-column: 2; }
+        td.range { grid-column: 1 / -1; font-size: 12px; color: var(--dim); }
+        td.rule { grid-column: 1 / -1; margin-top: 4px; }
+        tr.group { display: block; }
+        tr.group td { display: block; }
+      }
+    </style>
+    <title>ギター指板の覚え方｜開放弦から11段階で進める目安と目標の回答時間 — Guitar Toolbox</title>
+  </head>
+  <body>
+    <main class="guide">
+      <nav class="crumbs" aria-label="パンくずリスト">
+        <ol>
+          <li><a href="https://guitartoolbox.site/">Guitar Toolbox</a></li>
+          <li><a href="/fretboard/">指板トレーナー</a></li>
+          <li aria-current="page">指板の覚え方</li>
+        </ol>
+      </nav>
+      <article>
+        <h1>ギター指板の音の覚え方：開放弦から11段階で進める目安</h1>
+        <p>指板の音は、6本の開放弦の音名から始め、6弦と5弦のナチュラル音（♯・♭の付かない音）、5フレットとオクターブの形の順に覚えます。各段階は、目印なしの10問で9問以上正解し、平均回答時間が目標（多くの段階で2.5秒）以内に収まったら次へ進む目安です。</p>
+        <p class="note">この記事の段階・目標の数値は、指板トレーナーの学習マップの設定値をそのまま載せています。</p>
+        <div class="cta">
+          <a class="button" href="/fretboard/">指板トレーナーを開く</a>
+          <span>無料・ブラウザで使える</span>
+        </div>
+
+        <h2>指板が覚えにくい理由</h2>
+        <p>標準チューニングの開放弦は、6弦から順に E・A・D・G・B・E です。隣り合う弦はほとんどが5フレット分ずれていますが、3弦と2弦の間だけは4フレット分です。</p>
+        <p>音名は C・D・E・F・G・A・B の7つで、E と F、B と C の間だけが1フレット、ほかは2フレット離れています。そのため同じ音名でも、弦ごとにフレットの数え方が変わります。指板全体を一度に覚えようとせず、範囲を区切って1つずつ法則を足していくほうが迷いません。</p>
+
+        <h2>覚える順番（11段階）</h2>
+        <p>指板トレーナーの学習マップは、音名の6段階と度数の5段階、合わせて11段階です。段階にロックは無く、どこからでも始められます。各段階の秒数は、目印なしの10問で目指す平均回答時間です。</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>段階</th><th>範囲</th><th>覚え方</th><th>目標の時間</th></tr>
+            </thead>
+            <tbody>
+              <tr class="group"><td colspan="4">音名（指板の位置を見て音名を答える）</td></tr>
+              <tr><td class="name">1. 開放弦</td><td class="range">全弦・0フレット・全音</td><td class="rule">6弦から順に E A D G B E。太い弦から読む。</td><td class="num">2.0秒</td></tr>
+              <tr><td class="name">2. 6弦のナチュラル音</td><td class="range">6弦・0〜12フレット・ナチュラル</td><td class="rule">E-F と B-C は1フレット、ほかの隣り合う音は2フレット。開放 E から数える。</td><td class="num">2.5秒</td></tr>
+              <tr><td class="name">3. 5弦のナチュラル音</td><td class="range">5弦・0〜12フレット・ナチュラル</td><td class="rule">数え方は6弦と同じ。開放 A から数える。</td><td class="num">2.5秒</td></tr>
+              <tr><td class="name">4. 5フレット＝細い隣の弦の開放</td><td class="range">全弦・0〜5フレット・ナチュラル</td><td class="rule">5フレットは細い隣の弦の開放音と同じ。3弦だけは4フレットが2弦の開放 B。</td><td class="num">2.5秒</td></tr>
+              <tr><td class="name">5. オクターブの形</td><td class="range">全弦・0〜12フレット・ナチュラル</td><td class="rule">同じ音は2本細い弦の2フレット先。3弦と2弦の間をまたぐと3フレット先。</td><td class="num">2.2秒</td></tr>
+              <tr><td class="name">6. シャープとフラット</td><td class="range">全弦・0〜12フレット・全音</td><td class="rule">ナチュラル音の1フレット右が ♯、左が ♭。同じ場所に2つの名前がある。</td><td class="num">2.5秒</td></tr>
+              <tr class="group"><td colspan="4">度数（ルートの位置を見て、そこからの度数を答える・0〜12フレット）</td></tr>
+              <tr><td class="name">7. 5度とオクターブ</td><td class="range">ルート・5度</td><td class="rule">5度は細い隣の弦の2フレット先。オクターブは2本細い弦の2フレット先。</td><td class="num">2.5秒</td></tr>
+              <tr><td class="name">8. 4度</td><td class="range">ルート・5度・4度</td><td class="rule">4度は細い隣の弦の同じフレット。</td><td class="num">2.5秒</td></tr>
+              <tr><td class="name">9. 長3度・短3度</td><td class="range">ここまでの度数と長3度・短3度</td><td class="rule">長3度は細い隣の弦の1フレット手前、短3度は2フレット手前。</td><td class="num">2.5秒</td></tr>
+              <tr><td class="name">10. 7度・2度・6度</td><td class="range">すべての度数</td><td class="rule">短7度は2本細い弦の同じフレット、長7度は1フレット先、長6度は1フレット手前。長2度は同じ弦の2フレット先。</td><td class="num">3.0秒</td></tr>
+              <tr><td class="name">11. 2弦をまたぐ形</td><td class="range">すべての度数</td><td class="rule">3弦と2弦の間をまたぐと、同じ形が1フレット右にずれる。</td><td class="num">3.0秒</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>目印にするフレット</h2>
+        <h3>12フレット</h3>
+        <p>12フレットは開放弦と同じ音名に戻ります（1オクターブ上）。7フレットより上の音は、開放から数えるより12フレットから左へ数えたほうが近道です。</p>
+        <h3>5フレット</h3>
+        <p>5フレットの音は、細い隣の弦の開放音と同じです。たとえば6弦の5フレットは A で、5弦の開放と同じ音名です。例外は3弦で、2弦の開放 B と同じになるのは4フレットです。</p>
+        <h3>E-F と B-C</h3>
+        <p>ナチュラル音どうしで1フレットしか離れていないのは、E と F、B と C の2か所だけです。6弦と1弦は開放が E なので、1フレットがすぐ F になります。</p>
+
+        <h2>正解率と回答時間で進み具合を見る</h2>
+        <p>各段階は、覚え方を読む、目印を見ながら3問、目印を消して10問、の3ステップで進みます。目印なしの10問で9問以上正解し、平均回答時間が段階ごとの目標以内ならクリアです。学習マップにはどの段階も「目標 90%」と、その段階の目標の時間が出ます。</p>
+        <p>普段のクイズの記録でもクリアになります。範囲内のマスの9割で、3回以上答えていて、正解率9割以上、平均が目標の時間以内なら、その段階はクリアとして扱われます。</p>
+        <p>ホームと成績に出る指板の習熟度（0〜100）は、正解率・回答時間・最後に答えた日・回答回数から計算します。回答時間は、平均1.2秒以下なら速さを満点、4秒以上なら速さを0として数えます。</p>
+
+        <h2>1回の練習の進め方</h2>
+        <ol>
+          <li>学習マップで段階を1つ選びます。「次はここ」の表示は、まだクリアしていない最初の段階に付きます。</li>
+          <li>覚え方の文と指板の図で、その段階の法則を1つだけ確かめます。</li>
+          <li>目印を見ながら3問答えます。</li>
+          <li>目印を消して10問答えます。間違えると、正解に加えて法則と、知っている音からの道筋（開放 E から数える、など）が出ます。</li>
+          <li>9問以上正解して平均が目標の時間以内なら次の段階へ、届かなければ同じ段階をもう一度解きます。</li>
+        </ol>
+
+        <h2>音名の次は度数へ</h2>
+        <p>7〜11段階は度数です。指板にルート（基準にする音）の位置が出て、そこから見た度数を答えます。5度とオクターブ、4度、3度の順に、細い隣の弦のどこにあるかという形で覚えます。最後の段階では、3弦と2弦の間で形が1フレット右にずれる例外をまとめて練習します。</p>
+        <p>音名と度数が指板でつながったら、聴いた音を指板のどこで弾くかを探す<a href="/fretboard/ear-training/">耳コピ練習</a>に進めます。</p>
+
+        <h2>よくある質問</h2>
+        <dl>
+          <dt>何日で覚えられますか？</dt>
+          <dd>人によって違うため、この記事では日数の目安を出していません。各段階の目標（目印なしの10問で9問以上正解し、平均が目標の時間以内）を満たしたら次へ進んでください。</dd>
+          <dt>ナチュラル音だけ覚えれば足りますか？</dt>
+          <dd>♯ と ♭ は、ナチュラル音の1フレット右が ♯、左が ♭ です。ナチュラル音の位置が分かれば導けます。同じ場所に2つの名前があることも含めて、6段階目の「シャープとフラット」で練習します。</dd>
+          <dt>指板の図を眺めるのと何が違いますか？</dt>
+          <dd>図では答えが見えたままです。指板トレーナーは位置を出して音名を答えさせ、1問ごとに回答時間を計ります。苦手なマスは成績のヒートマップで確かめられます。</dd>
+        </dl>
+      </article>
+
+      <section class="next" aria-labelledby="next-heading">
+        <h2 id="next-heading">次に開くページ</h2>
+        <ul>
+          <li><a href="/fretboard/">指板トレーナーを開く</a>（学習マップの1段階目から始める）</li>
+          <li><a href="/fretboard/ear-training/">耳コピ練習</a>（聴いたフレーズを指板で弾く）</li>
+          <li><a href="/looper/">ループ練習</a>（YouTube の動画の難しい箇所を繰り返して弾く）</li>
+        </ul>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <nav aria-label="サイト">
+        <a href="https://guitartoolbox.site/">ギター練習ツール一覧</a>
+      </nav>
+    </footer>
+  </body>
+</html>

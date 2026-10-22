@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
           en: resolve('en/index.html'),
           earTrainingJa: resolve('ear-training/index.html'),
           earTrainingEn: resolve('en/ear-training/index.html'),
+          memorizeGuideJa: resolve('guides/memorize-fretboard/index.html'),
         },
       },
     },

@@ -31,11 +31,17 @@ describe('static bilingual discovery', () => {
     });
   }
 
-  it('generates four sitemap URLs with three reciprocal language links each', async () => {
+  it('generates four bilingual sitemap URLs with three reciprocal language links each', async () => {
     const generator = await import(pathToFileURL(resolve('scripts/generate-sitemap.mjs')).href);
     const xml: string = generator.renderSitemap();
     expect(xml).toContain('xmlns:xhtml="http://www.w3.org/1999/xhtml"');
-    const urls = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1]);
+    const all = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1]);
+    expect(all).toHaveLength(5);
+    const guide = all.filter((entry) => entry.includes('/guides/'));
+    expect(guide).toEqual([expect.stringContaining('<loc>https://guitartoolbox.site/fretboard/guides/memorize-fretboard/</loc>')]);
+    expect(guide[0]).not.toContain('xhtml:link');
+    expect(xml).not.toContain('/fretboard/en/guides/');
+    const urls = all.filter((entry) => !entry.includes('/guides/'));
     expect(urls).toHaveLength(4);
     const pages = ['', '', 'ear-training/', 'ear-training/'];
     urls.forEach((entry, i) => {
@@ -66,7 +72,11 @@ describe.runIf(existsSync(resolve('dist/fretboard/index.html')))('built bilingua
     expect(sw).toContain('en/index.html');
     expect(sw).toContain('en/manifest.webmanifest');
     const sitemap = readFileSync(resolve('dist/fretboard/sitemap.xml'), 'utf8');
-    expect([...sitemap.matchAll(/<url>/g)]).toHaveLength(4);
+    expect([...sitemap.matchAll(/<url>/g)]).toHaveLength(5);
     expect([...sitemap.matchAll(/<xhtml:link /g)]).toHaveLength(12);
+    const guide = readFileSync(resolve('dist/fretboard/guides/memorize-fretboard/index.html'), 'utf8');
+    expect([...guide.matchAll(/<h1[\s>]/g)]).toHaveLength(1);
+    expect(guide).toContain('rel="canonical" href="https://guitartoolbox.site/fretboard/guides/memorize-fretboard/"');
+    expect(guide).not.toContain('hreflang=');
   });
 });
