@@ -7,6 +7,7 @@
 「練習エンジン」が中核（方針は [CONTEXT.md] と `docs/adr/`、経緯は [docs/history.md]）。
 UIは**機材の操作盤**（灰の筐体＋暗い読み取りの窓＋木の指板＋琥珀の読み取り数字、等幅データ表示）。
 **UI作業の前に `docs/design-system/README.md` を読む**（トークン・部品のルール・使わないもの・構成の正）。
+**読み物ページ（`guides/`・`chords/` など）を足すときは `docs/CONTENT-GUIDE.md` を読む**。
 Cloudflare Pages で自動デプロイ（GitHub master push → 即反映）。
 
 ## コマンド
