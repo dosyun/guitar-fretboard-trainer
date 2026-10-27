@@ -44,9 +44,9 @@ describe('ear training discovery without JavaScript', () => {
   it('generates four URLs with alternates pointing to the corresponding feature', async () => {
     const generator = await import(pathToFileURL(resolve('scripts/generate-sitemap.mjs')).href);
     const xml: string = generator.renderSitemap();
-    // 日本語だけの読み物（guides/）は言語の対応を持たないため、ここでは数えない。
+    // 日本語だけの読み物（guides/・chords/）は言語の対応を持たないため、ここでは数えない。
     const entries = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1])
-      .filter((entry) => !entry.includes('/guides/'));
+      .filter((entry) => !entry.includes('/guides/') && !entry.includes('/chords/'));
     expect(entries).toHaveLength(4);
     expect(entries.map((entry) => entry.match(/<loc>([^<]+)<\/loc>/)?.[1])).toEqual([
       'https://guitartoolbox.site/fretboard/', 'https://guitartoolbox.site/fretboard/en/', ja, en,

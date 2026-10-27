@@ -22,6 +22,8 @@ export default defineConfig(({ mode }) => {
           earTrainingJa: resolve('ear-training/index.html'),
           earTrainingEn: resolve('en/ear-training/index.html'),
           memorizeGuideJa: resolve('guides/memorize-fretboard/index.html'),
+          // コード別の押さえ方（scripts/generate-chord-pages.mjs の生成物）
+          ...Object.fromEntries(['f', 'g', 'c', 'd'].map((slug) => [`chord_${slug}`, resolve(`chords/${slug}/index.html`)])),
         },
       },
     },

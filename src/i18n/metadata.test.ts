@@ -36,12 +36,18 @@ describe('static bilingual discovery', () => {
     const xml: string = generator.renderSitemap();
     expect(xml).toContain('xmlns:xhtml="http://www.w3.org/1999/xhtml"');
     const all = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1]);
-    expect(all).toHaveLength(5);
+    expect(all).toHaveLength(9);
     const guide = all.filter((entry) => entry.includes('/guides/'));
     expect(guide).toEqual([expect.stringContaining('<loc>https://guitartoolbox.site/fretboard/guides/memorize-fretboard/</loc>')]);
     expect(guide[0]).not.toContain('xhtml:link');
     expect(xml).not.toContain('/fretboard/en/guides/');
-    const urls = all.filter((entry) => !entry.includes('/guides/'));
+    // コード別の押さえ方も日本語だけ。存在しない英語版の URL と hreflang は出さない。
+    const chords = all.filter((entry) => entry.includes('/chords/'));
+    expect(chords.map((entry) => entry.match(/<loc>([^<]+)<\/loc>/)?.[1])).toEqual(
+      ['f', 'g', 'c', 'd'].map((slug) => `https://guitartoolbox.site/fretboard/chords/${slug}/`));
+    for (const entry of chords) expect(entry).not.toContain('xhtml:link');
+    expect(xml).not.toContain('/fretboard/en/chords/');
+    const urls = all.filter((entry) => !entry.includes('/guides/') && !entry.includes('/chords/'));
     expect(urls).toHaveLength(4);
     const pages = ['', '', 'ear-training/', 'ear-training/'];
     urls.forEach((entry, i) => {
@@ -72,7 +78,7 @@ describe.runIf(existsSync(resolve('dist/fretboard/index.html')))('built bilingua
     expect(sw).toContain('en/index.html');
     expect(sw).toContain('en/manifest.webmanifest');
     const sitemap = readFileSync(resolve('dist/fretboard/sitemap.xml'), 'utf8');
-    expect([...sitemap.matchAll(/<url>/g)]).toHaveLength(5);
+    expect([...sitemap.matchAll(/<url>/g)]).toHaveLength(9);
     expect([...sitemap.matchAll(/<xhtml:link /g)]).toHaveLength(12);
     const guide = readFileSync(resolve('dist/fretboard/guides/memorize-fretboard/index.html'), 'utf8');
     expect([...guide.matchAll(/<h1[\s>]/g)]).toHaveLength(1);
