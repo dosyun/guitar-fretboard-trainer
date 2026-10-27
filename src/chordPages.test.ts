@@ -68,7 +68,8 @@ describe('chord pages (/fretboard/chords/<slug>/)', () => {
     const pages = generator.renderChordPages();
     expect(pages.map((page) => page.slug)).toEqual(['f', 'g', 'c', 'd']);
     for (const page of pages) {
-      expect(readFileSync(resolve(page.path), 'utf8'), `${page.path} is stale: run node scripts/generate-chord-pages.mjs`).toBe(page.html);
+      // core.autocrlf で CRLF に変わったチェックアウトでも比べられるよう、改行をそろえる。
+      expect(readFileSync(resolve(page.path), 'utf8').replace(/\r\n/g, '\n'), `${page.path} is stale: run node scripts/generate-chord-pages.mjs`).toBe(page.html);
     }
   });
 
