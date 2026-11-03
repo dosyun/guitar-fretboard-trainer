@@ -56,7 +56,7 @@ export function newId(): string {
 
 /** 1問の回答を記録する。音名認識のときだけセル集計を更新する。 */
 export function recordAttempt(attempt: PracticeAttempt): void {
-  const attempts = load<PracticeAttempt[]>(ATTEMPTS_KEY, []);
+  const attempts = loadRawAttempts();
   attempts.push(attempt);
   if (attempts.length > MAX_ATTEMPTS) {
     attempts.splice(0, attempts.length - MAX_ATTEMPTS);
@@ -179,7 +179,7 @@ export function saveSession(summary: SessionSummary): void {
 }
 
 export function getAllSessions(): SessionSummary[] {
-  return load<SessionSummary[]>(SESSIONS_KEY, []);
+  return load<SessionSummary[]>(SESSIONS_KEY, []).filter((s) => s.quizType !== 'course-triad');
 }
 
 export interface OverallStats {
@@ -190,7 +190,7 @@ export interface OverallStats {
 }
 
 /**
- * Home / Stats 共通の全体サマリ。実際に回答した全ログを母集団にする。
+ * Home / Stats 共通の全体サマリ。コースを除く実際の回答を母集団にする。
  * セッションは結果画面・推移・前回比のまとまりであり、途中で画面を閉じた回答も
  * 「解いた1問」として累計・正答率・平均反応に含める。
  */
@@ -213,13 +213,42 @@ export function getLastSession(quizType: QuizType): SessionSummary | null {
   return sessions.length > 0 ? sessions[sessions.length - 1] : null;
 }
 
+function loadRawAttempts(): PracticeAttempt[] {
+  const value = load<unknown>(ATTEMPTS_KEY, []);
+  return Array.isArray(value)
+    ? value.filter((attempt): attempt is PracticeAttempt =>
+      typeof attempt === 'object' && attempt !== null && !Array.isArray(attempt))
+    : [];
+}
+
+/** 既存の成績集計向け。コースの回答は含めない。 */
 export function getAllAttempts(): PracticeAttempt[] {
-  return load<PracticeAttempt[]>(ATTEMPTS_KEY, []);
+  return loadRawAttempts().filter((a) => a.quizType !== 'course-triad');
+}
+
+/** コース誤答の直近履歴。同時刻では保存順が後の回答を優先する。 */
+export function getCourseMisses(limit: number): PracticeAttempt[] {
+  if (limit <= 0) return [];
+  const sorted = loadRawAttempts()
+    .map((attempt, index) => ({ attempt, index }))
+    .filter(({ attempt }) => attempt.quizType === 'course-triad')
+    .sort((a, b) => b.attempt.createdAt - a.attempt.createdAt || b.index - a.index);
+  const seen = new Set<string>();
+  const misses: PracticeAttempt[] = [];
+  for (const { attempt } of sorted) {
+    const key = attempt.courseKey !== undefined
+      ? JSON.stringify(['courseKey', attempt.courseKey])
+      : JSON.stringify(['position', attempt.string, attempt.fret, attempt.degree, attempt.rootNote]);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    if (!attempt.isCorrect) misses.push(attempt);
+  }
+  return misses.slice(0, limit);
 }
 
 /** すべての練習データを消去する (設定のリセット用)。 */
 export function clearPracticeData(): void {
-  [ATTEMPTS_KEY, CELLS_KEY, DEGREES_KEY, SESSIONS_KEY].forEach((k) => {
+  [ATTEMPTS_KEY, CELLS_KEY, DEGREES_KEY, SESSIONS_KEY, 'gft-course-v1'].forEach((k) => {
     try {
       localStorage.removeItem(k);
     } catch {

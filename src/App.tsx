@@ -38,6 +38,7 @@ const ChordProgressionQuiz = lazy(() => import('./components/ChordProgressionQui
 const LessonsPage = lazy(() => import('./components/LessonsPage').then((m) => ({ default: m.LessonsPage })));
 const StatsPage = lazy(() => import('./components/StatsPage').then((m) => ({ default: m.StatsPage })));
 const ScaleMap = lazy(() => import('./components/ScaleMap').then((m) => ({ default: m.ScaleMap })));
+const PracticeCourse = lazy(() => import('./components/course/PracticeCourse').then((m) => ({ default: m.PracticeCourse })));
 const ScaleQuiz = lazy(() => import('./components/ScaleQuiz').then((m) => ({ default: m.ScaleQuiz })));
 import { useQuiz } from './hooks/useQuiz';
 import { useScore } from './hooks/useScore';
@@ -45,6 +46,7 @@ import { useSession } from './hooks/useSession';
 import { getLastSession, clearPracticeData } from './data/practiceStore';
 import { recordSkill, clearSkills } from './data/skillStore';
 import { isManualTempo } from './data/tempo';
+import { courseLocation, readCourseRoute, type CourseEntry } from './data/courseRoute';
 import type { SessionSummary } from './types/practice';
 import type { Phase } from './data/phases';
 import { PHASES } from './data/phases';
@@ -61,7 +63,7 @@ import { Segmented, Switch } from 'antd';
 import type { Accidental, FretPosition, NoteName, CagedFormName } from './types';
 import './index.css';
 
-type AppView = 'home' | 'practice' | 'theory' | 'stats' | 'settings';
+type AppView = 'home' | 'practice' | 'theory' | 'stats' | 'settings' | 'course';
 type TheoryTab = 'learn' | 'map' | 'scale' | 'caged' | 'voicing' | 'open' | 'diatonic' | 'arpeggio';
 
 function practiceRangeSummary(
@@ -113,8 +115,14 @@ const PRACTICE_MODE_GROUPS: { label: string; modes: { v: PracticeMode; l: string
 
 function App() {
   const [accidental, setAccidental] = useState<Accidental>('flat');
+  const [initialCourseRoute] = useState(() => readCourseRoute(
+    window.location.pathname, window.location.search, document.referrer,
+  ));
+  const [courseDay, setCourseDay] = useState<number | undefined>(initialCourseRoute?.day);
+  const [courseSource, setCourseSource] = useState<CourseEntry>(initialCourseRoute?.entry ?? 'direct');
   const [view, setView] = useState<AppView>(() =>
-    /\/ear-training\/?$/.test(window.location.pathname) ? 'practice' : 'home');
+    initialCourseRoute ? 'course'
+      : /\/ear-training\/?$/.test(window.location.pathname) ? 'practice' : 'home');
   const [theoryTab, setTheoryTab] = useState<TheoryTab>('learn');
   const [learnOpenId, setLearnOpenId] = useState<string | undefined>(undefined);
   const [activeStage, setActiveStage] = useState<Phase | null>(null);
@@ -171,13 +179,23 @@ function App() {
 
   useEffect(() => {
     const home = currentLanguageUrl();
-    const path = view === 'practice' && practiceMode === 'ear'
-      ? home + 'ear-training/' : home;
-    if (window.location.pathname !== path) {
-      window.history.replaceState(window.history.state, '',
-        path + window.location.search + window.location.hash);
+    let location: string;
+    if (view === 'course') {
+      location = courseLocation(home, courseDay, window.location.search, window.location.hash);
+    } else {
+      const path = view === 'practice' && practiceMode === 'ear' ? home + 'ear-training/' : home;
+      let search = window.location.search;
+      if (/\/course\/?$/.test(window.location.pathname)) {
+        const params = new URLSearchParams(search);
+        params.delete('day');
+        search = params.toString() !== '' ? '?' + params.toString() : '';
+      }
+      location = path + search + window.location.hash;
     }
-  }, [view, practiceMode]);
+    if (window.location.pathname + window.location.search + window.location.hash !== location) {
+      window.history.replaceState(window.history.state, '', location);
+    }
+  }, [view, practiceMode, courseDay]);
 
   const {
     quiz,
@@ -369,7 +387,21 @@ function App() {
   };
 
   // レッスンの「見る/練習する」導線: 理論サブタブ or 練習モードへ。
+  const openCourse = (entry: CourseEntry, day?: number) => {
+    stop();
+    setActiveStage(null);
+    setResult(null);
+    setCourseDay(day);
+    setCourseSource(entry);
+    setView('course');
+  };
+
   const handleLessonGoto = (target: string) => {
+    if (target === 'course' && currentLanguageUrl() === '/fretboard/en/') target = 'practice-triad';
+    if (target === 'course') {
+      openCourse('lesson', 1);
+      return;
+    }
     const practiceTarget: Record<string, PracticeMode> = {
       'practice-chord': 'chord-tone',
       'practice-prog': 'progression',
@@ -502,7 +534,7 @@ function App() {
 
   return (
     <div className="min-h-dvh flex flex-col bg-bg lg:pl-48">
-      <PwaReloadPrompt deferReload={view === 'practice'} />
+      <PwaReloadPrompt deferReload={view === 'practice' || view === 'course'} />
       <SideNav view={view} onChange={changeView} />
       <header
         className="border-b border-hair px-4 py-4 sm:px-8"
@@ -552,7 +584,13 @@ function App() {
             onOpenStats={() => setView('stats')}
             onShowHelp={() => { setSettingsShowHelp(true); setView('settings'); }}
             onLearn={goToLearn}
+            onStartCourse={(day) => openCourse('home_card', day)}
           />
+        )}
+
+        {view === 'course' && (
+          <PracticeCourse initialDay={courseDay} entry={courseSource} onDayChange={setCourseDay}
+            onLearn={goToLearn} onExit={() => changeView('home')} />
         )}
 
         {/* ===== 理論ビュー: サブナビ ===== */}
@@ -1135,7 +1173,7 @@ function App() {
   );
 }
 
-const NAV_ITEMS: { key: AppView; label: string }[] = [
+const NAV_ITEMS: { key: Exclude<AppView, 'course'>; label: string }[] = [
   { key: 'home', label: 'ホーム' },
   { key: 'practice', label: '練習' },
   { key: 'theory', label: '理論' },
@@ -1143,7 +1181,7 @@ const NAV_ITEMS: { key: AppView; label: string }[] = [
   { key: 'settings', label: '設定' },
 ];
 
-const VIEW_HEADINGS: Record<Exclude<AppView, 'home'>, { label: string; title: string; description: string }> = {
+const VIEW_HEADINGS: Record<Exclude<AppView, 'home' | 'course'>, { label: string; title: string; description: string }> = {
   practice: { label: 'PRACTICE', title: '指板で確かめる', description: '音名・度数・コード・耳の7種類の練習。1問ごとに反応時間を記録します。' },
   theory: { label: 'LEARN & REFERENCE', title: '音楽の仕組みをつかむ', description: 'レッスンで学び、指板で響きと形を確かめる。' },
   stats: { label: 'PROGRESS', title: '練習の成果を見る', description: '正確さと反応時間から、次に練習する場所を見つける。' },

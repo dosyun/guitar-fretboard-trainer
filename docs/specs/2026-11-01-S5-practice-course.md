@@ -122,7 +122,8 @@ interface CourseStore {
   version: 1;
   days: Record<number, {        // 回の番号（1〜5）
     startedAt: number;          // 最初に始めた時刻（ms）
-    completedAt?: number;       // ①〜④を終えた時刻
+    completedAt?: number;       // ①〜④を初めて終えた時刻。やり直しても上書きしない（gap の起点）
+    lastCompletedAt?: number;   // ①〜④を最後に終えた時刻
     hidden?: { correct: number; total: number };  // ②の結果
     switchBpm?: 60 | 72 | 84;   // ③で最後に使った BPM
     switchOk?: boolean;         // ③の自己申告
@@ -144,7 +145,7 @@ interface CourseStore {
 | イベント | いつ | パラメータ |
 |---|---|---|
 | `course_view` | コースの入口を表示 | `entry`（`direct`・`home_card`・`lesson`・`hub`。`?from=` か遷移元で決める） |
-| `course_day_start` | 回の①を表示 | `course_day`（1〜5）、`is_repeat`（その回を2度目以降なら true）、`gap`（直前の回を終えてからの日数の帯。`gft-course-v1` の `completedAt` から計算し、`same_day`・`1-7d`・`8d+`・`none`＝前の回を終えていない） |
+| `course_day_start` | 回の①を表示 | `course_day`（1〜5）、`is_repeat`（その回を2度目以降なら true）、`gap`（直前の回を終えてからの日数の帯。`gft-course-v1` の直前の回の `completedAt`（初回完了の時刻。復習しても動かない）から計算し、`same_day`・`1-7d`・`8d+`・`none`＝前の回を終えていない） |
 | `course_step_complete` | ①〜⑤の各ステップを終えた | `course_day`、`course_step`（`confirm`・`hidden`・`switch`・`retry`・`looper`）、`result`（②は正答数の帯 `0-4`・`5-7`・`8-10`、③は `ok`・`stalled`）、`bpm`（③だけ） |
 | `course_day_complete` | ①〜④を終えた | `course_day`、`days_completed`（それまでに終えた回の数） |
 | `course_to_looper` | ⑤のリンクを押した | `course_day` |

@@ -181,7 +181,7 @@ export const LESSONS: Lesson[] = [
       { q: 'メジャートライアドの構成は？', choices: ['R ♭3 5', 'R 3 5', 'R 3 ♭5'], answer: 1, why: '長3度＝メジャー(明るい)。' },
       { q: 'C メジャーの3度の音は？', choices: ['E♭', 'E', 'G'], answer: 1, why: 'Cから長3度＝E。' },
     ],
-    link: { label: 'トライアドを指板で組み立てる練習へ', target: 'practice-triad' },
+    link: { label: 'トライアドの練習コース第1回へ', target: 'course' },
   },
   {
     id: 'power-chord',

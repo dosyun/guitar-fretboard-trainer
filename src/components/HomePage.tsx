@@ -4,6 +4,8 @@ import { getOverallStats, getNoteRecognitionMetrics, getStreak } from '../data/p
 import { getMasterySummary } from '../data/mastery';
 import { getCompletedLessons } from '../data/lessonProgress';
 import { LESSONS } from '../data/lessons';
+import { getNextDay } from '../data/courseStore';
+import { currentLanguageUrl } from '../i18n';
 import { getNoteLabel } from '../data/fretboard';
 import { PhaseMap } from './PhaseMap';
 import { InstallPrompt } from './InstallPrompt';
@@ -26,6 +28,7 @@ interface HomePageProps {
   onOpenStats: () => void;
   onShowHelp: () => void;
   onLearn: (lessonId?: string) => void;
+  onStartCourse: (day: number) => void;
 }
 
 const FAST_MS = 1200;
@@ -57,7 +60,7 @@ function NextRow({ label, children, actions }: { label: ReactNode; children: Rea
   );
 }
 
-export function HomePage({ accidental, maxFret, dailyLength, goal, onStartGoal, onDailyLengthChange, onStartDaily, onStartPractice, onStartPhase, onOpenStats, onShowHelp, onLearn }: HomePageProps) {
+export function HomePage({ accidental, maxFret, dailyLength, goal, onStartGoal, onDailyLengthChange, onStartDaily, onStartPractice, onStartPhase, onOpenStats, onShowHelp, onLearn, onStartCourse }: HomePageProps) {
   const metrics = getNoteRecognitionMetrics();
   const streak = getStreak();
   const overall = getOverallStats();
@@ -121,6 +124,16 @@ export function HomePage({ accidental, maxFret, dailyLength, goal, onStartGoal, 
       <section aria-labelledby="next-title">
         <h2 id="next-title" className="text-sm font-semibold text-ink">次にやること</h2>
         <ul className="mt-2 divide-y divide-hair border-y border-hair">
+          {currentLanguageUrl() === '/fretboard/' && (
+            <NextRow label="コース" actions={
+              <button onClick={() => onStartCourse(getNextDay())} className="min-h-12 text-sm text-dim hover:text-ink">
+                コースをはじめる <span aria-hidden="true">→</span>
+              </button>
+            }>
+              <p className="text-base font-semibold text-ink">{`次は第${getNextDay()}回`}</p>
+              <p className="text-sm text-dim">トライアドを演奏で使う、1回約15分の練習です。</p>
+            </NextRow>
+          )}
           {hasData ? (
             worst && (
               <NextRow

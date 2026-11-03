@@ -8,6 +8,7 @@ import type { NoteName, IntervalName, FretPosition } from './index';
  * - position-to-note / note-to-position … 基本の音名認識（ヒートマップ対象）
  * - interval … 基本の度数モード（指板で度数を探す＝degreeStats を駆動）
  * - chordtone/progression/guidetone/keyfunc/ear … 各実戦クイズ（度数統計は汚さない）
+ * - course-triad … コースの回答（保存のみ。既存の成績集計から除外）
  */
 export type QuizType =
   | 'position-to-note'
@@ -17,7 +18,8 @@ export type QuizType =
   | 'progression'
   | 'guidetone'
   | 'keyfunc'
-  | 'ear';
+  | 'ear'
+  | 'course-triad';
 
 /** 指板ヒートマップの色付け対象になるクイズ種別 (音名認識のみ) */
 export const NOTE_RECOGNITION_TYPES: QuizType[] = ['position-to-note', 'note-to-position'];
@@ -40,6 +42,7 @@ export interface PracticeAttempt {
   wrong?: string; // 誤答時にユーザーが選んだ/触れた音名（混同ペア診断用）
   rootNote?: NoteName; // interval: ルート
   degree?: IntervalName; // interval: 度数
+  courseKey?: string;
   createdAt: number; // epoch ms
 }
 
@@ -54,6 +57,7 @@ export interface AttemptInput {
   wrong?: string;
   rootNote?: NoteName;
   degree?: IntervalName;
+  courseKey?: string;
 }
 
 /** セッション要約 (結果画面・前回比の単位) */

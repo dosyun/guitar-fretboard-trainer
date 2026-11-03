@@ -11,12 +11,15 @@ interface FretboardProps {
   highlightPosition: FretPosition | null;
   feedback: Feedback;
   correctPositions?: FretPosition[];
+  /** 共通音などを中立の琥珀で示す位置。 */
+  accentPositions?: FretPosition[];
   rootPosition?: FretPosition;
   ghostLabels?: { position: FretPosition; label: string }[];
   /** 出題位置が無いときに、横スクロールで中央に寄せるフレット */
   focusFret?: number;
   showLabelAt?: (stringIndex: number, fret: number) => string | undefined;
   onPositionClick?: (pos: FretPosition) => void;
+  playOnClick?: boolean;
   scrollContainerRef?: RefObject<HTMLElement | null>;
 }
 
@@ -67,11 +70,13 @@ export function Fretboard({
   highlightPosition,
   feedback,
   correctPositions,
+  accentPositions,
   rootPosition,
   ghostLabels,
   focusFret,
   showLabelAt,
   onPositionClick,
+  playOnClick = true,
   scrollContainerRef,
 }: FretboardProps) {
   const totalWidth = PADDING_LEFT + NUT_WIDTH + FRET_WIDTH * maxFret + PADDING_RIGHT;
@@ -246,6 +251,7 @@ export function Fretboard({
       {/* フレットマーカー (インタラクティブ) */}
       {Array.from({ length: 6 }, (_, s) =>
         Array.from({ length: maxFret + 1 }, (_, f) => {
+          const accented = accentPositions?.some((p) => p.string === s && p.fret === f) ?? false;
           const highlighted = isHighlighted(s, f);
           const isCorrect = isCorrectPos(s, f);
           const isRoot = rootPosition?.string === s && rootPosition?.fret === f;
@@ -262,13 +268,13 @@ export function Fretboard({
               key={`m-${s}-${f}`}
               cx={posX(f)}
               cy={stringY(s)}
-              highlighted={highlighted || isCorrect || isRoot}
+              highlighted={highlighted || isCorrect || isRoot || accented}
               feedback={markerFeedback}
               showLabel={label}
               // 出題位置のハイライトは中立色(琥珀)。音高カラーは答え/正解表示(label)のときだけ。
-              noteColor={label && !isRoot ? note : undefined}
+              noteColor={label && !isRoot && !accented ? note : undefined}
               ariaLabel={`${6 - s}弦 ${f === 0 ? '開放' : `${f}フレット`}`}
-              onClick={onPositionClick ? () => { playMidi(getMidiAt(s, f)); onPositionClick({ string: s, fret: f }); } : undefined}
+              onClick={onPositionClick ? () => { if (playOnClick) playMidi(getMidiAt(s, f)); onPositionClick({ string: s, fret: f }); } : undefined}
             />
           );
         })

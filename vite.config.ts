@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
           en: resolve('en/index.html'),
           earTrainingJa: resolve('ear-training/index.html'),
           earTrainingEn: resolve('en/ear-training/index.html'),
+          courseJa: resolve('course/index.html'),
           memorizeGuideJa: resolve('guides/memorize-fretboard/index.html'),
           // コード別の押さえ方（scripts/generate-chord-pages.mjs の生成物）
           ...Object.fromEntries(['f', 'g', 'c', 'd'].map((slug) => [`chord_${slug}`, resolve(`chords/${slug}/index.html`)])),
@@ -109,9 +110,10 @@ export default defineConfig(({ mode }) => {
           cacheId: 'gft-fretboard',
           // 未知の URL はオンライン・オフラインともアプリへ置き換えない。
           navigateFallback: null,
-          // 各ディレクトリの専用 HTML に解決し、言語と耳トレの URL を保つ。
-          // 下の globPatterns で4つの HTML をすべて precache に含める。
+          // 各ディレクトリの専用 HTML に解決し、言語と各機能の URL を保つ。
+          // 下の globPatterns ですべての専用 HTML を precache に含める。
           directoryIndex: 'index.html',
+          ignoreURLParametersMatching: [/^utm_/, /^fbclid$/, /^day$/, /^from$/],
           // フォントも同梱(woff2)なので precache に含まれオフライン対応。外部フォント取得なし。
           globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,webmanifest}'],
         },

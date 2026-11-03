@@ -28,6 +28,8 @@ export function setSoundEnabled(on: boolean): void {
   } catch {
     /* ignore */
   }
+  if (!on) cancelScheduled();
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('gft-sound-change'));
   if (on) {
     // 切替時に小さく鳴らして“出た”ことを示す（ユーザー操作中なので解錠もできる）
     playMidi(69, 0, 0.5, 0.6);
@@ -77,4 +79,71 @@ export function playChord(midis: number[]): void {
 /** 分散（アルペジオ、step秒間隔で上昇）。 */
 export function playArpeggio(midis: number[], step = 0.16): void {
   midis.forEach((m, i) => playMidi(m, i * step, 0.9, 0.9));
+}
+
+export type ScheduledAudio = () => void;
+const scheduled = new Set<ScheduledAudio>();
+const silence: ScheduledAudio = () => {};
+
+/** AudioContext の絶対時刻。利用できない環境では null。 */
+export function getAudioTime(): number | null {
+  return getCtx()?.currentTime ?? null;
+}
+
+export function getAudioState(): AudioContextState | null {
+  return ctx?.state ?? null;
+}
+
+/** 指定した予約だけ、引数なしなら全予約を取り消す。 */
+export function cancelScheduled(handles?: readonly ScheduledAudio[]): void {
+  for (const cancel of handles ?? [...scheduled]) cancel();
+}
+
+function scheduleTone(ac: AudioContext, frequency: number, t0: number,
+  dur: number, gainScale: number): ScheduledAudio {
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type = 'triangle';
+  osc.frequency.value = frequency;
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, 0.2 * gainScale), t0 + 0.008);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(gain).connect(ac.destination);
+  let cancelled = false;
+  const cleanup = () => {
+    cancelled = true;
+    scheduled.delete(cancel);
+    osc.disconnect();
+    gain.disconnect();
+  };
+  const cancel = () => {
+    if (cancelled) return;
+    cancelled = true;
+    try { osc.stop(); } catch { /* 終了済みでも後始末は続ける。 */ }
+    gain.gain.cancelScheduledValues(ac.currentTime);
+    gain.gain.setValueAtTime(0, ac.currentTime);
+    cleanup();
+  };
+  osc.onended = cleanup;
+  scheduled.add(cancel);
+  osc.start(t0);
+  osc.stop(t0 + dur + 0.05);
+  return cancel;
+}
+
+/** 和音を AudioContext の絶対時刻で予約する。 */
+export function scheduleChord(midis: number[], time: number): ScheduledAudio {
+  if (!enabled) return silence;
+  const ac = getCtx();
+  if (!ac || !Number.isFinite(time)) return silence;
+  const handles = midis.map((midi) => scheduleTone(ac, midiToFreq(midi), time, 1.5, 0.7));
+  return () => cancelScheduled(handles);
+}
+
+/** 各拍のクリック。小節頭は高い音で区別する。 */
+export function scheduleClick(time: number, accent = false): ScheduledAudio {
+  if (!enabled) return silence;
+  const ac = getCtx();
+  if (!ac || !Number.isFinite(time)) return silence;
+  return scheduleTone(ac, accent ? 1200 : 800, time, 0.045, accent ? 0.5 : 0.3);
 }
