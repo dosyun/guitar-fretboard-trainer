@@ -110,12 +110,85 @@ export function getScalePositions(
   return results;
 }
 
-/** 5つのボックスポジションに分割 */
+export type ScaleBox = { boxIndex: number; fretRange: [number, number]; positions: { pos: FretPosition; degree: string }[] };
+
+const PENTATONIC_SCALES: ScaleName[] = ['minor-pentatonic', 'major-pentatonic', 'blues'];
+const MINOR_PENTA_INTERVALS = [0, 3, 5, 7, 10];
+const TUNING = [40, 45, 50, 55, 59, 64]; // MIDI: E A D G B E
+
+export function isPentatonicBoxScale(scaleName: ScaleName): boolean {
+  return PENTATONIC_SCALES.includes(scaleName);
+}
+
+/**
+ * 5つのボックスポジションに分割
+ * ペンタ系（マイナー・メジャー・ブルース）は各弦2音ずつの標準の5ポジション。
+ * 7音スケールはフレット幅で機械的に区切った目安（getFretSliceBoxes）。
+ */
 export function getScaleBoxPositions(
   scaleName: ScaleName,
   rootNote: NoteName,
   maxFret: number = 22,
-): { boxIndex: number; fretRange: [number, number]; positions: { pos: FretPosition; degree: string }[] }[] {
+): ScaleBox[] {
+  return isPentatonicBoxScale(scaleName)
+    ? getPentatonicBoxes(scaleName, rootNote, maxFret)
+    : getFretSliceBoxes(scaleName, rootNote, maxFret);
+}
+
+/**
+ * ペンタの5ポジション。6弦のマイナーペンタのルートから低い順に5音を並べ、
+ * 第k箱はk番目の音から12音を各弦2音ずつ6弦→1弦に割り当てる（Aマイナーなら第1が5〜8F）。
+ * メジャーペンタは同じ5音のマイナーペンタ（短3度下）と同じ箱を同じ番号にする（Cメジャーの第1＝Aマイナーの第1）。
+ * ブルースはマイナーペンタの箱に、箱のフレット範囲に入る♭5を足す。
+ * 箱が maxFret をはみ出すときは12フレット下と比べ、見える音が多い方に置く（同数なら元の位置）。
+ */
+function getPentatonicBoxes(scaleName: ScaleName, rootNote: NoteName, maxFret: number): ScaleBox[] {
+  const scale = SCALES[scaleName];
+  const rootIndex = getNoteIndex(rootNote);
+  const minorRoot = scaleName === 'major-pentatonic' ? (rootIndex + 9) % 12 : rootIndex;
+  const startPitch = TUNING[0] + (minorRoot - TUNING[0] % 12 + 12) % 12;
+
+  // 6弦のマイナーペンタのルートから上へ、16音（第5箱の最後の音まで）
+  const pitches: number[] = [];
+  for (let p = startPitch; pitches.length < 16; p++) {
+    if (MINOR_PENTA_INTERVALS.includes((p - startPitch) % 12)) pitches.push(p);
+  }
+
+  const degreeOf = (string: number, fret: number) => {
+    const idx = scale.intervals.indexOf(((TUNING[string] + fret) % 12 - rootIndex + 12) % 12);
+    return scale.degreeLabels[idx];
+  };
+  const visible = (fret: number) => fret >= 0 && fret <= maxFret;
+
+  return [0, 1, 2, 3, 4].map((boxIndex) => {
+    const frets = pitches
+      .slice(boxIndex, boxIndex + 12)
+      .map((p, i) => ({ string: Math.floor(i / 2), fret: p - TUNING[Math.floor(i / 2)] }));
+    const lowered = frets.map((f) => ({ ...f, fret: f.fret - 12 }));
+    const countVisible = (fs: typeof frets) => fs.filter((f) => visible(f.fret)).length;
+    const chosen = (countVisible(lowered) > countVisible(frets) ? lowered : frets).filter((f) => visible(f.fret));
+
+    const fretValues = chosen.map((f) => f.fret);
+    const fretRange: [number, number] = [Math.min(...fretValues), Math.max(...fretValues)];
+
+    const positions = chosen.map(({ string, fret }) => ({ pos: { string, fret }, degree: degreeOf(string, fret) }));
+    if (scaleName === 'blues') {
+      for (const p of getScalePositions(scaleName, rootNote, maxFret)) {
+        if (p.degree === '♭5' && p.pos.fret >= fretRange[0] && p.pos.fret <= fretRange[1]) positions.push(p);
+      }
+    }
+    positions.sort((a, b) => a.pos.string - b.pos.string || a.pos.fret - b.pos.fret);
+
+    return { boxIndex, fretRange, positions };
+  });
+}
+
+/** 7音スケール用: 6弦ルートの1フレット手前から一定幅で5つに区切る */
+function getFretSliceBoxes(
+  scaleName: ScaleName,
+  rootNote: NoteName,
+  maxFret: number,
+): ScaleBox[] {
   const allPositions = getScalePositions(scaleName, rootNote, maxFret);
 
   // ルート音のフレット位置を6弦で見つける（基準点）
@@ -124,14 +197,8 @@ export function getScaleBoxPositions(
   let rootFret6 = (rootIndex - tuning6 % 12 + 12) % 12;
   if (rootFret6 === 0) rootFret6 = 12; // 開放弦の場合は12Fを基準に
 
-  // ペンタトニック: 各ポジションは約3-4フレット幅
-  // メジャー/マイナー: 各ポジションは約4-5フレット幅
-  // 汎用的に: 指板を均等に5分割ではなく、スケールの構造に基づいて分割
-
-  // シンプルなアプローチ: フレット範囲を5つに分割
-  // 各ボックスの開始フレットを計算
-  const isPenta = scaleName.includes('pentatonic');
-  const boxWidth = isPenta ? 3 : 4;
+  // シンプルなアプローチ: フレット範囲を4フレット幅で5つに分割
+  const boxWidth = 4;
 
   // ルートの6弦ポジションを基準にボックスを配置
   const boxStarts: number[] = [];

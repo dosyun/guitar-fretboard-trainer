@@ -57,7 +57,7 @@ import { useScaleQuiz } from './hooks/useScaleQuiz';
 import { getNoteAt, getIntervalAt, getAllPositionsForNote, INTERVAL_NAMES } from './data/fretboard';
 import { toneWhy } from './data/theory';
 import { CAGED_ORDER } from './data/caged';
-import { SCALES, SCALE_LIST, SCALE_COLORS } from './data/scales';
+import { SCALES, SCALE_LIST, SCALE_COLORS, isPentatonicBoxScale } from './data/scales';
 import type { ScaleName } from './data/scales';
 import { Segmented, Switch } from 'antd';
 import type { Accidental, FretPosition, NoteName, CagedFormName } from './types';
@@ -984,6 +984,13 @@ function App() {
                     </button>
                   ))}
                 </div>
+                <p className="text-xs text-dim text-center">
+                  {scaleName === 'major-pentatonic'
+                    ? '1〜5は各弦2音ずつの箱。番号は同じ5音のマイナーペンタと同じで、Cメジャーの1はAマイナーの1と同じ箱です。'
+                    : isPentatonicBoxScale(scaleName)
+                      ? '1〜5は各弦2音ずつの箱。6弦のルートが左端の箱を1とします。'
+                      : '7音スケールの1〜5は、6弦のルートの1フレット手前から4フレットずつ区切った目安です。'}
+                </p>
 
                 {/* 表示モード */}
                 <div className="flex justify-center">
