@@ -33,3 +33,6 @@ temp/
 # Pinterest の参考画像（公開リポジトリには載せない）
 docs/design-system/pinterest-directions.jpg
 docs/design-system/directions.png
+
+# 定点観測レポート（site-report が生成。ダッシュボードはファイルを直接読む）
+/report/
