@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import type { NoteName, FretPosition, Feedback } from '../types';
 import type { ScaleName } from '../data/scales';
 import { getRandomScalePosition, isInScale, SCALES } from '../data/scales';
+import { pickFresh } from '../data/questionPick';
 
 const FEEDBACK_DELAY = 800;
 
@@ -94,9 +95,15 @@ export function useScaleQuiz({
   const [started, setStarted] = useState(false);
   const feedbackTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
+  // 直前と同じ位置は出さない（同じ問題が続くと「次へ進まない」ように見えるため）
   const nextQuestion = useCallback(() => {
-    setQuiz(generateQuestion(quiz.mode, rootNote, scaleName, maxFret, boxFretRange));
-  }, [quiz.mode, rootNote, scaleName, maxFret, boxFretRange]);
+    const keyOf = (q: ScaleQuizState) => q.currentPosition ? `${q.currentPosition.string}:${q.currentPosition.fret}` : '';
+    setQuiz(pickFresh(
+      () => generateQuestion(quiz.mode, rootNote, scaleName, maxFret, boxFretRange),
+      keyOf,
+      [keyOf(quiz)],
+    ));
+  }, [quiz, rootNote, scaleName, maxFret, boxFretRange]);
 
   const start = useCallback((mode: ScaleQuizMode) => {
     setStarted(true);

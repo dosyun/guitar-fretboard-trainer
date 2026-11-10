@@ -211,6 +211,8 @@ function App() {
     setRootNote,
     toggleHint,
     correctPositions,
+    foundPositions,
+    repeatTap,
   } = useQuiz({
     maxFret,
     accidental,
@@ -332,6 +334,7 @@ function App() {
       return `${6 - quiz.currentPosition.string}弦 ${quiz.currentPosition.fret}フレットの音名は？`;
     }
     if (quiz.mode === 'note-to-position' && quiz.currentNote) {
+      if (foundPositions.length > 0) return `まだ答えていない「${quiz.currentNote}」の位置をタップしてください`;
       return `「${quiz.currentNote}」の位置をタップしてください`;
     }
     if (quiz.mode === 'interval' && quiz.currentPosition) {
@@ -815,6 +818,9 @@ function App() {
                 {quiz.mode === 'interval' && quiz.feedback && (
                   <p className="text-xs text-dim font-mono text-pretty">{getIntervalWhy()}</p>
                 )}
+                {repeatTap && !quiz.feedback && (
+                  <p className="text-sm text-dim text-pretty">{`そこはこの回で答えた場所です。別の「${quiz.currentNote}」を探してください。`}</p>
+                )}
                 {!quiz.feedback && (quiz.mode === 'position-to-note' || quiz.mode === 'interval') && (
                   <div>
                     <button onClick={toggleHint} className="min-h-12 text-sm text-dim hover:text-ink underline">
@@ -863,6 +869,10 @@ function App() {
                   feedback={quiz.feedback}
                   correctPositions={correctPositions}
                   showLabelAt={showLabelAt}
+                  // 同じ音が続く問題（1音ドリル）では、この回で答えた場所に薄く音名を出して「別の場所を」と促す
+                  ghostLabels={started && quiz.currentNote && !quiz.feedback
+                    ? foundPositions.map((position) => ({ position, label: quiz.currentNote as string }))
+                    : undefined}
                   onPositionClick={started && quiz.mode === 'note-to-position' ? handlePositionClick : undefined}
                   scrollContainerRef={fretboardScrollRef}
                 />

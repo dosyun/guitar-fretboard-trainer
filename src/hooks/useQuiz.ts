@@ -13,6 +13,9 @@ import { pickWeightedPosition, pickWeightedIntervalPosition } from '../data/prac
 import { isManualTempo } from '../data/tempo';
 import type { Phase } from '../data/phases';
 import { generateDegreeQuestion } from '../data/stageTutorial';
+import {
+  pickFresh, EMPTY_FOUND, cellKey, foundForQuestion, isFoundAgain, addFound, type FoundCells,
+} from '../data/questionPick';
 
 // 正解=素早く次へ。誤答=正解や「なぜ」を読む時間を確保して長めに。
 const CORRECT_DELAY = 800;
@@ -43,6 +46,7 @@ function generateQuestion(
   noteFilter: string[] | null,
   adaptive: boolean,
   stage?: Phase,
+  avoid: ReadonlySet<string> = new Set(),
 ): QuizState {
   if (stage?.mode === 'interval') {
     const { position, rootPosition } = generateDegreeQuestion(stage);
@@ -54,11 +58,12 @@ function generateQuestion(
   }
   if (mode === 'position-to-note' || mode === 'interval') {
     // adaptive(=デイリー)は弱点優先。チャレンジは純ランダム。
+    const excluded = (p: FretPosition) => avoid.has(`p:${p.string}:${p.fret}`);
     const weak = !adaptive
       ? null
       : mode === 'position-to-note'
-        ? pickWeightedPosition('position-to-note', strings, fretRange, noteFilter, accidental)
-        : pickWeightedIntervalPosition(rootNote, strings, fretRange, noteFilter, accidental);
+        ? pickWeightedPosition('position-to-note', strings, fretRange, noteFilter, accidental, excluded)
+        : pickWeightedIntervalPosition(rootNote, strings, fretRange, noteFilter, accidental, excluded);
     const pos = weak ?? getRandomPosition(maxFret, strings, fretRange, noteFilter, accidental);
     return {
       mode,
@@ -71,7 +76,8 @@ function generateQuestion(
   }
   // note-to-position: adaptiveなら弱点セルの音名、そうでなければランダムな音名
   const weakPos = adaptive
-    ? pickWeightedPosition('note-to-position', strings, fretRange, noteFilter, accidental)
+    ? pickWeightedPosition('note-to-position', strings, fretRange, noteFilter, accidental,
+      (p) => avoid.has(`n:${getNoteAt(p.string, p.fret, accidental)}`))
     : null;
   const note = weakPos
     ? getNoteAt(weakPos.string, weakPos.fret, accidental)
@@ -118,6 +124,9 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
   const answeredRef = useRef(false);
   const answerCountRef = useRef(0);
   const roundCompleteRef = useRef(onRoundComplete);
+  // 音名→位置で同じ音が続くとき（1音ドリル）の答え済みの場所。押し直しは数えない。
+  const [found, setFound] = useState<FoundCells>(EMPTY_FOUND);
+  const [repeatTap, setRepeatTap] = useState(false);
 
   useEffect(() => { roundCompleteRef.current = onRoundComplete; }, [onRoundComplete]);
   useEffect(() => () => {
@@ -137,12 +146,15 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       const nf = stage ? stage.notes : scope ? scope.noteFilter : noteFilter;
       const ad = stage ? false : adaptiveRef.current;
       const mf = stage ? 12 : maxFret;
-      // 直近6問と被らない問題を最大6回まで引き直す。
-      let q = generateQuestion(mode, rootNote, mf, accidental, ss, fr, nf, ad, stage);
-      for (let i = 0; i < 6 && recentKeys.current.includes(keyOf(q)); i++) {
-        q = generateQuestion(mode, rootNote, mf, accidental, ss, fr, nf, ad, stage);
-      }
+      // 直近6問を避け、候補が2つ以上ある限り直前と同じ問題は出さない。
+      const q = pickFresh(
+        (avoid) => generateQuestion(mode, rootNote, mf, accidental, ss, fr, nf, ad, stage, avoid),
+        keyOf,
+        recentKeys.current,
+      );
       recentKeys.current = [...recentKeys.current, keyOf(q)].slice(-6);
+      setFound((prev) => foundForQuestion(prev, q.mode === 'note-to-position' ? q.currentNote : null));
+      setRepeatTap(false);
       return q;
     },
     [maxFret, accidental, strings, fretRange, noteFilter, stage]
@@ -192,6 +204,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       setShowHint(false);
       adaptiveRef.current = adaptive;
       recentKeys.current = [];
+      setFound(EMPTY_FOUND);
       setQuiz(buildQuestion(mode, rootNote, scope));
       questionShownAt.current = Date.now();
     },
@@ -288,6 +301,12 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
   const answerPosition = useCallback(
     (pos: FretPosition) => {
       if (!activeRef.current || answeredRef.current || quiz.feedback || !quiz.currentNote) return;
+      const cell = cellKey(pos.string, pos.fret);
+      // 同じ音が続く問題で、さっき答えた場所をもう一度押しても数えない
+      if (isFoundAgain(found, quiz.currentNote, cell)) {
+        setRepeatTap(true);
+        return;
+      }
       answeredRef.current = true;
       answerCountRef.current++;
 
@@ -295,6 +314,13 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       const isCorrect = correctPositions.some(
         (p) => p.string === pos.string && p.fret === pos.fret
       );
+      if (isCorrect) {
+        const inScope = correctPositions
+          .filter((p) => (strings.length === 0 || strings.includes(p.string)) && p.fret >= fretRange[0] && p.fret <= fretRange[1])
+          .map((p) => cellKey(p.string, p.fret));
+        setFound((prev) => addFound(prev, quiz.currentNote as string, cell, inScope));
+      }
+      setRepeatTap(false);
 
       if (isCorrect) onCorrect();
       else onWrong();
@@ -323,7 +349,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
         advanceQuestion();
       }, isCorrect ? CORRECT_DELAY : WRONG_DELAY);
     },
-    [quiz.feedback, quiz.currentNote, maxFret, accidental, onCorrect, onWrong, onAttempt, advanceQuestion]
+    [quiz.feedback, quiz.currentNote, found, strings, fretRange, maxFret, accidental, onCorrect, onWrong, onAttempt, advanceQuestion]
   );
 
   const setMode = useCallback(
@@ -358,6 +384,15 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
       ? getAllPositionsForNote(quiz.currentNote, maxFret, accidental)
       : undefined;
 
+  // 同じ音が続くときに、この回ですでに答えた場所（指板に表示して「別の場所を」と促す）
+  const foundPositions: FretPosition[] =
+    quiz.mode === 'note-to-position' && found.note === quiz.currentNote
+      ? found.cells.map((c) => {
+        const [string, fret] = c.split(':').map(Number);
+        return { string, fret };
+      })
+      : [];
+
   return {
     quiz,
     started,
@@ -372,5 +407,7 @@ export function useQuiz({ maxFret, accidental, strings, fretRange, noteFilter, o
     setRootNote,
     toggleHint,
     correctPositions,
+    foundPositions,
+    repeatTap,
   };
 }

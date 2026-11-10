@@ -304,6 +304,7 @@ export function pickWeightedPosition(
   fretRange: [number, number],
   noteFilter: string[] | null,
   accidental: Accidental,
+  exclude?: (position: FretPosition) => boolean,
 ): FretPosition | null {
   const ss = strings.length ? strings : [0, 1, 2, 3, 4, 5];
   const [lo, hi] = fretRange;
@@ -311,6 +312,8 @@ export function pickWeightedPosition(
   for (const s of ss) {
     for (let f = lo; f <= hi; f++) {
       if (noteFilter && noteFilter.length && !noteFilter.includes(getNoteAt(s, f, accidental))) continue;
+      // 直近に出した問題は候補から外す（同じ問題が続くと「進まない」ように見えるため）
+      if (exclude?.({ string: s, fret: f })) continue;
       candidates.push({ string: s, fret: f });
     }
   }
@@ -340,6 +343,7 @@ export function pickWeightedIntervalPosition(
   fretRange: [number, number],
   noteFilter: string[] | null,
   accidental: Accidental,
+  exclude?: (position: FretPosition) => boolean,
 ): FretPosition | null {
   const ss = strings.length ? strings : [0, 1, 2, 3, 4, 5];
   const [lo, hi] = fretRange;
@@ -347,6 +351,8 @@ export function pickWeightedIntervalPosition(
   for (const s of ss) {
     for (let f = lo; f <= hi; f++) {
       if (noteFilter && noteFilter.length && !noteFilter.includes(getNoteAt(s, f, accidental))) continue;
+      // 直近に出した問題は候補から外す（同じ問題が続くと「進まない」ように見えるため）
+      if (exclude?.({ string: s, fret: f })) continue;
       candidates.push({ string: s, fret: f });
     }
   }

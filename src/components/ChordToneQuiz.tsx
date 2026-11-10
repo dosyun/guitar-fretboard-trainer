@@ -5,6 +5,7 @@ import { Fretboard } from './Fretboard';
 import { RootSelector } from './RootSelector';
 import { getNoteAt, getNoteNames, getNoteIndex, getAllPositionsForNote, INTERVAL_NAMES } from '../data/fretboard';
 import { CHORD_TYPES } from '../data/chords';
+import { pickOtherThan } from '../data/questionPick';
 import { toneWhy } from '../data/theory';
 import { useSession } from '../hooks/useSession';
 import { getLastSession } from '../data/practiceStore';
@@ -42,7 +43,9 @@ export function ChordToneQuiz({ accidental, maxFret, onLearn }: ChordToneQuizPro
   const regen = (r: NoteName, tid: string) => {
     const c = CHORD_TYPES.find((x) => x.id === tid)!;
     const ri = getNoteIndex(r);
-    const t = c.tones[Math.floor(Math.random() * c.tones.length)];
+    // 直前と同じ度数は出さない（同じ問題が続くと「次へ進まない」ように見え、同じ場所の押し直しで正答数が増えるため）
+    const previous = target && target.root === r ? c.tones.find((x) => x.st === target.st) : undefined;
+    const t = pickOtherThan(c.tones, previous);
     setTarget({ deg: t.deg, note: noteNames[(ri + t.st) % 12], st: t.st, root: r });
     setFeedback(null);
     setWrongPick(null);

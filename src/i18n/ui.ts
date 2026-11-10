@@ -171,6 +171,8 @@ export const uiEnglish: Record<string, string> = {
   "12フレット = 開放弦と同じ音({0})": "Fret 12 = the same note as the open string ({0})",
   "{0}弦 {1}フレットの音名は？": "What note is at fret {1} on string {0}?",
   "「{0}」の位置をタップしてください": "Tap a position for {0}",
+  "まだ答えていない「{0}」の位置をタップしてください": "Tap a position for {0} you haven't answered yet",
+  "そこはこの回で答えた場所です。別の「{0}」を探してください。": "You already answered that spot this round. Find another {0}.",
   "ルート {0} に対する度数は？ ({1}弦 {2}フレット)": "What interval is this from root {0}? (String {1}, fret {2})",
   "正解!": "Correct!",
   "不正解... 正解: {0}": "Incorrect. Answer: {0}",

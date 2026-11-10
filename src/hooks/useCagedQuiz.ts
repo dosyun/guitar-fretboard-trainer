@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import type { CagedFormName, CagedQuizMode, NoteName, FretPosition, Feedback } from '../types';
 import { getCagedPositions, getCagedChordTones, CAGED_ORDER } from '../data/caged';
+import { pickOtherThan } from '../data/questionPick';
 
 const FEEDBACK_DELAY = 1000;
 
@@ -20,16 +21,18 @@ export interface CagedQuizState {
   correctAnswer: string | null;
 }
 
-function randomForm(): CagedFormName {
-  return CAGED_ORDER[Math.floor(Math.random() * 5)];
+/** 直前と同じフォームは出さない（同じ盤面が続くと「次へ進まない」ように見えるため）。 */
+function randomForm(previous?: CagedFormName | null): CagedFormName {
+  return pickOtherThan(CAGED_ORDER, previous);
 }
 
 function generateQuestion(
   mode: CagedQuizMode,
   rootNote: NoteName,
   maxFret: number,
+  previousForm?: CagedFormName | null,
 ): CagedQuizState {
-  const form = randomForm();
+  const form = randomForm(previousForm);
 
   if (mode === 'identify-form') {
     const positions = getCagedPositions(form, rootNote, maxFret);
@@ -80,8 +83,8 @@ export function useCagedQuiz({ rootNote, maxFret, onCorrect, onWrong }: UseCaged
   const feedbackTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const nextQuestion = useCallback(() => {
-    setQuiz(generateQuestion(quiz.mode, rootNote, maxFret));
-  }, [quiz.mode, rootNote, maxFret]);
+    setQuiz(generateQuestion(quiz.mode, rootNote, maxFret, quiz.targetForm));
+  }, [quiz.mode, quiz.targetForm, rootNote, maxFret]);
 
   const start = useCallback((mode: CagedQuizMode) => {
     setStarted(true);
