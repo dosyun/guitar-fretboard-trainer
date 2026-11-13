@@ -52,6 +52,8 @@
       .fretboard-intro h1 { margin: 0 0 1.5rem; font-size: 1.5rem; line-height: 1.4; }
       .fretboard-intro p { margin: 1rem 0 0; line-height: 1.8; }
       @media (max-width: 52rem) { .fretboard-intro { margin: 1.5rem 1rem; } }
+      /* 1024px 未満は下部に固定ナビがあるため、最後の行が隠れないよう余白を取る */
+      @media (max-width: 63.99rem) { .fretboard-intro { margin-bottom: calc(6rem + env(safe-area-inset-bottom)); } }
     </style>
   </head>
   <body>
