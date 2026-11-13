@@ -46,6 +46,12 @@
     </script>
 
     <title>Guitar Fretboard Trainer — 指板を反射で覚える練習トレーナー</title>
+    <style>
+      .fretboard-intro { max-width: 48rem; margin: 2rem auto; padding: 1.5rem; background: var(--surface, #1b1813); border: 1px solid var(--hair, #322c22); border-radius: 0.75rem; }
+      .fretboard-intro h1 { margin: 0 0 1.5rem; font-size: 1.5rem; line-height: 1.4; }
+      .fretboard-intro p { margin: 1rem 0 0; line-height: 1.8; }
+      @media (max-width: 52rem) { .fretboard-intro { margin: 1.5rem 1rem; } }
+    </style>
   </head>
   <body>
     <nav aria-label="言語とツール一覧" class="flex justify-end gap-6 border-b border-hair bg-bg px-6 py-3 text-sm text-dim">
@@ -54,6 +60,12 @@
       <a href="https://guitartoolbox.site/fretboard/en/" lang="en" hreflang="en">English</a>
     </nav>
     <div id="root"></div>
+    <section class="fretboard-intro" aria-labelledby="fretboard-intro-heading">
+      <h1 id="fretboard-intro-heading">ギターの指板の音名と度数を反射で覚える練習トレーナー</h1>
+      <p>指板の位置を見て音名を答えるクイズで、ギターの指板を覚えるための練習アプリです。キーの主音から数えた音の位置である度数を答える問題もあります。1問ごとに回答までの時間を記録するので、正解できるかだけでなく、迷わずに答えられるかまで確かめられます。</p>
+      <p>成績の画面では、弦とフレットごとの間違えやすさと答えるまでの遅さをヒートマップで表示します。苦手な場所が色で分かるので、次に練習する範囲を絞れます。スケールや CAGED の形は指板図で確かめられ、トライアドやコードトーンを指板の上で探す練習もできます。音名の表記と練習する指板の範囲は、設定で自分に合わせて変えられます。</p>
+      <p>聴いたフレーズを指板で弾く練習は、<a href="/fretboard/ear-training/">耳コピ練習のページ</a>にまとめています。聴いた音と指板の位置を結び付けたいときに使ってください。まず開放弦に近い狭い範囲から始め、慣れたら範囲を広げていくと続けやすくなります。</p>
+    </section>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

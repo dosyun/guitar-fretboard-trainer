@@ -28,6 +28,18 @@ describe('static bilingual discovery', () => {
       });
       expect(html).toContain('<a href="' + hub + '"');
       expect(html).toContain('<a href="' + other + '"');
+      // トップの静的な説明セクション（JavaScript の前に読める見出しと本文）
+      const intro = html.match(/<section class="fretboard-intro"[\s\S]*?<\/section>/)?.[0];
+      expect(intro).toBeDefined();
+      expect(html.indexOf(intro!)).toBeGreaterThan(html.indexOf('<div id="root"></div>'));
+      expect([...intro!.matchAll(/<h1[\s>]/g)]).toHaveLength(1);
+      const text = [...intro!.matchAll(/<p>([\s\S]*?)<\/p>/g)].map((m) => m[1].replace(/<[^>]+>/g, '')).join('');
+      if (language === 'en') {
+        expect(intro).not.toMatch(/[\u3040-\u30ff\u4e00-\u9fff]/);
+      } else {
+        expect(text.length).toBeGreaterThanOrEqual(350);
+        expect(text.length).toBeLessThanOrEqual(600);
+      }
     });
   }
 
@@ -69,6 +81,7 @@ describe.runIf(existsSync(resolve('dist/fretboard/index.html')))('built bilingua
       const expected = 'https://guitartoolbox.site/fretboard/' + (page.startsWith('en/') ? 'en/' : '');
       expect(html).toContain('rel="canonical" href="' + expected + '"');
       expect([...html.matchAll(/rel="manifest"/g)]).toHaveLength(1);
+      expect([...html.matchAll(/<section class="fretboard-intro"[\s\S]*?<h1[\s>]/g)]).toHaveLength(1);
     }
     const manifest = JSON.parse(readFileSync(resolve('dist/fretboard/en/manifest.webmanifest'), 'utf8'));
     expect(manifest).toMatchObject({ lang: 'en', start_url: '/fretboard/en/', id: '/fretboard/en/', scope: '/fretboard/' });

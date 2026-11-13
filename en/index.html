@@ -47,6 +47,12 @@
     </script>
 
     <title>Guitar Fretboard Trainer — Learn Notes, Intervals & Chord Tones</title>
+    <style>
+      .fretboard-intro { max-width: 48rem; margin: 2rem auto; padding: 1.5rem; background: var(--surface, #1b1813); border: 1px solid var(--hair, #322c22); border-radius: 0.75rem; }
+      .fretboard-intro h1 { margin: 0 0 1.5rem; font-size: 1.5rem; line-height: 1.4; }
+      .fretboard-intro p { margin: 1rem 0 0; line-height: 1.8; }
+      @media (max-width: 52rem) { .fretboard-intro { margin: 1.5rem 1rem; } }
+    </style>
   </head>
   <body>
     <nav aria-label="Language and guitar tools" class="flex justify-end gap-6 border-b border-hair bg-bg px-6 py-3 text-sm text-dim">
@@ -54,6 +60,12 @@
       <a href="https://guitartoolbox.site/fretboard/" lang="ja" hreflang="ja">Japanese</a>
     </nav>
     <div id="root"></div>
+    <section class="fretboard-intro" aria-labelledby="fretboard-intro-heading">
+      <h1 id="fretboard-intro-heading">Guitar fretboard trainer for learning note names and scale degrees by reflex</h1>
+      <p>This practice app helps you learn the guitar fretboard with quick quizzes: a position is shown on the fretboard and you name the note. There are also questions on scale degrees, the position of a note counted from the tonic of the key. Every answer is timed, so you can check not only whether you are right but whether you can answer without hesitating.</p>
+      <p>The stats view shows a heatmap of every string and fret, colored by how often you miss it and how slowly you answer. Weak spots stand out, so you can narrow the range you practice next. Scale and CAGED shapes appear on fretboard diagrams, and you can practice finding triads and chord tones on the neck. You can change how note names are shown and which part of the fretboard you practice in the settings.</p>
+      <p>To practice playing back melodies you hear, open the <a href="/fretboard/en/ear-training/">ear training page</a>. It helps you connect what you hear with where the notes sit on the fretboard. Start with a narrow range near the open strings, then widen it as you get comfortable.</p>
+    </section>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
