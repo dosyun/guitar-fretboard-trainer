@@ -73,6 +73,18 @@ export default defineConfig(({ mode }) => {
   const measurementId = ${JSON.stringify(measurementId)};
   window.dataLayer = window.dataLayer || [];
   window.gtag = function () { window.dataLayer.push(arguments); };
+  // ?internal=1 で印を付けた運営者のブラウザでは gtag/js を読み込まない（送信されない）。?internal=0 で印を消す。
+  // 印は localStorage の gt_internal で、ハブ・/theory/ と同じオリジンなので、どのページで付けても除外される。
+  let internal = false;
+  try {
+    const params = new URLSearchParams(location.search);
+    if (params.get('internal') === '1') localStorage.setItem('gt_internal', '1');
+    if (params.get('internal') === '0') localStorage.removeItem('gt_internal');
+    internal = localStorage.getItem('gt_internal') === '1';
+  } catch {
+    // localStorage が使えない環境では印を読まず、通常どおり計測する
+  }
+  if (internal) return;
   window.gtag('js', new Date());
   window.gtag('config', measurementId);
   const script = document.createElement('script');
