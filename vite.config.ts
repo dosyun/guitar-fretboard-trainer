@@ -21,6 +21,10 @@ export default defineConfig(({ mode }) => {
           en: resolve('en/index.html'),
           earTrainingJa: resolve('ear-training/index.html'),
           earTrainingEn: resolve('en/ear-training/index.html'),
+          scaleCMajorJa: resolve('scales/c-major/index.html'),
+          scaleDorianJa: resolve('scales/dorian/index.html'),
+          scaleCMajorEn: resolve('en/scales/c-major/index.html'),
+          scaleDorianEn: resolve('en/scales/dorian/index.html'),
           courseJa: resolve('course/index.html'),
           memorizeGuideJa: resolve('guides/memorize-fretboard/index.html'),
           // コード別の押さえ方（scripts/generate-chord-pages.mjs の生成物）

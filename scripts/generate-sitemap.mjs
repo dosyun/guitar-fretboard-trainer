@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { CHORD_SLUGS } from './generate-chord-pages.mjs';
 
 export function renderSitemap() {
-  const bilingual = ['', 'ear-training/'].flatMap((page) => {
+  const bilingual = ['', 'ear-training/', 'scales/c-major/', 'scales/dorian/'].flatMap((page) => {
     const languages = [
       ['ja', `https://guitartoolbox.site/fretboard/${page}`],
       ['en', `https://guitartoolbox.site/fretboard/en/${page}`],

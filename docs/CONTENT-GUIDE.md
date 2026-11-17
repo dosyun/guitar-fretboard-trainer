@@ -72,3 +72,27 @@
 - 検証: `npm run build` のあとに `npx vitest run` と `npm run lint`（エラー0）。ビルド前にテストを回すと、古い `dist/` を検査して落ちることがある
 - 表示: `npm run preview` を開き、375px と 1280px で横はみ出しが0かを見る（preview は localhost で待ち受ける）
 - 公開: `master` への push で Workers Builds が自動でビルド・公開する（約3分）。手元からの `npm run deploy` は計測タグなしで出るので使わない
+
+## 日英の対で作る量産ページ
+
+「型と置き場所」「形式」の日本語だけの規定に対する例外です。
+日英は同じ構成にし、本文と FAQ は各言語で書きます。
+
+| 対象 | 置き場所・登録先 |
+|---|---|
+| 日本語版 | `<種類>/<スラッグ>/index.html`。スケールの見本は `scales/c-major/index.html` |
+| 英語版 | `en/<種類>/<スラッグ>/index.html` |
+| データと生成 | `scripts/<種類>-pages/*.mjs` と `scripts/generate-<種類>-pages.mjs` |
+| ビルド入力 | `vite.config.ts` に日英それぞれを登録 |
+| サイトマップ | `scripts/generate-sitemap.mjs` の `bilingual` に日本語側の相対パスを登録 |
+
+両言語の head に `hreflang="ja"`・`hreflang="en"`・`hreflang="x-default"` の3本を置き、x-default は英語版を指します。
+canonical は各ページ自身を指し、`html lang` は日本語版を `ja`、英語版を `en` にします。
+本文の上部に対になる言語への切り替えリンクを置きます。
+英語版の本文・title・description・aria-label には日本語の文字を含めません。
+
+ビルドとテストの前に生成スクリプトを実行します。
+スケールの見本は `node scripts/generate-scale-pages.mjs` です。
+生成物は直接編集せず、テストで実ファイルと生成スクリプトの出力を比較します。
+音名・度数・フレットは、生成コードとは独立した開放弦からの計算と仕様の手計算値で照合します。
+サイトマップの件数と言語の対応のテストも更新し、日本語だけの既存ページには hreflang を付けません。
